@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script src="config.js"></script>
 <style>
 /* ฟอนต์เอกสาร: ใช้ TH SarabunPSK ในเครื่องถ้ามี ไม่มีก็ใช้ Sarabun ที่ย่อขนาดให้ใกล้เคียง */
 @font-face{font-family:'SarabunDoc';font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/sarabun@5/files/sarabun-thai-400-normal.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;size-adjust:72%}
@@ -426,6 +427,28 @@ textarea{resize:vertical;min-height:40px;line-height:1.5}
 .icon.aiI{color:#7353f5}
 .sheet .pa button.a{color:#7353f5}
 
+/* ================= login gate ================= */
+.gate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 80% 10%,rgba(245,184,28,.22),transparent 40%),radial-gradient(circle at 10% 90%,rgba(47,124,246,.25),transparent 45%),linear-gradient(135deg,#0a1836,#1a3a7a)}
+.gateCard{width:min(420px,100%);background:var(--panel);color:var(--ink);border-radius:24px;padding:34px 30px 24px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);border-top:5px solid var(--gold)}
+.logo.big{width:64px;height:64px;border-radius:18px;margin:0 auto 14px}
+.logo.big svg{width:32px;height:32px}
+.gateCard h1{margin:0;font-size:26px}
+.gsub{margin:4px 0 20px;color:var(--muted);font-size:14.5px;line-height:1.5}
+.gbtn{width:100%;padding:13px 16px;font-size:16px;border-radius:12px}
+.gbtn svg{width:19px;height:19px}
+.gnote{font-size:12.5px;color:var(--muted);margin:14px 0 16px;line-height:1.55}
+.glink{display:block;margin:6px auto 0;background:none;border:0;color:var(--blue);font-size:13.5px;cursor:pointer;text-decoration:none;font-family:inherit}
+.glink:hover{text-decoration:underline}
+.gateMsg{font-size:13.5px;padding:10px 12px;border-radius:10px;margin-bottom:14px;background:var(--panel-2);color:var(--ink-2)}
+.gateMsg.err{background:color-mix(in srgb,var(--danger) 10%,var(--panel));color:var(--danger)}
+.acct{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);margin-bottom:12px}
+.acct .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4c6fd6,#7a5cf0);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.acct b{display:block;font-size:14.5px}
+.acct small{display:block;color:var(--muted);font-size:12.5px}
+.acct .btn{margin-left:auto}
+.rolePills button[disabled]{opacity:.45;cursor:not-allowed}
+.ssoTag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.3px}
+
 /* ================= dialogs / toast ================= */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;transition:.25s;pointer-events:none;z-index:80;box-shadow:var(--shadow-lg);display:flex;gap:8px;align-items:center}
 .toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
@@ -546,8 +569,23 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
     <symbol id="i-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14 9l2 2"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
   </defs>
 </svg>
+
+<div class="gate" id="gate" hidden>
+  <div class="gateCard">
+    <div class="logo big"><svg><use href="#i-doc"/></svg></div>
+    <h1>TOR Builder</h1>
+    <p class="gsub">ระบบร่างขอบเขตของงาน (TOR)<br><span data-agency>คณะครุศาสตร์อุตสาหกรรม</span></p>
+    <div class="gateMsg" id="gateMsg" hidden></div>
+    <button class="btn gold gbtn" id="ssoLogin"><svg><use href="#i-key"/></svg>เข้าสู่ระบบด้วย ICIT Account</button>
+    <p class="gnote">ใช้บัญชีเดียวกับระบบของมหาวิทยาลัย (KMUTNB SSO)<br>รหัสผ่านกรอกที่หน้าของมหาวิทยาลัยเท่านั้น ระบบนี้ไม่เห็นรหัสผ่านของคุณ</p>
+    <button class="glink" id="gateLocal">ใช้งานแบบไม่เชื่อมต่อ (เก็บข้อมูลในเครื่องนี้)</button>
+    <a class="glink" href="guide.html" target="_blank" rel="noopener">คู่มือการใช้งาน</a>
+  </div>
+</div>
 
 <div class="app">
   <aside class="side" id="side">
@@ -790,8 +828,9 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
     <p class="hint">ไฟล์ Word ใช้ฟอนต์ TH SarabunPSK · หน้า PDF ใช้ TH SarabunPSK ถ้ามีในเครื่อง ไม่มีจะใช้ Sarabun แทน</p>
     <div class="driveBox">
       <div class="dh"><span class="gd"><svg><use href="#i-drive"/></svg></span><div><b>เก็บข้อมูลใน Google Drive</b><small>ให้ทั้งทีมเปิดเอกสารชุดเดียวกัน · ดูวิธีติดตั้งใน README</small></div></div>
+      <div class="acct" id="acctBox" hidden><span class="av" id="acctAv">?</span><span style="min-width:0"><b id="acctName">—</b><small id="acctMeta">—</small></span><button class="btn sm" id="btnLogout"><svg><use href="#i-logout"/></svg>ออกจากระบบ</button></div>
       <div class="field"><label for="cUrl">Web app URL (จาก Google Apps Script)</label><input type="text" id="cUrl" placeholder="https://script.google.com/macros/s/…/exec" spellcheck="false"></div>
-      <div class="field"><label for="cKey">รหัสทีม (TEAM_KEY)</label><input type="password" id="cKey" placeholder="รหัสที่ตั้งไว้ใน Apps Script" autocomplete="off"></div>
+      <div class="field" id="cKeyBox"><label for="cKey">รหัสทีม (TEAM_KEY)</label><input type="password" id="cKey" placeholder="รหัสที่ตั้งไว้ใน Apps Script" autocomplete="off"></div>
       <div class="hint" id="cStatus"></div>
       <div class="row"><button class="btn primary sm" id="cConnect">เชื่อมต่อ</button><button class="btn sm" id="cInvite" hidden>คัดลอกลิงก์เชิญทีม</button><button class="btn sm danger" id="cDisconnect" hidden>ยกเลิกการเชื่อมต่อ</button></div>
     </div>
@@ -1457,7 +1496,7 @@ $('#pasteGo').onclick = () => {
    ========================================================= */
 let editMode = false, showTrack = true, drawerTab = 'changes';
 const ROLE = {maker:'ผู้จัดทำ', reviewer:'ผู้ตรวจสอบ'};
-const me = () => ({by: settings.userName || ROLE[settings.role || 'maker'], role: settings.role || 'maker'});
+const me = () => ({by: (typeof authValid === 'function' && authValid() ? auth.user.name : settings.userName) || ROLE[settings.role || 'maker'], role: settings.role || 'maker'});
 
 /* ---- ตัดคำภาษาไทยเพื่อเทียบความต่างระดับคำ ---- */
 const segmenter = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('th', {granularity:'word'}) : null;
@@ -1890,11 +1929,16 @@ $('#togTrack').onclick = () => { showTrack = !showTrack; $('#togTrack').classLis
 
 /* ---- บทบาทผู้ใช้ ---- */
 function applyRole(){
+  const su = authValid() ? auth.user : null;
+  if (su && su.role === 'maker' && settings.role !== 'maker'){ settings.role = 'maker'; store.set(K_SET, settings); }
+  const rb = document.querySelector('#rolePills [data-role="reviewer"]');
+  rb.disabled = !!(su && su.role === 'maker'); rb.title = rb.disabled ? 'บัญชีของคุณเป็นผู้จัดทำ — ขอสิทธิ์ผู้ตรวจสอบจากผู้ดูแลระบบ' : '';
+  if (su) settings.userName = su.name;
   const role = settings.role || 'maker';
   document.querySelectorAll('#rolePills button').forEach(b => b.classList.toggle('on', b.dataset.role === role));
   const name = settings.userName || '';
   $('#whoName').textContent = name || 'ตั้งชื่อผู้ใช้งาน';
-  $('#whoRole').textContent = ROLE[role] + (role === 'reviewer' ? ' · นักวิชาการพัสดุ' : ' · ผู้กำหนดรายละเอียด');
+  $('#whoRole').innerHTML = su ? `<span class="ssoTag">ICIT</span> ${esc(ROLE[role])}${su.role === 'admin' ? ' · ผู้ดูแล' : ''}` : ROLE[role] + (role === 'reviewer' ? ' · นักวิชาการพัสดุ' : ' · ผู้กำหนดรายละเอียด');
   $('#whoAv').textContent = name ? name.replace(/^(นาย|นางสาว|นาง|ดร\.|ผศ\.|รศ\.|อ\.)\s*/, '').trim().charAt(0) : '?';
   if (doc && !$('#viewEditor').hidden) renderFlow();
 }
@@ -1905,7 +1949,7 @@ $('#rolePills').addEventListener('click', e => {
   toast('สลับเป็น' + ROLE[settings.role] + 'แล้ว');
   if (!settings.userName) setTimeout(() => $('#whoBtn').click(), 400);
 });
-$('#whoBtn').onclick = () => { $('#navSettings').click(); setTimeout(() => $('#sUser').focus(), 50); };
+$('#whoBtn').onclick = () => { $('#navSettings').click(); setTimeout(() => (authValid() ? $('#acctBox') : $('#sUser')).scrollIntoView({block:'center'}), 50); if (!authValid()) setTimeout(() => $('#sUser').focus(), 60); };
 
 /* =========================================================
    บันทึก / โหลดร่าง
@@ -2224,12 +2268,15 @@ let cloudInfo = {};
 const pending = {};                     // id -> true = มีการแก้ที่ยังไม่ขึ้น Drive
 const saveTimers = {};
 let cloudLoaded = false;
-const cloudOn = () => !!(settings.cloudUrl && settings.cloudKey);
+const CFG = window.TOR_CONFIG || {};
+const cloudUrl = () => settings.cloudUrl || CFG.driveUrl || '';
+const cloudOn = () => !localMode() && !!cloudUrl() && (ssoMode() ? authValid() : !!settings.cloudKey);
 
-async function api(action, payload = {}, url = settings.cloudUrl, key = settings.cloudKey){
-  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(Object.assign({action, key}, payload))});
+async function api(action, payload = {}, url = cloudUrl(), key = settings.cloudKey){
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(Object.assign({action, key, session: authValid() ? auth.session : undefined}, payload))});
   if (!r.ok) throw new Error('เซิร์ฟเวอร์ตอบกลับ ' + r.status);
   let j; try { j = await r.json(); } catch(e){ throw new Error('URL ไม่ใช่ตัวเชื่อม TOR Builder (ตรวจว่าลงท้ายด้วย /exec และตั้ง Who has access = Anyone)'); }
+  if (j.relogin){ auth = null; store.set(K_AUTH, null); setCloud('off'); showGate(j.error, true); }
   if (!j.ok && !j.conflict) throw new Error(j.error || 'เกิดข้อผิดพลาด');
   return j;
 }
@@ -2343,14 +2390,30 @@ $('#dlgConflict').addEventListener('click', async e => {
 
 /* ---- ตั้งค่าการเชื่อมต่อ ---- */
 function renderCloudSettings(msg, ok){
-  $('#cUrl').value = settings.cloudUrl || ''; $('#cKey').value = settings.cloudKey || '';
+  $('#cUrl').value = cloudUrl(); $('#cKey').value = settings.cloudKey || '';
+  const sso = ssoMode();
+  $('#cKeyBox').hidden = sso; $('#acctBox').hidden = !authValid();
+  $('#sUser').disabled = authValid();
+  if (authValid()){
+    const u = auth.user;
+    $('#acctName').textContent = u.name; $('#acctAv').textContent = (u.name || '?').replace(/^(นาย|นางสาว|นาง|ดร\.|ผศ\.|รศ\.|อ\.)\s*/, '').charAt(0);
+    $('#acctMeta').textContent = [u.username, {admin:'ผู้ดูแลระบบ', reviewer:'ผู้ตรวจสอบ', maker:'ผู้จัดทำ'}[u.role], u.org].filter(Boolean).join(' · ');
+  }
   $('#cStatus').innerHTML = msg ? `<span style="color:${ok ? 'var(--ok)' : 'var(--danger)'}">${esc(msg)}</span>`
     : cloudOn() ? `<span style="color:var(--ok)">เชื่อมต่ออยู่${cloudInfo.owner ? ' · เก็บใน Drive ของ ' + esc(cloudInfo.owner) : ''}</span>` : 'ยังไม่ได้เชื่อมต่อ — ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น';
-  $('#cDisconnect').hidden = !cloudOn(); $('#cInvite').hidden = !cloudOn();
+  $('#cDisconnect').hidden = !cloudOn() || sso; $('#cInvite').hidden = !cloudOn() || sso;
+  $('#cConnect').hidden = sso && authValid();
+  if (sso && !msg) $('#cStatus').innerHTML = authValid() ? '<span style="color:var(--ok)">เชื่อม Google Drive ผ่านบัญชี ICIT แล้ว</span>' : 'ระบบนี้ใช้การเข้าสู่ระบบด้วย ICIT Account';
 }
 async function connectCloud(url, key){
   url = url.trim(); key = key.trim();
   if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) throw new Error('URL ต้องขึ้นต้นด้วย https://script.google.com/macros/s/ และลงท้ายด้วย /exec');
+  const conf = await api('config', {}, url, key);
+  if (conf.sso){   // เซิร์ฟเวอร์ใช้ ICIT Account → ไปหน้าเข้าสู่ระบบ
+    settings.cloudUrl = url; store.set(K_SET, settings); ssoConf = conf; store.set(K_SSOC, conf);
+    ss.del('torb.local');
+    $('#dlgSettings').close(); showGate('ระบบนี้ใช้ ICIT Account — กดปุ่มด้านล่างเพื่อเข้าสู่ระบบ'); return {owner:''};
+  }
   if (!key) throw new Error('กรุณากรอกรหัสทีม');
   const info = await api('ping', {}, url, key);
   settings.cloudUrl = url; settings.cloudKey = key; store.set(K_SET, settings);
@@ -2376,6 +2439,7 @@ $('#cInvite').onclick = async () => {
   catch(e){ prompt('คัดลอกลิงก์นี้ส่งให้ทีม (มีรหัสทีมอยู่ในลิงก์ ส่งเฉพาะคนในทีม)', link); }
 };
 $('#btnSync').onclick = () => cloudRefresh(false);
+$('#btnLogout').onclick = logout;
 $('#cloudState').onclick = () => { $('#navSettings').click(); setTimeout(() => $('#cUrl').scrollIntoView({block:'center'}), 50); };
 
 /* ---- ลิงก์เชิญทีม #/join/<ข้อมูล> ---- */
@@ -2661,6 +2725,83 @@ $('#btnAIDraft').onclick = openAIDraft;
 $('#heroAI').onclick = () => { const d = TEMPLATES[0].make(); d.items = []; openNew(d); setTimeout(openAIDraft, 50); };
 
 /* =========================================================
+   เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO · OpenID Connect + PKCE)
+   หน้าเว็บส่ง code ให้ Apps Script แลกเป็นข้อมูลผู้ใช้ (client secret อยู่ฝั่ง Google เท่านั้น)
+   ========================================================= */
+const K_AUTH = 'torb.auth.v1', K_SSOC = 'torb.ssoconf.v1';
+const ssMem = {};
+const ss = { get(k){ try { return sessionStorage.getItem(k); } catch(e){ return ssMem[k] ?? null; } }, set(k, v){ try { sessionStorage.setItem(k, v); } catch(e){ ssMem[k] = v; } }, del(k){ try { sessionStorage.removeItem(k); } catch(e){ delete ssMem[k]; } } };
+let auth = store.get(K_AUTH, null);
+let ssoConf = store.get(K_SSOC, null);
+const authValid = () => !!(auth && auth.session && auth.exp > Date.now());
+const ssoMode = () => !!(ssoConf && ssoConf.sso);
+const localMode = () => ss.get('torb.local') === '1';
+const redirectUri = () => location.origin + location.pathname.replace(/index\.html$/, '');
+const rand = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, x => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[x % 66]).join(''); };
+const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+function showGate(msg, isErr){
+  $('#gate').hidden = false;
+  $('#gateMsg').hidden = !msg; $('#gateMsg').textContent = msg || ''; $('#gateMsg').className = 'gateMsg' + (isErr ? ' err' : '');
+  $('#ssoLogin').disabled = false; $('#ssoLogin').innerHTML = `${svg('key')}เข้าสู่ระบบด้วย ICIT Account`;
+}
+function hideGate(){ $('#gate').hidden = true; }
+async function startLogin(){
+  const b = $('#ssoLogin'); b.disabled = true; b.innerHTML = '<span class="spin"></span>กำลังไปที่ KMUTNB SSO…';
+  try {
+    if (!ssoConf || !ssoConf.clientId){ ssoConf = await api('config'); store.set(K_SSOC, ssoConf); }
+    const verifier = rand(64), state = rand(24);
+    const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+    ss.set('torb.pkce', JSON.stringify({verifier, state, hash: location.hash && !location.hash.startsWith('#/join') ? location.hash : '#/home'}));
+    location.href = ssoConf.authorize + '?' + new URLSearchParams({response_type:'code', client_id:ssoConf.clientId, redirect_uri:redirectUri(), scope:ssoConf.scope, state, code_challenge:challenge, code_challenge_method:'S256'});
+  } catch(e){ showGate('เชื่อมต่อระบบไม่ได้: ' + e.message, true); }
+}
+async function finishLogin(q){
+  let saved = {}; try { saved = JSON.parse(ss.get('torb.pkce') || '{}'); } catch(e){}
+  try { history.replaceState(null, '', location.pathname + (saved.hash || '#/home')); } catch(e){}
+  if (q.get('error')) return showGate('SSO แจ้งว่า: ' + (q.get('error_description') || q.get('error')), true);
+  if (!saved.state || q.get('state') !== saved.state) return showGate('การเข้าสู่ระบบหมดเวลาหรือไม่ถูกต้อง กรุณาลองอีกครั้ง', true);
+  showGate('กำลังยืนยันตัวตนกับมหาวิทยาลัย…');
+  $('#ssoLogin').disabled = true; $('#ssoLogin').innerHTML = '<span class="spin"></span>กำลังเข้าสู่ระบบ…';
+  try {
+    const j = await api('login', {code:q.get('code'), verifier:saved.verifier, redirect_uri:redirectUri()});
+    auth = {session:j.session, user:j.user, exp:Date.now() + 11.5 * 3600e3}; store.set(K_AUTH, auth);
+    ss.del('torb.pkce');
+    settings.userName = j.user.name;
+    if (j.user.role === 'maker') settings.role = 'maker';
+    else if (!settings.role || j.user.role === 'reviewer') settings.role = 'reviewer';
+    store.set(K_SET, settings);
+    hideGate(); toast('ยินดีต้อนรับ ' + j.user.name);
+    return true;
+  } catch(e){ showGate(e.message, true); return false; }
+}
+function logout(){
+  const pend = Object.keys(pending).length;
+  if (pend && !confirm(`ยังมีการแก้ไข ${pend} ฉบับที่ยังไม่ขึ้น Google Drive — ออกจากระบบตอนนี้การแก้ไขนั้นจะค้างอยู่ในเครื่องนี้ ต้องการออกหรือไม่?`)) return;
+  const wipe = confirm('ลบสำเนาเอกสารที่เก็บไว้ในเครื่องนี้ด้วยไหม?\n(แนะนำถ้าเป็นเครื่องที่ใช้ร่วมกับผู้อื่น — ข้อมูลใน Google Drive ยังอยู่ครบ)');
+  if (wipe){ for (const id in drafts) if (!pending[id]) delete drafts[id]; syncRev = {}; saveAll(); saveSync(); doc = null; store.set(K_CUR, ''); }
+  auth = null; store.set(K_AUTH, null); cloudIndex = {};
+  $('#dlgSettings').open && $('#dlgSettings').close();
+  setCloud('off'); showGate('ออกจากระบบแล้ว');
+}
+async function bootAuth(){
+  if (!cloudUrl()) return true;                                   // ไม่มีเซิร์ฟเวอร์ → ใช้งานในเครื่อง
+  const q = new URLSearchParams(location.search);
+  if (q.get('code') || q.get('error')){
+    try { if (!ssoConf) { ssoConf = await api('config'); store.set(K_SSOC, ssoConf); } } catch(e){}
+    return await finishLogin(q);
+  }
+  try { ssoConf = await api('config'); store.set(K_SSOC, ssoConf); } catch(e){ /* ออฟไลน์: ใช้ค่าที่จำไว้ */ }
+  if (ssoMode() && !authValid() && !localMode()){ showGate(auth ? 'หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบอีกครั้ง' : ''); return false; }
+  return true;
+}
+$('#ssoLogin').onclick = startLogin;
+$('#gateLocal').onclick = () => {
+  ss.set('torb.local', '1');
+  hideGate(); setCloud('off'); toast('ใช้งานแบบไม่เชื่อมต่อ — ข้อมูลเก็บในเครื่องนี้เท่านั้น'); route(curPath || '#/home');
+};
+
+/* =========================================================
    อื่น ๆ
    ========================================================= */
 document.querySelectorAll('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
@@ -2680,8 +2821,12 @@ let toastT; function toast(m){ const t = $('#toast'); t.textContent = m; t.class
 
 applyTheme(); applyAgency(); updatePageStyle(); updateNavCounts(); applyRole();
 if (doc){ $('#navEdit').hidden = false; $('#navEdit').href = '#/edit/' + doc.id; $('#navEditName').textContent = doc.name || 'ร่างไม่มีชื่อ'; }
-route();
-setCloud(cloudOn() ? 'busy' : 'off'); cloudRefresh(true).then(applyAIVisibility); applyAIVisibility();
+(async () => {
+  const ok = await bootAuth();
+  applyRole(); route();
+  if (ok){ setCloud(cloudOn() ? 'busy' : 'off'); cloudRefresh(true).then(applyAIVisibility); }
+  applyAIVisibility();
+})();
 document.fonts && document.fonts.ready.then(fitSheet);
 </script>
 </body>

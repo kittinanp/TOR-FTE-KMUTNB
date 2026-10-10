@@ -10,18 +10,36 @@
  *  5) คัดลอก Web app URL (ลงท้ายด้วย /exec) ไปใส่ในหน้า “ตั้งค่า > Google Drive” ของระบบ
  *
  * ข้อมูลทั้งหมดถูกเก็บในโฟลเดอร์ “TOR Builder” บน Google Drive ของบัญชีที่ Deploy
+ *
+ * เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO) — ตั้งค่าใน Project Settings > Script Properties
+ *   SSO_CLIENT_ID       = Client ID ที่ได้จาก https://sso.kmutnb.ac.th (เมนูสำหรับนักพัฒนา)
+ *   SSO_CLIENT_SECRET   = Client Secret (เก็บที่นี่ที่เดียว ห้ามใส่ในหน้าเว็บ)
+ *   ALLOWED_ACCOUNT_TYPES = personnel            (ไม่บังคับ — ค่าเริ่มต้น personnel, คั่นด้วย , เช่น personnel,student)
+ *   ALLOWED_USERS       = user1,user2@kmutnb.ac.th (ไม่บังคับ — ถ้าใส่ จะให้เข้าได้เฉพาะรายชื่อนี้)
+ *   ALLOWED_ORG         = ครุศาสตร์อุตสาหกรรม     (ไม่บังคับ — จำกัดเฉพาะหน่วยงานที่มีคำนี้)
+ *   REVIEWERS           = รายชื่อ username/อีเมล นักวิชาการพัสดุ (ได้สิทธิ์ผู้ตรวจสอบ)
+ *   ADMINS              = รายชื่อผู้ดูแลระบบ (ได้ทุกสิทธิ์)
+ * เมื่อใส่ SSO_CLIENT_ID แล้ว ระบบจะบังคับเข้าสู่ระบบด้วย ICIT Account แทนรหัสทีม
  */
 
 // ★ เปลี่ยนเป็นรหัสทีมของคุณ (ห้ามใช้ค่าเริ่มต้นนี้) — ผู้ใช้ต้องกรอกรหัสนี้ในระบบจึงจะอ่าน/เขียนได้
 const TEAM_KEY = 'CHANGE-ME';
 
 const ROOT_NAME = 'TOR Builder';
+const SSO = {
+  authorize: 'https://sso.kmutnb.ac.th/auth/authorize',
+  token: 'https://sso.kmutnb.ac.th/auth/token',
+  userinfo: 'https://sso.kmutnb.ac.th/resources/userinfo',
+  scope: 'openid profile email personnel_info'
+};
+const SESSION_HOURS = 12;
 const DATA_FOLDER = 'ข้อมูลระบบ (ห้ามแก้ไขไฟล์ในนี้)';
 const WORD_FOLDER = 'เอกสาร Word';
 
 /** รันครั้งแรกเพื่อสร้างโฟลเดอร์และอนุญาตสิทธิ์ */
 function setup() {
-  if (teamKey_() === 'CHANGE-ME') throw new Error('กรุณาเปลี่ยน TEAM_KEY ในบรรทัดบนสุดก่อน');
+  if (!ssoOn_() && teamKey_() === 'CHANGE-ME') throw new Error('กรุณาเปลี่ยน TEAM_KEY ในบรรทัดบนสุด หรือใส่ SSO_CLIENT_ID ใน Script Properties ก่อน');
+  secret_();
   const root = root_();
   sub_(DATA_FOLDER);
   sub_(WORD_FOLDER);
@@ -35,8 +53,18 @@ function doGet() {
 function doPost(e) {
   let req;
   try { req = JSON.parse(e.postData.contents); } catch (err) { return out_({ ok: false, error: 'ข้อมูลที่ส่งมาไม่ถูกต้อง' }); }
-  if (teamKey_() === 'CHANGE-ME') return out_({ ok: false, error: 'ผู้ดูแลยังไม่ได้ตั้ง TEAM_KEY ใน Apps Script' });
-  if (req.key !== teamKey_()) return out_({ ok: false, auth: true, error: 'รหัสทีมไม่ถูกต้อง' });
+  // คำสั่งที่ไม่ต้องยืนยันตัวตน
+  if (req.action === 'config') return out_(config_());
+  if (req.action === 'login') { try { return out_(login_(req)); } catch (err) { return out_({ ok: false, error: String(err.message || err) }); } }
+
+  let user = null;
+  if (ssoOn_()) {
+    user = verify_(req.session);
+    if (!user) return out_({ ok: false, auth: true, relogin: true, error: 'กรุณาเข้าสู่ระบบด้วย ICIT Account อีกครั้ง' });
+  } else {
+    if (teamKey_() === 'CHANGE-ME') return out_({ ok: false, error: 'ผู้ดูแลยังไม่ได้ตั้ง TEAM_KEY ใน Apps Script' });
+    if (req.key !== teamKey_()) return out_({ ok: false, auth: true, error: 'รหัสทีมไม่ถูกต้อง' });
+  }
 
   const writes = ['save', 'delete', 'saveFile'];
   const lock = LockService.getScriptLock();
@@ -46,7 +74,8 @@ function doPost(e) {
       case 'ping':     return out_({ ok: true, folderUrl: root_().getUrl(), wordUrl: sub_(WORD_FOLDER).getUrl(), owner: Session.getEffectiveUser().getEmail() });
       case 'list':     return out_({ ok: true, items: list_() });
       case 'get':      return out_(get_(req.id));
-      case 'save':     return out_(save_(req.doc, req.baseRev, req.force));
+      case 'me':       return out_({ ok: true, user: user });
+      case 'save':     return out_(save_(req.doc, req.baseRev, req.force, user));
       case 'delete':   return out_(del_(req.id));
       case 'saveFile': return out_(saveFile_(req));
       case 'ai':       return out_(ai_(req));
@@ -81,14 +110,21 @@ function get_(id) {
 }
 
 /** บันทึกโดยตรวจว่ามีคนอื่นบันทึกแทรกหรือไม่ (เทียบเลขรุ่น rev) */
-function save_(doc, baseRev, force) {
+function save_(doc, baseRev, force, user) {
   if (!doc || !doc.id) return { ok: false, error: 'ไม่มีข้อมูลเอกสาร' };
   const f = file_(doc.id);
-  let rev = 0;
+  let rev = 0, prevStatus = '';
   if (f) {
     const cur = JSON.parse(f.getDescription() || '{}');
-    rev = cur.rev || 0;
+    rev = cur.rev || 0; prevStatus = cur.status || '';
     if (!force && baseRev !== rev) return { ok: false, conflict: true, remote: cur };
+  }
+  if (user) {
+    // ชื่อผู้บันทึกมาจากบัญชี ICIT ไม่ใช่ชื่อที่พิมพ์เอง
+    doc._savedBy = user.name; doc._savedByUser = user.username;
+    // เฉพาะผู้ตรวจสอบ / ผู้ดูแล ที่ให้ “ผ่านการตรวจ” ได้
+    if (doc.status === 'done' && prevStatus !== 'done' && user.role === 'maker')
+      return { ok: false, error: 'บัญชีของคุณไม่มีสิทธิ์ให้ “ผ่านการตรวจ” — ติดต่อผู้ดูแลเพื่อขอสิทธิ์ผู้ตรวจสอบ' };
   }
   const s = {
     id: doc.id, name: doc.name || '', type: doc.type || '', status: doc.status || 'draft',
@@ -154,6 +190,92 @@ function aiModels_() {
   let j; try { j = JSON.parse(res.getContentText()); } catch (e) { return { ok: false, error: 'โหลดรายชื่อโมเดลไม่ได้' }; }
   const list = (j.data || []).map(function (m) { return { id: m.id, name: m.name || m.id }; });
   return { ok: true, models: list, hasKey: !!c.key, defaultModel: c.model };
+}
+
+/* ---------------- เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO / OpenID Connect) ---------------- */
+
+function ssoOn_() { return !!prop_('SSO_CLIENT_ID'); }
+function prop_(k) { return PropertiesService.getScriptProperties().getProperty(k); }
+function list_prop_(k) { return String(prop_(k) || '').split(/[,\s]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(String); }
+
+function config_() {
+  return { ok: true, sso: ssoOn_(), clientId: prop_('SSO_CLIENT_ID') || '', authorize: SSO.authorize, scope: SSO.scope, teamKey: !ssoOn_() };
+}
+
+function login_(req) {
+  if (!ssoOn_()) return { ok: false, error: 'ยังไม่ได้เปิดใช้ SSO' };
+  if (!req.code || !req.redirect_uri) return { ok: false, error: 'ข้อมูลเข้าสู่ระบบไม่ครบ' };
+  const res = UrlFetchApp.fetch(SSO.token, {
+    method: 'post', muteHttpExceptions: true,
+    headers: { Authorization: 'Basic ' + Utilities.base64Encode(prop_('SSO_CLIENT_ID') + ':' + prop_('SSO_CLIENT_SECRET')) },
+    payload: { grant_type: 'authorization_code', code: req.code, redirect_uri: req.redirect_uri, code_verifier: req.verifier || '' }
+  });
+  let tok; try { tok = JSON.parse(res.getContentText()); } catch (e) { tok = {}; }
+  if (!tok.access_token) return { ok: false, error: 'SSO ปฏิเสธการเข้าสู่ระบบ: ' + (tok.error_description || tok.error || res.getResponseCode()) };
+
+  const ui = JSON.parse(UrlFetchApp.fetch(SSO.userinfo, { headers: { Authorization: 'Bearer ' + tok.access_token }, muteHttpExceptions: true }).getContentText() || '{}');
+  const username = String(ui.preferred_username || ui.username || ui.sub || '').toLowerCase();
+  if (!username) return { ok: false, error: 'ไม่ได้รับข้อมูลผู้ใช้จาก SSO' };
+  const email = String(ui.email || '').toLowerCase();
+  const type = String(ui.kmutnb_account_type || ui.account_type || '').toLowerCase();
+  const info = ui.kmutnb_personnel_info || ui.personnel_info || {};
+  const org = pickOrg_(info);
+  const name = ui.name || ui.display_name || [ui.given_name, ui.family_name].filter(String).join(' ') || username;
+
+  const types = list_prop_('ALLOWED_ACCOUNT_TYPES'); if (!types.length) types.push('personnel');
+  if (type && types.indexOf(type) < 0) return { ok: false, error: 'บัญชีประเภท “' + type + '” ไม่ได้รับอนุญาตให้ใช้ระบบนี้' };
+  const ids = [username, email].filter(String);
+  const allowed = list_prop_('ALLOWED_USERS');
+  if (allowed.length && !ids.some(function (x) { return allowed.indexOf(x) >= 0; })) return { ok: false, error: 'บัญชีนี้ยังไม่ได้รับสิทธิ์ใช้งาน — ติดต่อผู้ดูแลระบบ' };
+  const needOrg = prop_('ALLOWED_ORG');
+  if (needOrg && JSON.stringify(info).indexOf(needOrg) < 0 && org.indexOf(needOrg) < 0) return { ok: false, error: 'ระบบนี้สำหรับบุคลากร' + needOrg + 'เท่านั้น' };
+
+  const inList = function (k) { const l = list_prop_(k); return ids.some(function (x) { return l.indexOf(x) >= 0; }); };
+  const role = inList('ADMINS') ? 'admin' : inList('REVIEWERS') ? 'reviewer' : 'maker';
+  const user = { username: username, name: name, email: email, type: type, org: org, role: role };
+  logLogin_(user);
+  return { ok: true, user: user, session: sign_(user) };
+}
+
+function pickOrg_(info) {
+  if (!info || typeof info !== 'object') return '';
+  const keys = ['faculty_name', 'faculty', 'department_name', 'department', 'division_name', 'unit_name', 'org_name'];
+  for (let i = 0; i < keys.length; i++) { const v = info[keys[i]]; if (v) return typeof v === 'string' ? v : (v.name || v.name_th || ''); }
+  return '';
+}
+
+function secret_() {
+  const props = PropertiesService.getScriptProperties();
+  let s = props.getProperty('SESSION_SECRET');
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props.setProperty('SESSION_SECRET', s); }
+  return s;
+}
+
+function sign_(user) {
+  const body = Utilities.base64EncodeWebSafe(JSON.stringify({ u: user, exp: Date.now() + SESSION_HOURS * 3600 * 1000 }), Utilities.Charset.UTF_8);
+  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(body, secret_()));
+  return body + '.' + sig;
+}
+
+function verify_(session) {
+  if (!session || session.indexOf('.') < 0) return null;
+  const parts = session.split('.');
+  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(parts[0], secret_()));
+  if (sig !== parts[1]) return null;
+  try {
+    const p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString('UTF-8'));
+    return p.exp > Date.now() ? p.u : null;
+  } catch (e) { return null; }
+}
+
+/** บันทึกประวัติการเข้าสู่ระบบ (ไฟล์ข้อความในโฟลเดอร์ข้อมูลระบบ) */
+function logLogin_(user) {
+  try {
+    const name = 'login-log.txt', folder = sub_(DATA_FOLDER), it = folder.getFilesByName(name);
+    const line = new Date().toISOString() + '\t' + user.username + '\t' + user.name + '\t' + user.role + '\n';
+    if (it.hasNext()) { const f = it.next(); const t = f.getBlob().getDataAsString('UTF-8'); f.setContent((t + line).slice(-200000)); }
+    else folder.createFile(name, line, 'text/plain');
+  } catch (e) {}
 }
 
 /* ---------------- ตัวช่วย ---------------- */

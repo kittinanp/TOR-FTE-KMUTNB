@@ -299,18 +299,18 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 40px}
     <div class="sh"><div class="no" style="background:linear-gradient(135deg,#d79a00,#f5b81c)">6</div><div><h2>ผู้ดูแล: ติดตั้งครั้งเดียว</h2><p>ใช้เวลาประมาณ 10 นาที · ข้อมูลทั้งหมดอยู่ใน Google Drive ของหน่วยงาน</p></div></div>
     <div class="arch">
       <div class="node"><div class="ic" style="background:#24292f"><svg><use href="#i-git"/></svg></div><b>GitHub Pages</b><small>หน้าเว็บของระบบ<br>(ไม่มีข้อมูล / รหัส)</small></div>
-      <div class="arr"><svg><use href="#i-arrow"/></svg>รหัสทีม</div>
-      <div class="node"><div class="ic" style="background:linear-gradient(135deg,#1fa463,#4285f4)"><svg><use href="#i-code"/></svg></div><b>Google Apps Script</b><small>ตัวกลาง ตรวจรหัสทีม<br>เก็บ API key ของ AI</small></div>
+      <div class="arr"><svg><use href="#i-arrow"/></svg>ICIT Account</div>
+      <div class="node"><div class="ic" style="background:linear-gradient(135deg,#1fa463,#4285f4)"><svg><use href="#i-code"/></svg></div><b>Google Apps Script</b><small>ยืนยันตัวตน ICIT SSO<br>เก็บรหัสลับ / AI key</small></div>
       <div class="arr"><svg><use href="#i-arrow"/></svg>อ่าน / เขียน</div>
       <div class="node"><div class="ic" style="background:linear-gradient(135deg,#ffcd40,#f0701b)"><svg><use href="#i-drive"/></svg></div><b>Google Drive</b><small>ร่าง TOR · ความเห็น<br>ไฟล์ Word</small></div>
     </div>
     <div class="setup">
       <div class="su"><b>สร้าง Apps Script</b><p>เข้า <code>script.google.com</code> → โปรเจกต์ใหม่ → วางโค้ด <code>google-apps-script/Code.gs</code></p></div>
-      <div class="su"><b>ตั้งรหัสทีม</b><p>แก้ <code>TEAM_KEY = 'CHANGE-ME'</code> เป็นรหัสที่เดายาก (12 ตัวขึ้นไป)</p></div>
+      <div class="su"><b>ลงทะเบียน ICIT SSO</b><p>ที่ <code>sso.kmutnb.ac.th</code> → สำหรับนักพัฒนาแอป → ใส่ Redirect URI เป็นลิงก์เว็บของระบบ → ได้ Client ID / Secret</p></div>
       <div class="su"><b>Run ฟังก์ชัน setup</b><p>อนุญาตสิทธิ์ Drive · ถ้าเตือน “unverified” กด Advanced → Go to… (เป็นสคริปต์ของคุณเอง)</p></div>
       <div class="su"><b>Deploy เป็น Web app</b><p>Execute as: <b>Me</b> · Who has access: <b>Anyone</b> → คัดลอก URL ที่ลงท้าย <code>/exec</code></p></div>
-      <div class="su"><b>ใส่ AI key (ถ้าใช้)</b><p>Project Settings → Script Properties → เพิ่ม <code>AI_KEY</code> (เช่น key ของ OpenRouter)</p></div>
-      <div class="su"><b>เชื่อมต่อ & เชิญทีม</b><p>ในระบบ: ตั้งค่า → วาง URL + รหัสทีม → เชื่อมต่อ → <b>คัดลอกลิงก์เชิญทีม</b> ส่งให้ทุกคน</p></div>
+      <div class="su"><b>Script Properties</b><p>เพิ่ม <code>SSO_CLIENT_ID</code> <code>SSO_CLIENT_SECRET</code> <code>REVIEWERS</code> และ <code>AI_KEY</code> (ถ้าใช้ AI)</p></div>
+      <div class="su"><b>ใส่ URL ใน config.js</b><p>นำ Web app URL ใส่ <code>driveUrl</code> ในไฟล์ <code>config.js</code> → ทุกคนเปิดเว็บแล้ว <b>เข้าสู่ระบบด้วย ICIT Account</b> ได้ทันที</p></div>
     </div>
   </div>
 
@@ -318,6 +318,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 40px}
   <div class="card" id="faq">
     <div class="sh"><div class="no">7</div><div><h2>คำถามที่พบบ่อย</h2></div></div>
     <div class="faq">
+      <details><summary>เข้าสู่ระบบอย่างไร?</summary><p>กด “เข้าสู่ระบบด้วย ICIT Account” แล้วกรอกบัญชีเดียวกับระบบของมหาวิทยาลัยที่หน้า KMUTNB SSO — ระบบนี้ไม่เห็นรหัสผ่าน เซสชันอยู่ได้ 12 ชั่วโมง สิทธิ์ผู้ตรวจสอบกำหนดโดยผู้ดูแล</p></details>
       <details><summary>ข้อมูลเก็บที่ไหน ปลอดภัยไหม?</summary><p>ถ้าเชื่อม Drive: อยู่ในโฟลเดอร์ “TOR Builder” ของบัญชีผู้ดูแล และมีสำเนาในเบราว์เซอร์ของแต่ละคน · ถ้าไม่เชื่อม: อยู่ในเบราว์เซอร์เครื่องนั้นเท่านั้น ควรกด “สำรองข้อมูล” เป็นระยะ</p></details>
       <details><summary>สองคนแก้ฉบับเดียวกันพร้อมกันได้ไหม?</summary><p>ได้ ถ้ามีคนบันทึกแทรก ระบบจะถามว่าจะโหลดฉบับใน Drive, บันทึกทับ หรือเก็บของตัวเองเป็นสำเนา — ไม่มีข้อมูลหายเงียบ ๆ</p></details>
       <details><summary>เน็ตหลุดระหว่างทำงาน?</summary><p>ทำต่อได้ ระบบบันทึกในเครื่องก่อน แล้วขึ้น Drive ให้อัตโนมัติเมื่อกลับมาออนไลน์ (สถานะดูได้ที่มุมซ้ายล่าง)</p></details>
