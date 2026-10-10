@@ -401,6 +401,31 @@ textarea{resize:vertical;min-height:40px;line-height:1.5}
 .driveBox .gd{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1fa463,#4285f4 55%,#ffcd40);color:#fff;display:grid;place-items:center;flex:none}
 .driveBox .gd svg{width:19px;height:19px}
 
+/* ================= AI ================= */
+.btn.ai{background:linear-gradient(135deg,#7353f5,#2f7cf6);border-color:transparent;color:#fff}
+.btn.ai:hover{filter:brightness(1.08)}
+.btn.ai[disabled],.btn[disabled]{opacity:.6;cursor:default}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;display:inline-block;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.aiWait{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;padding:14px;border:1px dashed var(--line);border-radius:12px}
+.aiErr{color:var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--panel));border-radius:10px;padding:10px 12px;font-size:14px}
+.aiOut{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--panel-2)}
+.aiHead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.aiHead svg{width:18px;height:18px;color:#7353f5}
+.aiHead .q,.aiTree .q{font-size:12.5px;color:var(--muted);font-weight:400}
+.aiTree{margin:0;padding-left:0;list-style:none;font-family:'Sarabun',sans-serif;font-size:14.5px;line-height:1.65}
+.aiTree ul{list-style:none;padding-left:22px;margin:2px 0 6px}
+.aiNote{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:13.5px;color:var(--ink-2);background:color-mix(in srgb,#7353f5 8%,var(--panel));border-radius:10px;padding:9px 12px}
+.aiNote svg{width:16px;height:16px;color:#7353f5;margin-top:3px}
+.aiDiff{font-family:'Sarabun',sans-serif;font-size:15px;line-height:1.7;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.aiDiff ins{color:#08703a;background:#e3f6ea;text-decoration:underline}
+.aiDiff del{color:#c2271b;background:#fde9e7}
+.aiBoxD{margin-top:16px;border:1px solid color-mix(in srgb,#7353f5 30%,var(--line));border-radius:14px;padding:12px;background:color-mix(in srgb,#7353f5 4%,var(--panel))}
+.chk.done{opacity:.6}
+.chk .ra{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.icon.aiI{color:#7353f5}
+.sheet .pa button.a{color:#7353f5}
+
 /* ================= dialogs / toast ================= */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;transition:.25s;pointer-events:none;z-index:80;box-shadow:var(--shadow-lg);display:flex;gap:8px;align-items:center}
 .toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
@@ -519,6 +544,8 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
     <symbol id="i-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v9a3 3 0 0 0 3 3h11M15 12l4 4-4 4"/></symbol>
     <symbol id="i-drive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="M8 3l6 10h8M2 13h12l4 7"/></symbol>
     <symbol id="i-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
   </defs>
 </svg>
 
@@ -532,6 +559,7 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
       <a href="#/home" data-nav="home"><svg><use href="#i-home"/></svg><span>หน้าหลัก<span class="cur">ภาพรวมและร่างทั้งหมด</span></span></a>
       <a href="#/library" data-nav="library"><svg><use href="#i-grid"/></svg><span>คลังแม่แบบ<span class="cur" id="navTplCount">แม่แบบพร้อมใช้</span></span></a>
       <a href="#/edit" data-nav="edit" id="navEdit" hidden><svg><use href="#i-edit"/></svg><span>กำลังแก้ไข<span class="cur" id="navEditName">—</span></span></a>
+      <a href="guide.html" target="_blank" rel="noopener"><svg><use href="#i-book"/></svg><span>คู่มือการใช้งาน<span class="cur">ฉบับอินโฟกราฟิก</span></span></a>
       <div class="sec">จัดการข้อมูล</div>
       <button id="navSettings"><svg><use href="#i-gear"/></svg>ตั้งค่าหน่วยงาน</button>
       <button id="navExport"><svg><use href="#i-save"/></svg>สำรองข้อมูล (.json)</button>
@@ -571,6 +599,7 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
           <div class="hero">
             <div class="plus"><svg><use href="#i-plus"/></svg></div>
             <div class="grow"><h2>สร้าง TOR ใหม่</h2><p>เลือกประเภทงาน ระบบจะเตรียมหัวข้อและเงื่อนไขมาตรฐานให้ทันที</p></div>
+            <button class="btn ai aiOnly" id="heroAI" hidden><svg><use href="#i-spark"/></svg>ร่างด้วย AI</button>
             <a class="btn gold" href="#/library"><svg><use href="#i-grid"/></svg>ดูคลังแม่แบบทั้งหมด</a>
           </div>
           <div class="create" id="createGrid"></div>
@@ -681,6 +710,7 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
               <div class="row" style="margin-top:12px">
                 <button class="btn sm" id="addItem"><svg><use href="#i-plus"/></svg>รายการหลัก</button>
                 <button class="btn sm" id="addGroup" title="หัวข้อจัดกลุ่ม ไม่มีเลขลำดับ เช่น 'สำหรับห้องเครือข่าย อาคาร 52'"><svg><use href="#i-plus"/></svg>หัวข้อกลุ่ม</button>
+                <button class="btn sm ai aiOnly" id="btnAIDraft" hidden><svg><use href="#i-spark"/></svg>AI ช่วยร่าง</button>
                 <button class="btn sm" id="btnPaste" title="วางข้อความที่มีเลขข้อ 1. 1.1 1) ระบบจะแยกลำดับให้"><svg><use href="#i-clip"/></svg>วางจากข้อความ</button>
               </div>
               <div class="row" style="margin-top:14px">
@@ -765,6 +795,21 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
       <div class="hint" id="cStatus"></div>
       <div class="row"><button class="btn primary sm" id="cConnect">เชื่อมต่อ</button><button class="btn sm" id="cInvite" hidden>คัดลอกลิงก์เชิญทีม</button><button class="btn sm danger" id="cDisconnect" hidden>ยกเลิกการเชื่อมต่อ</button></div>
     </div>
+    <div class="driveBox">
+      <div class="dh"><span class="gd" style="background:linear-gradient(135deg,#7353f5,#2f7cf6)"><svg><use href="#i-spark"/></svg></span><div><b>AI ผู้ช่วย</b><small>ช่วยร่างสเปก ปรับภาษา และตรวจตามระเบียบ · OpenRouter / Typhoon / OpenAI / Ollama</small></div></div>
+      <div class="field"><label for="aiMode">วิธีเชื่อมต่อ</label><select id="aiMode"><option value="off">ปิด</option><option value="drive">ผ่าน Apps Script ของทีม (แนะนำ — API key เก็บที่ Google)</option><option value="direct">ใช้ API key ของฉัน (เรียกจากเบราว์เซอร์นี้)</option></select></div>
+      <div class="hint" id="aiDriveHint" hidden>ผู้ดูแลใส่ <b>AI_KEY</b> (และ AI_BASE ถ้าไม่ใช่ OpenRouter) ใน Apps Script → Project Settings → Script Properties</div>
+      <div id="aiDirectBox" hidden>
+        <div class="row">
+          <div class="field"><label for="aiProvider">ผู้ให้บริการ</label><select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="typhoon">Typhoon (โมเดลภาษาไทย)</option><option value="openai">OpenAI</option><option value="ollama">Ollama (ในเครื่อง)</option><option value="custom">กำหนดเอง</option></select></div>
+          <div class="field" style="flex:2"><label for="aiBase">API base URL</label><input type="text" id="aiBase" spellcheck="false"></div>
+        </div>
+        <div class="field"><label for="aiKey">API key <span class="hint">(เก็บในเบราว์เซอร์นี้เท่านั้น)</span></label><input type="password" id="aiKey" autocomplete="off" placeholder="sk-…"></div>
+      </div>
+      <div class="field" id="aiModelBox" hidden><label for="aiModel">โมเดล</label><div class="row" style="flex-wrap:nowrap"><input type="text" id="aiModel" list="aiModelList" placeholder="กด “โหลดรายชื่อ” แล้วพิมพ์ค้นหา เช่น claude, gpt, typhoon" spellcheck="false"><button class="btn sm" id="aiLoadModels">โหลดรายชื่อ</button></div><datalist id="aiModelList"></datalist></div>
+      <div class="hint" id="aiStatus"></div>
+      <div class="row"><button class="btn sm ai" id="aiTest">ทดสอบ AI</button></div>
+    </div>
   </div>
 </dialog>
 
@@ -790,6 +835,30 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
     <div class="chips" id="cmPresets" style="margin-top:10px"></div>
   </div>
   <div class="dlgFoot"><button class="btn" data-close>ยกเลิก</button><button class="btn primary" id="cmSave">บันทึกความเห็น</button></div>
+</dialog>
+
+<dialog id="dlgAI" style="width:min(760px,calc(100vw - 32px))">
+  <div class="dlgHead"><div class="di" style="background:linear-gradient(135deg,#7353f5,#2f7cf6);color:#fff"><svg><use href="#i-spark"/></svg></div><h2>AI ช่วยร่างรายละเอียด</h2><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgBody">
+    <div class="row">
+      <div class="field"><label for="aiType">ประเภท</label><select id="aiType"><option value="buy">ซื้อ — คุณลักษณะเฉพาะของพัสดุ</option><option value="hire">จ้าง — รายละเอียดงานจ้าง</option></select></div>
+      <div class="field"><label for="aiLevel">ความละเอียด</label><select id="aiLevel"><option value="short">กระชับ</option><option value="normal" selected>ปกติ</option><option value="detail">ละเอียด</option></select></div>
+    </div>
+    <div class="field"><label for="aiDesc">อธิบายสิ่งที่ต้องการ</label><textarea id="aiDesc" rows="3" placeholder="เช่น เครื่องปรับอากาศ 2 เครื่อง ขนาด 30,000 และ 60,000 BTU พร้อมติดตั้ง ห้องสมาคมศิษย์เก่า / จ้างซ่อมกระเบื้องพื้นทางเดินอาคาร 44 ประมาณ 30 ตร.ม."></textarea></div>
+    <button class="btn ai" id="aiGo"><svg><use href="#i-spark"/></svg>ร่างด้วย AI</button>
+    <div id="aiResult" style="margin-top:14px"></div>
+  </div>
+  <div class="dlgFoot">
+    <label class="check" style="margin:0 auto 0 0"><input type="checkbox" id="aiReplace">แทนที่รายการเดิม</label>
+    <button class="btn" data-close>ยกเลิก</button>
+    <button class="btn primary" id="aiApply" disabled>ใช้รายการนี้</button>
+  </div>
+</dialog>
+
+<dialog id="dlgAIFix">
+  <div class="dlgHead"><div class="di" style="background:linear-gradient(135deg,#7353f5,#2f7cf6);color:#fff"><svg><use href="#i-spark"/></svg></div><div><h2>AI ปรับภาษา</h2><small class="hint" id="fixLabel"></small></div><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgBody" id="fixBody"></div>
+  <div class="dlgFoot"><button class="btn" id="fixAgain">ลองอีกครั้ง</button><button class="btn" data-close>ยกเลิก</button><button class="btn primary" id="fixOk" disabled>ใช้ข้อความนี้</button></div>
 </dialog>
 
 <dialog id="dlgConflict">
@@ -1123,6 +1192,7 @@ const ICON = {
   del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
   sub:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v10h12M12 10l4 4-4 4"/></svg>',
   out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
   dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
 };
 
@@ -1155,7 +1225,7 @@ function renderTree(){
         html.push(`<div class="qty"><span class="lbl">จำนวน</span><input type="text" data-f="qty" value="${esc(node.qty)}" placeholder="—"><input type="text" data-f="unit" list="unitList" value="${esc(node.unit)}" placeholder="หน่วย">
           <label class="check" style="margin:0 0 0 6px;font-size:12.5px"><input type="checkbox" data-f="tech" ${node.tech ? 'checked' : ''}>มีหัวข้อ “รายละเอียดคุณสมบัติทางเทคนิค”</label></div>`);
       }
-      html.push(`<div class="tools">${tool('sub','ข้อย่อย')}${depth>1 ? tool('out','เลื่อนออก') : ''}${tool('up','ขึ้น')}${tool('down','ลง')}${tool('dup','สำเนา')}${tool('del','ลบ','del')}</div>`);
+      html.push(`<div class="tools">${aiOn() ? tool('ai','AI ปรับภาษา','aiI') : ''}${tool('sub','ข้อย่อย')}${depth>1 ? tool('out','เลื่อนออก') : ''}${tool('up','ขึ้น')}${tool('down','ลง')}${tool('dup','สำเนา')}${tool('del','ลบ','del')}</div>`);
       if (node.children.length){ html.push('<div class="children">'); walk(node.children, depth+1, p); html.push('</div>'); }
       html.push('</div>');
     });
@@ -1177,6 +1247,7 @@ $('#tree').addEventListener('input', e => {
 $('#tree').addEventListener('change', e => { if (e.target.dataset.f === 'tech'){ changed(false); } });
 $('#tree').addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'ai') return aiRewrite('n:' + b.closest('.node').dataset.id);
   const id = b.closest('.node').dataset.id; const r = findParent(id); const i = r.list.indexOf(r.node);
   switch (b.dataset.act){
     case 'sub': r.node.children.push(N('')); break;
@@ -1487,7 +1558,7 @@ function renderPreview(){
     if (!editMode) return mark;
     const isNode = b.ref.startsWith('n:');
     const btn = (act, icon, tip, cls='') => `<button class="${cls}" data-pa="${act}" data-ref="${b.ref}" title="${tip}"><svg><use href="#i-${icon}"/></svg></button>`;
-    return mark + `<span class="pa">${btn('comment','chat','เพิ่มความเห็น')}${isNode ? btn('after','plus','เพิ่มข้อถัดไป') : ''}${isNode && b.item ? btn('child','sub','เพิ่มข้อย่อย') : ''}${isNode || b.ref.startsWith('x:') ? btn('delete','trash','ลบข้อนี้','d') : ''}</span>`;
+    return mark + `<span class="pa">${aiOn() && !b.ref.startsWith('t:') ? btn('ai','spark','AI ปรับภาษา','a') : ''}${btn('comment','chat','เพิ่มความเห็น')}${isNode ? btn('after','plus','เพิ่มข้อถัดไป') : ''}${isNode && b.item ? btn('child','sub','เพิ่มข้อย่อย') : ''}${isNode || b.ref.startsWith('x:') ? btn('delete','trash','ลบข้อนี้','d') : ''}</span>`;
   };
 
   const out = [delHtml(delAfter.get('^'))];
@@ -1551,6 +1622,7 @@ sheetEl.addEventListener('click', e => {
   const b = e.target.closest('[data-pa]'); if (!b) return;
   const ref = b.dataset.ref, act = b.dataset.pa;
   if (act === 'comment') return openComment(ref);
+  if (act === 'ai') return aiRewrite(ref);
   if (ref.startsWith('x:')){
     const i = +ref.slice(2), old = doc.cond.extras[i];
     doc.cond.extras.splice(i, 1); logEvent('delete', 'เงื่อนไขเพิ่มเติม', {before:old}); afterModelChange(); return;
@@ -1668,6 +1740,7 @@ function renderDrawer(focusRef){
     h = `<div class="tip">ตรวจเบื้องต้นตามหลักการ พ.ร.บ. การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ. 2560 — เป็นตัวช่วยเท่านั้น ผู้ตรวจสอบควรพิจารณาประกอบระเบียบอีกครั้ง</div>`;
     h += R.length ? R.map(r => `<div class="chk ${r.lv}" ${r.ref ? `data-goto="${r.ref}"` : ''}><span class="dt">${r.lv === 'err' ? '!' : r.lv === 'warn' ? '?' : 'i'}</span><span><b>${esc(r.msg)}</b>${r.note ? `<small>${esc(r.note)}</small>` : ''}</span></div>`).join('')
       : `<div class="chk ok"><span class="dt">✓</span><span><b>ไม่พบประเด็นจากการตรวจอัตโนมัติ</b><small>พร้อมส่งตรวจ / พิจารณาต่อ</small></span></div>`;
+    h += aiReviewHtml();
   }
   if (drawerTab === 'log'){
     const T = {edit:'แก้ไข', add:'เพิ่ม', delete:'ลบ', comment:'ความเห็น', submit:'ส่งให้ผู้ตรวจ', return:'ส่งกลับแก้ไข', approve:'ผ่านการตรวจ', accept:'ยอมรับการแก้ไข', revert:'ย้อนการแก้ไข', resolve:'แก้ไขตามความเห็น', create:'สร้างเอกสาร'};
@@ -2052,7 +2125,7 @@ document.querySelectorAll('.mobileTabs .btn').forEach(b => b.onclick = () => {
    ========================================================= */
 $('#navExport').onclick = () => {
   persist();
-  const data = {app:'TOR Builder', version:2, exported:new Date().toISOString(), settings:Object.assign({}, settings, {cloudKey:''}), drafts:Object.values(drafts), templates:userTpl};
+  const data = {app:'TOR Builder', version:2, exported:new Date().toISOString(), settings:Object.assign({}, settings, {cloudKey:'', aiKey:''}), drafts:Object.values(drafts), templates:userTpl};
   download(new Blob([JSON.stringify(data, null, 1)], {type:'application/json'}), `TOR-Builder-สำรอง-${new Date().toISOString().slice(0,10)}.json`);
   toast('ดาวน์โหลดไฟล์สำรองแล้ว');
 };
@@ -2093,7 +2166,7 @@ function updatePageStyle(){
 }
 $('#navSettings').onclick = () => {
   document.querySelectorAll('[data-set]').forEach(el => el.value = settings[el.dataset.set] ?? '');
-  renderCloudSettings(); closeNav(); $('#dlgSettings').showModal();
+  renderCloudSettings(); renderAISettings(); closeNav(); $('#dlgSettings').showModal();
 };
 document.querySelectorAll('[data-set]').forEach(el => el.addEventListener('input', () => {
   const k = el.dataset.set; settings[k] = el.type === 'number' ? (+el.value || 16) : el.value;
@@ -2325,6 +2398,269 @@ setInterval(() => { if (cloudOn() && !$('#viewHome').hidden && document.visibili
 window.addEventListener('beforeunload', e => { if (cloudOn() && Object.keys(pending).length){ e.preventDefault(); e.returnValue = ''; } });
 
 /* =========================================================
+   AI ผู้ช่วย — ใช้รูปแบบ API มาตรฐาน (OpenAI-compatible)
+   รองรับ OpenRouter, Typhoon, OpenAI, Ollama หรือบริการอื่นที่เข้ากันได้
+   โหมด drive: เรียกผ่าน Apps Script ของทีม (API key อยู่ฝั่ง Google)
+   โหมด direct: เรียกจากเบราว์เซอร์ด้วย key ของผู้ใช้เอง
+   ========================================================= */
+const AI_PRESETS = {
+  openrouter:{name:'OpenRouter', base:'https://openrouter.ai/api/v1'},
+  typhoon:{name:'Typhoon (โมเดลภาษาไทย)', base:'https://api.opentyphoon.ai/v1'},
+  openai:{name:'OpenAI', base:'https://api.openai.com/v1'},
+  ollama:{name:'Ollama (ในเครื่อง)', base:'http://localhost:11434/v1'},
+  custom:{name:'กำหนดเอง', base:''}
+};
+const aiOn = () => settings.aiMode === 'drive' ? cloudOn() : settings.aiMode === 'direct' ? !!(settings.aiBase && settings.aiModel) : false;
+
+async function aiChat(messages, {temperature = 0.2, max_tokens = 4000} = {}){
+  if (settings.aiMode === 'drive'){
+    if (!cloudOn()) throw new Error('โหมดนี้ต้องเชื่อม Google Drive ก่อน');
+    const j = await api('ai', {model:settings.aiModel || '', messages, temperature, max_tokens});
+    return j.content || '';
+  }
+  if (settings.aiMode === 'direct'){
+    const headers = {'Content-Type':'application/json', 'HTTP-Referer':location.origin, 'X-Title':'TOR Builder'};
+    if (settings.aiKey) headers.Authorization = 'Bearer ' + settings.aiKey;
+    const r = await fetch(settings.aiBase.replace(/\/+$/, '') + '/chat/completions', {method:'POST', headers, body:JSON.stringify({model:settings.aiModel, messages, temperature, max_tokens})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) throw new Error((j.error && (j.error.message || j.error)) || ('HTTP ' + r.status));
+    return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+  }
+  throw new Error('ยังไม่ได้ตั้งค่า AI (ตั้งค่า → AI ผู้ช่วย)');
+}
+function parseAIJson(text){
+  let t = String(text || '').replace(/```(?:json)?/gi, '').trim();
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b < a) throw new Error('AI ไม่ได้ตอบเป็นรูปแบบที่ระบบอ่านได้ ลองอีกครั้งหรือเปลี่ยนโมเดล');
+  return JSON.parse(t.slice(a, b + 1));
+}
+const stripNum = s => String(s || '').replace(/^\s*(\(?\d+(\.\d+)*[.)]?|[-•●▪])\s+/, '').trim();
+
+const AI_SYSTEM = `คุณคือผู้เชี่ยวชาญการจัดทำขอบเขตของงาน (TOR) และรายละเอียดคุณลักษณะเฉพาะของพัสดุ สำหรับหน่วยงานของรัฐไทย (${settings.agency || 'มหาวิทยาลัย'}) ตาม พ.ร.บ. การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ. 2560
+หลักการเขียน:
+- ภาษาราชการ กระชับ ชัดเจน ตรวจสอบได้
+- ห้ามระบุยี่ห้อ รุ่น หรือกำหนดคุณลักษณะให้ใกล้เคียงยี่ห้อใดยี่ห้อหนึ่ง (มาตรา 9)
+- ค่าตัวเลขให้ใช้ "ไม่น้อยกว่า" / "ไม่เกิน" และ/หรือ "หรือดีกว่า" เพื่อไม่จำกัดผู้เสนอราคา
+- งานซื้อ: แต่ละรายการหลักเป็นชื่อพัสดุ ข้อย่อยขึ้นต้นด้วย "มี…" "เป็น…" "สามารถ…"
+- งานจ้าง: แต่ละข้อขึ้นต้นด้วย "งาน…" เช่น งานตรวจสอบ งานรื้อถอน งานติดตั้ง งานทดสอบ งานทำความสะอาดในพื้นที่ที่เกี่ยวข้อง
+- ห้ามใส่เลขข้อนำหน้าข้อความ (ระบบใส่ให้เอง)
+- ถ้าไม่ทราบค่าที่แน่นอน ให้ใช้ค่าที่เหมาะสมทั่วไป และบอกใน notes ว่าควรตรวจสอบ
+- อ้างอิงมาตรา/ระเบียบเฉพาะที่มั่นใจเท่านั้น
+ตัวอย่างสำนวนที่หน่วยงานใช้:
+"เครื่องปรับอากาศ แบบแยกส่วนแบบแขวน พร้อมติดตั้ง" → "มีความสามารถในการทำความเย็น ขนาดไม่น้อยกว่า 30,000 บีทียู/ชั่วโมง", "มีระบบการใช้สารทำความเย็นชนิด R-32 หรือดีกว่า ที่ต้องเป็นมิตรต่อสิ่งแวดล้อม"
+"งานรื้อถอนพื้นกระเบื้องเดิมขนาด 60x60 เซนติเมตร จำนวนไม่น้อยกว่า 29 ตารางเมตร"
+ตอบเป็น JSON อย่างเดียว ห้ามมีข้อความอื่น`;
+
+/* ---------- 1) AI ช่วยร่างรายละเอียด ---------- */
+let aiDraft = null;
+function openAIDraft(){
+  if (!aiOn()){ toast('ยังไม่ได้ตั้งค่า AI — ไปที่ ตั้งค่า → AI ผู้ช่วย'); $('#navSettings').click(); return; }
+  $('#aiType').value = doc.type;
+  $('#aiDesc').value = $('#aiDesc').value || [doc.name, doc.qty && doc.unit ? `จำนวน ${doc.qty} ${doc.unit}` : '', doc.place].filter(Boolean).join(' ');
+  $('#aiResult').innerHTML = ''; $('#aiApply').disabled = true; aiDraft = null;
+  $('#dlgAI').showModal(); $('#aiDesc').focus();
+}
+$('#aiGo').onclick = async () => {
+  const desc = $('#aiDesc').value.trim(); if (!desc){ $('#aiDesc').focus(); return; }
+  const type = $('#aiType').value, level = $('#aiLevel').value;
+  const btn = $('#aiGo'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>AI กำลังร่าง…';
+  $('#aiResult').innerHTML = '<div class="aiWait"><span class="spin"></span>กำลังร่างรายละเอียด อาจใช้เวลา 10–40 วินาที</div>';
+  try {
+    const content = await aiChat([
+      {role:'system', content:AI_SYSTEM},
+      {role:'user', content:`ประเภท: ${type === 'buy' ? 'งานซื้อ (รายละเอียดคุณลักษณะเฉพาะของพัสดุ)' : 'งานจ้าง (รายละเอียดงานจ้าง)'}
+ความต้องการ: ${desc}
+ระดับรายละเอียด: ${{short:'กระชับ 3–5 ข้อย่อยต่อรายการ', normal:'ปกติ 5–8 ข้อย่อยต่อรายการ', detail:'ละเอียด มีข้อย่อยระดับ 3 ได้'}[level]}
+ตอบ JSON รูปแบบ:
+{"name":"ชื่อรายการ/ชื่องานที่เหมาะสม","qty":"จำนวนรวม","unit":"หน่วย","items":[{"text":"รายการหลัก","qty":"จำนวน (งานซื้อ)","unit":"หน่วย","tech":true,"children":[{"text":"ข้อย่อย","children":[{"text":"ข้อย่อยระดับ 3 (ถ้ามี)"}]}]}],"extras":["เงื่อนไขเพิ่มเติมที่ควรมี เช่น การติดตั้ง การรับประกัน"],"notes":"สิ่งที่ผู้จัดทำควรตรวจสอบ"}`}
+    ], {temperature:0.3});
+    aiDraft = parseAIJson(content);
+    if (!Array.isArray(aiDraft.items) || !aiDraft.items.length) throw new Error('AI ไม่ได้ส่งรายการกลับมา');
+    renderAIDraft();
+  } catch(e){ $('#aiResult').innerHTML = `<div class="aiErr">${esc(e.message)}</div>`; }
+  btn.disabled = false; btn.innerHTML = `${svg('spark')}ร่างใหม่อีกครั้ง`;
+};
+function renderAIDraft(){
+  const d = aiDraft, lv3 = (p, i) => doc.l3style === 'dot' ? `${p}.${i}` : `${i})`;
+  const list = d.items.map((it, i) => `<li><b>${i+1}. ${esc(stripNum(it.text))}</b>${it.qty ? ` <span class="q">จำนวน ${esc(it.qty)} ${esc(it.unit || '')}</span>` : ''}
+    ${(it.children || []).length ? `<ul>${it.children.map((c, j) => `<li>${i+1}.${j+1} ${esc(stripNum(c.text))}${(c.children || []).length ? `<ul>${c.children.map((g, k) => `<li>${lv3(`${i+1}.${j+1}`, k+1)} ${esc(stripNum(g.text))}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ul>` : ''}</li>`).join('');
+  const ex = (d.extras || []).filter(Boolean);
+  $('#aiResult').innerHTML = `<div class="aiOut"><div class="aiHead">${svg('spark')}<b>${esc(d.name || 'ผลการร่าง')}</b>${d.qty ? `<span class="q">จำนวน ${esc(d.qty)} ${esc(d.unit || '')}</span>` : ''}</div><ol class="aiTree">${list}</ol>
+    ${ex.length ? `<div class="lbl" style="margin-top:10px">เงื่อนไขเพิ่มเติมที่ AI แนะนำ</div>${ex.map((x, i) => `<label class="check"><input type="checkbox" data-aix="${i}" checked>${esc(x)}</label>`).join('')}` : ''}
+    ${d.notes ? `<div class="aiNote">${svg('alert')}<span><b>ควรตรวจสอบ:</b> ${esc(d.notes)}</span></div>` : ''}</div>`;
+  $('#aiApply').disabled = false;
+}
+function aiToNode(o, depth){
+  const n = N(stripNum(o.text), (o.children || []).filter(c => c && c.text).map(c => aiToNode(c, depth + 1)));
+  if (depth === 1){ n.qty = o.qty ? String(o.qty) : ''; n.unit = o.unit || ''; n.tech = !!o.tech && doc.type === 'buy'; }
+  return n;
+}
+$('#aiApply').onclick = () => {
+  if (!aiDraft) return;
+  const replace = $('#aiReplace').checked;
+  if ($('#aiType').value !== doc.type){ doc.type = $('#aiType').value; doc.cond.delivery.ref = doc.type === 'buy' ? 'ใบสั่งซื้อ' : 'ใบสั่งจ้าง'; doc.boldL1 = doc.type === 'buy'; }
+  const items = aiDraft.items.filter(x => x && x.text).map(x => aiToNode(x, 1));
+  const isEmpty = !doc.items.some(n => n.text.trim());
+  doc.items = replace || isEmpty ? items : doc.items.concat(items);
+  if ((!doc.name.trim() || isEmpty) && aiDraft.name) doc.name = aiDraft.name;
+  if (isEmpty && aiDraft.qty){ doc.qty = String(aiDraft.qty); doc.unit = aiDraft.unit || doc.unit; }
+  document.querySelectorAll('[data-aix]').forEach(c => { if (c.checked){ const t = aiDraft.extras[+c.dataset.aix]; if (t && !doc.cond.extras.includes(t)) doc.cond.extras.push(t); } });
+  logEvent('add', 'AI ช่วยร่างรายละเอียด ' + items.length + ' รายการ', {ai:true});
+  $('#dlgAI').close(); afterModelChange();
+  toast('ใส่รายละเอียดจาก AI แล้ว — โปรดตรวจทานทุกข้อ');
+};
+
+/* ---------- 2) AI ปรับภาษารายข้อ ---------- */
+let aiFix = null;
+async function aiRewrite(ref){
+  if (!aiOn()){ toast('ยังไม่ได้ตั้งค่า AI — ไปที่ ตั้งค่า → AI ผู้ช่วย'); return; }
+  const B = buildBlocks(), b = B.find(x => x.ref === ref); if (!b) return;
+  const old = rawOf(b);
+  if (!old.trim()){ toast('ข้อนี้ยังว่างอยู่ — พิมพ์ใจความคร่าว ๆ ก่อน แล้วให้ AI ปรับภาษา'); return; }
+  aiFix = {ref, old, now:null};
+  $('#fixLabel').textContent = refLabel(ref, B) + ' · ' + (doc.name || '');
+  $('#fixBody').innerHTML = '<div class="aiWait"><span class="spin"></span>AI กำลังปรับภาษา…</div>';
+  $('#fixOk').disabled = true;
+  if (!$('#dlgAIFix').open) $('#dlgAIFix').showModal();
+  try {
+    const idx = B.findIndex(x => x.ref === ref);
+    const ctx = B.slice(Math.max(0, idx - 4), idx + 3).filter(x => x.t === 'p' || x.t === 'title').map(x => (x.num ? x.num + ' ' : '') + rawOf(x)).join('\n');
+    const content = await aiChat([
+      {role:'system', content:AI_SYSTEM},
+      {role:'user', content:`ปรับข้อความข้อ ${b.num || ''} ของ${doc.type === 'buy' ? 'รายละเอียดคุณลักษณะเฉพาะของพัสดุ' : 'รายละเอียดงานจ้าง'} "${doc.name}" ให้เป็นภาษาราชการ ชัดเจน วัดผลได้ ถูกหลักระเบียบพัสดุ โดยคงความหมายเดิม
+ข้อความเดิม: ${old}
+บริบทข้อใกล้เคียง:
+${ctx}
+ตอบ JSON: {"text":"ข้อความใหม่ทั้งข้อ (ไม่ต้องมีเลขข้อ)","reason":"เหตุผลสั้น ๆ ว่าปรับอะไร"}`}
+    ]);
+    const j = parseAIJson(content);
+    aiFix.now = stripNum(j.text || '');
+    $('#fixBody').innerHTML = aiFix.now === old ? `<div class="aiNote">${svg('check')}<span>AI เห็นว่าข้อนี้เหมาะสมแล้ว ${esc(j.reason || '')}</span></div>`
+      : `<div class="rt aiDiff">${diffHtml(old, aiFix.now)}</div>${j.reason ? `<div class="aiNote">${svg('spark')}<span>${esc(j.reason)}</span></div>` : ''}<label class="field" style="margin-top:10px"><span class="lbl">แก้ไขก่อนใช้ได้</span><textarea id="fixEdit" rows="3">${esc(aiFix.now)}</textarea></label>`;
+    $('#fixOk').disabled = aiFix.now === old;
+  } catch(e){ $('#fixBody').innerHTML = `<div class="aiErr">${esc(e.message)}</div>`; }
+}
+$('#fixOk').onclick = () => {
+  if (!aiFix) return;
+  const now = ($('#fixEdit') ? $('#fixEdit').value : aiFix.now).replace(/\s+/g, ' ').trim();
+  setRefText(aiFix.ref, now);
+  logEvent('edit', refLabel(aiFix.ref) + ' (AI ปรับภาษา)', {before:aiFix.old, after:now, ai:true});
+  $('#dlgAIFix').close(); afterModelChange(); toast('ปรับข้อความแล้ว');
+};
+$('#fixAgain').onclick = () => aiFix && aiRewrite(aiFix.ref);
+
+/* ---------- 3) AI ตรวจตามระเบียบ ---------- */
+const aiIssues = {};   // docId -> {at, model, issues, summary}
+async function aiReview(){
+  if (!aiOn()){ toast('ยังไม่ได้ตั้งค่า AI'); return; }
+  const B = buildBlocks().filter(b => b.ref && b.t === 'p');
+  const lines = B.map(b => `[${b.ref}] ${b.num ? b.num + ' ' : ''}${rawOf(b) || '(ว่าง)'}`).join('\n');
+  aiIssues[doc.id] = {busy:true}; renderDrawer();
+  try {
+    const content = await aiChat([
+      {role:'system', content:AI_SYSTEM},
+      {role:'user', content:`ตรวจ${doc.type === 'buy' ? 'รายละเอียดคุณลักษณะเฉพาะของพัสดุ' : 'รายละเอียดงานจ้าง'} "${doc.name}" (วงเงิน ${doc.budget || 'ไม่ระบุ'} บาท) ในฐานะนักวิชาการพัสดุ
+ประเด็นที่ต้องดู: การระบุยี่ห้อ/รุ่น หรือสเปกที่ล็อกผู้ขาย, ค่าตายตัวที่ควรใช้ "ไม่น้อยกว่า/หรือดีกว่า", ความชัดเจนวัดผลได้, หน่วยนับ, ความครบถ้วนของงานติดตั้ง/ทดสอบ, เงื่อนไขที่ขาด, ภาษาราชการ
+เอกสาร (แต่ละบรรทัดขึ้นต้นด้วยรหัสอ้างอิงในวงเล็บเหลี่ยม):
+${lines}
+ตอบ JSON: {"summary":"สรุปภาพรวม 1–2 ประโยค","issues":[{"ref":"รหัสอ้างอิงจากรายการด้านบนเท่านั้น หรือ doc ถ้าเป็นภาพรวม","level":"err|warn|info","problem":"ปัญหาที่พบ","basis":"หลักเกณฑ์ที่เกี่ยวข้อง (ถ้ามั่นใจ)","suggestion":"ข้อความใหม่ทั้งข้อที่แนะนำ (เว้นว่างถ้าไม่ต้องแก้ข้อความ)"}]}
+ถ้าไม่มีประเด็นให้ issues เป็น []`}
+    ], {max_tokens:5000});
+    const j = parseAIJson(content);
+    const refs = new Set(B.map(b => b.ref));
+    aiIssues[doc.id] = {at:Date.now(), summary:j.summary || '', issues:(j.issues || []).filter(x => x && x.problem).map((x, i) => Object.assign({i, applied:false}, x, {ref: refs.has(x.ref) ? x.ref : 'doc', suggestion: stripNum(x.suggestion || '')}))};
+    logEvent('comment', 'AI ตรวจตามระเบียบ พบ ' + aiIssues[doc.id].issues.length + ' ประเด็น', {ai:true});
+  } catch(e){ aiIssues[doc.id] = {error:e.message}; }
+  renderDrawer();
+}
+function aiReviewHtml(){
+  if (!aiOn()) return `<div class="aiBoxD"><div class="aiHead">${svg('spark')}<b>AI ตรวจละเอียด</b></div><div class="hint">ตั้งค่า AI ก่อน (ตั้งค่า → AI ผู้ช่วย) เพื่อให้ AI ช่วยชี้ประเด็นรายข้อพร้อมข้อความแนะนำ</div></div>`;
+  const r = aiIssues[doc.id];
+  let h = `<div class="aiBoxD"><div class="aiHead">${svg('spark')}<b>AI ตรวจละเอียด</b><button class="btn sm ai" data-ai="review" ${r && r.busy ? 'disabled' : ''} style="margin-left:auto">${r && r.busy ? '<span class="spin"></span>กำลังตรวจ…' : r && r.issues ? 'ตรวจอีกครั้ง' : 'ให้ AI ตรวจ'}</button></div>`;
+  if (!r) return h + `<div class="hint">AI จะอ่านทั้งฉบับแล้วชี้ประเด็นรายข้อ เช่น สเปกที่อาจล็อกผู้ขาย ค่าตายตัว ภาษากำกวม พร้อมข้อความแนะนำ</div></div>`;
+  if (r.busy) return h + `<div class="aiWait"><span class="spin"></span>AI กำลังอ่านเอกสาร อาจใช้เวลา 20–60 วินาที</div></div>`;
+  if (r.error) return h + `<div class="aiErr">${esc(r.error)}</div></div>`;
+  const B = buildBlocks();
+  h += r.summary ? `<div class="aiNote">${svg('spark')}<span>${esc(r.summary)}</span></div>` : '';
+  h += r.issues.length ? r.issues.map(x => `<div class="chk ${x.level === 'err' ? 'err' : x.level === 'warn' ? 'warn' : 'info'}${x.applied ? ' done' : ''}" ${x.ref !== 'doc' ? `data-goto="${x.ref}"` : ''}><span class="dt">${x.applied ? '✓' : x.level === 'err' ? '!' : x.level === 'warn' ? '?' : 'i'}</span><span style="min-width:0;flex:1"><b>${esc(refLabel(x.ref, B))}: ${esc(x.problem)}</b>${x.basis ? `<small>${esc(x.basis)}</small>` : ''}
+      ${x.suggestion && x.ref !== 'doc' ? `<div class="rt aiDiff" style="margin-top:6px">${diffHtml(rawOf(B.find(b => b.ref === x.ref) || {text:''}), x.suggestion)}</div>` : ''}
+      <div class="ra">${x.suggestion && x.ref !== 'doc' && !x.applied ? `<button class="btn sm okb" data-ai="apply" data-i="${x.i}">${svg('check')}ใช้ข้อความนี้</button>` : ''}<button class="btn sm" data-ai="note" data-i="${x.i}">${svg('chat')}เป็นความเห็น</button></div></span></div>`).join('')
+    : `<div class="chk ok"><span class="dt">✓</span><span><b>AI ไม่พบประเด็นเพิ่มเติม</b></span></div>`;
+  return h + `<div class="hint" style="margin-top:8px">ผลจาก AI เป็นข้อเสนอแนะ ผู้ตรวจสอบต้องพิจารณาเอง · ${ago(r.at)}</div></div>`;
+}
+$('#drBody').addEventListener('click', e => {
+  const b = e.target.closest('[data-ai]'); if (!b) return;
+  e.stopPropagation();
+  if (b.dataset.ai === 'review') return aiReview();
+  const r = aiIssues[doc.id], x = r && r.issues[+b.dataset.i]; if (!x) return;
+  if (b.dataset.ai === 'apply'){
+    const before = rawOf(buildBlocks().find(bb => bb.ref === x.ref) || {text:''});
+    setRefText(x.ref, x.suggestion); x.applied = true;
+    logEvent('edit', refLabel(x.ref) + ' (ตามคำแนะนำ AI)', {before, after:x.suggestion, ai:true});
+    afterModelChange(); toast('ใช้ข้อความที่ AI แนะนำแล้ว — แสดงเป็นร่องรอยการแก้ไข');
+  }
+  if (b.dataset.ai === 'note'){
+    doc.comments.push(Object.assign({id:uid(), ref:x.ref, text:'[AI] ' + x.problem + (x.suggestion ? ' — แนะนำ: ' + x.suggestion : ''), at:Date.now(), resolved:false, replies:[]}, me()));
+    changed(false); toast('เพิ่มเป็นความเห็นแล้ว');
+  }
+  renderDrawer();
+}, true);
+
+/* ---------- ตั้งค่า AI ---------- */
+function renderAISettings(msg, ok){
+  $('#aiMode').value = settings.aiMode || 'off';
+  $('#aiProvider').value = settings.aiProvider || 'openrouter';
+  $('#aiBase').value = settings.aiBase || AI_PRESETS[settings.aiProvider || 'openrouter'].base;
+  $('#aiKey').value = settings.aiKey || '';
+  $('#aiModel').value = settings.aiModel || '';
+  const m = settings.aiMode || 'off';
+  $('#aiDirectBox').hidden = m !== 'direct';
+  $('#aiModelBox').hidden = m === 'off';
+  $('#aiDriveHint').hidden = m !== 'drive';
+  $('#aiStatus').innerHTML = msg ? `<span style="color:${ok ? 'var(--ok)' : 'var(--danger)'}">${esc(msg)}</span>`
+    : m === 'drive' && !cloudOn() ? '<span style="color:var(--danger)">ต้องเชื่อม Google Drive ด้านบนก่อน</span>'
+    : aiOn() ? `<span style="color:var(--ok)">พร้อมใช้งาน${settings.aiModel ? ' · ' + esc(settings.aiModel) : ''}</span>` : m === 'off' ? 'ปิดอยู่ — ปุ่ม AI จะไม่แสดง' : 'กรอกข้อมูลให้ครบ แล้วกด “ทดสอบ AI”';
+  applyAIVisibility();
+}
+function saveAISettings(){
+  settings.aiMode = $('#aiMode').value; settings.aiProvider = $('#aiProvider').value;
+  settings.aiBase = $('#aiBase').value.trim(); settings.aiKey = $('#aiKey').value.trim(); settings.aiModel = $('#aiModel').value.trim();
+  store.set(K_SET, settings);
+}
+['aiMode','aiBase','aiKey','aiModel'].forEach(id => $('#' + id).addEventListener('change', () => { saveAISettings(); renderAISettings(); }));
+$('#aiProvider').addEventListener('change', () => { const p = $('#aiProvider').value; $('#aiBase').value = AI_PRESETS[p].base; saveAISettings(); renderAISettings(p === 'ollama' ? 'Ollama: ต้องตั้ง OLLAMA_ORIGINS ให้อนุญาตโดเมนของเว็บนี้' : '', true); });
+$('#aiLoadModels').onclick = async () => {
+  saveAISettings(); const b = $('#aiLoadModels'); b.disabled = true; b.textContent = 'กำลังโหลด…';
+  try {
+    let list;
+    if (settings.aiMode === 'drive'){ const j = await api('aiModels'); list = j.models; if (!j.hasKey) renderAISettings('ยังไม่ได้ใส่ AI_KEY ใน Script Properties', false); if (j.defaultModel && !settings.aiModel){ $('#aiModel').value = j.defaultModel; saveAISettings(); } }
+    else {
+      const h = settings.aiKey ? {Authorization:'Bearer ' + settings.aiKey} : {};
+      const r = await fetch(settings.aiBase.replace(/\/+$/, '') + '/models', {headers:h}); const j = await r.json();
+      list = (j.data || []).map(m => ({id:m.id, name:m.name || m.id}));
+    }
+    $('#aiModelList').innerHTML = list.slice(0, 500).map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
+    renderAISettings(`โหลดรายชื่อ ${list.length} โมเดลแล้ว — พิมพ์ค้นหาในช่องโมเดล (เช่น claude, gpt, gemini, typhoon)`, true);
+  } catch(e){ renderAISettings('โหลดรายชื่อไม่ได้: ' + e.message, false); }
+  b.disabled = false; b.textContent = 'โหลดรายชื่อ';
+};
+$('#aiTest').onclick = async () => {
+  saveAISettings(); const b = $('#aiTest'); b.disabled = true; b.innerHTML = '<span class="spin"></span>กำลังทดสอบ…';
+  try {
+    const t = await aiChat([{role:'user', content:'ตอบคำว่า "พร้อมใช้งาน" เป็นภาษาไทยคำเดียว'}], {max_tokens:20});
+    renderAISettings('AI ตอบกลับ: ' + String(t).trim().slice(0, 60), true);
+  } catch(e){ renderAISettings(e.message, false); }
+  b.disabled = false; b.textContent = 'ทดสอบ AI';
+};
+function applyAIVisibility(){
+  const on = aiOn();
+  document.querySelectorAll('.aiOnly').forEach(el => el.hidden = !on);
+  if (doc && !$('#viewEditor').hidden){ renderTree(); renderPreview(); }
+}
+$('#btnAIDraft').onclick = openAIDraft;
+$('#heroAI').onclick = () => { const d = TEMPLATES[0].make(); d.items = []; openNew(d); setTimeout(openAIDraft, 50); };
+
+/* =========================================================
    อื่น ๆ
    ========================================================= */
 document.querySelectorAll('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
@@ -2345,7 +2681,7 @@ let toastT; function toast(m){ const t = $('#toast'); t.textContent = m; t.class
 applyTheme(); applyAgency(); updatePageStyle(); updateNavCounts(); applyRole();
 if (doc){ $('#navEdit').hidden = false; $('#navEdit').href = '#/edit/' + doc.id; $('#navEditName').textContent = doc.name || 'ร่างไม่มีชื่อ'; }
 route();
-setCloud(cloudOn() ? 'busy' : 'off'); cloudRefresh(true);
+setCloud(cloudOn() ? 'busy' : 'off'); cloudRefresh(true).then(applyAIVisibility); applyAIVisibility();
 document.fonts && document.fonts.ready.then(fitSheet);
 </script>
 </body>

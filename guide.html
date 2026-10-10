@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือ TOR Builder</title>
+<meta name="description" content="คู่มือการใช้งาน TOR Builder ฉบับอินโฟกราฟิก — ผู้จัดทำ ผู้ตรวจสอบ ผู้ดูแลระบบ และ AI ผู้ช่วย">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5fa; --panel:#fff; --panel-2:#f8f9fc; --ink:#14203a; --ink-2:#3a4762; --muted:#6b7590; --line:#e3e7f0;
+  --navy:#0f2350; --navy-2:#1a3a7a; --gold:#f5b81c; --gold-ink:#3d2c00; --blue:#2563eb; --ok:#12a150; --red:#d92d20;
+  --t1:#f2eeff; --c1:#7353f5; --t2:#e7f1ff; --c2:#2f7cf6; --t3:#fff0e3; --c3:#f0701b; --t4:#e2f6f1; --c4:#0f9b82; --t5:#ffeaf0; --c5:#e2416b; --t6:#fff5d9; --c6:#d79a00;
+  --shadow:0 1px 3px rgba(16,24,40,.06),0 10px 30px -10px rgba(16,24,40,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1220; --panel:#151c2e; --panel-2:#1a2236; --ink:#e8ecf5; --ink-2:#c3cbdc; --muted:#8c97b0; --line:#263049;
+    --t1:rgba(115,83,245,.15); --t2:rgba(47,124,246,.15); --t3:rgba(240,112,27,.15); --t4:rgba(15,155,130,.17); --t5:rgba(226,65,107,.15); --t6:rgba(215,154,0,.16);
+    --c1:#9d86ff; --c2:#6aa3ff; --c3:#ff9a52; --c4:#3cc9ad; --c5:#ff7598; --c6:#f2be3a; --shadow:0 10px 30px -10px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1220; --panel:#151c2e; --panel-2:#1a2236; --ink:#e8ecf5; --ink-2:#c3cbdc; --muted:#8c97b0; --line:#263049;
+  --t1:rgba(115,83,245,.15); --t2:rgba(47,124,246,.15); --t3:rgba(240,112,27,.15); --t4:rgba(15,155,130,.17); --t5:rgba(226,65,107,.15); --t6:rgba(215,154,0,.16);
+  --c1:#9d86ff; --c2:#6aa3ff; --c3:#ff9a52; --c4:#3cc9ad; --c5:#ff7598; --c6:#f2be3a; --shadow:0 10px 30px -10px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+svg{flex:none}
+a{color:var(--blue)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* hero */
+.hero{background:radial-gradient(circle at 85% 10%,rgba(245,184,28,.25),transparent 35%),linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;padding:44px 0 90px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:auto 0 0 0;height:6px;background:var(--gold)}
+.topnav{display:flex;align-items:center;gap:12px;margin-bottom:36px}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#ffd970);color:var(--navy);display:grid;place-items:center}
+.logo svg{width:22px;height:22px}
+.topnav b{font-size:17px}
+.topnav .sp{flex:1}
+.hbtn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;font-size:14px;border:1px solid rgba(255,255,255,.18);cursor:pointer;font-family:inherit}
+.hbtn:hover{background:rgba(255,255,255,.18)}
+.hbtn.gold{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600}
+.hbtn svg{width:16px;height:16px}
+.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{font-size:18px;color:#c9d4ee;max-width:640px;margin:0}
+.toc{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.toc a{color:#fff;text-decoration:none;font-size:13.5px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.toc a:hover{background:rgba(255,255,255,.16)}
+
+/* sections */
+section{margin:-50px auto 0;position:relative}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:30px;margin-bottom:26px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.sh .no{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:700;font-size:19px;color:#fff;background:linear-gradient(135deg,var(--navy),var(--navy-2));flex:none}
+.sh h2{margin:0;font-size:24px;line-height:1.3}
+.sh p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.next{margin-top:0}
+
+/* roles */
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.role{border-radius:18px;padding:22px;background:var(--t);position:relative;overflow:hidden}
+.role .ic{width:54px;height:54px;border-radius:16px;background:var(--c);color:#fff;display:grid;place-items:center;margin-bottom:14px;box-shadow:0 10px 20px -10px var(--c)}
+.role .ic svg{width:26px;height:26px}
+.role h3{margin:0;font-size:19px}
+.role .who{font-size:13px;color:var(--c);font-weight:600;margin-bottom:10px}
+.role ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14.5px}
+.role li{margin:3px 0}
+
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch;position:relative}
+.fstep{text-align:center;padding:0 8px;position:relative}
+.fstep .dot{width:74px;height:74px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:var(--t);color:var(--c);border:3px solid var(--c);position:relative;z-index:1;background-clip:padding-box}
+.fstep .dot svg{width:30px;height:30px}
+.fstep b{display:block;font-size:16px}
+.fstep small{display:block;color:var(--muted);font-size:13px;line-height:1.45;margin-top:3px}
+.fstep .tag{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2)}
+.fstep:not(:last-child)::after{content:'';position:absolute;top:37px;left:calc(50% + 40px);right:calc(-50% + 40px);height:3px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px)}
+.loop{margin:22px auto 0;max-width:760px;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--t5);color:var(--ink-2);font-size:14px}
+.loop svg{width:22px;height:22px;color:var(--c5)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;padding-top:6px}
+.step{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--panel-2);position:relative}
+.step .n{position:absolute;top:-12px;left:16px;background:var(--gold);color:var(--gold-ink);font-weight:700;font-size:13px;padding:2px 12px;border-radius:999px;box-shadow:0 4px 10px -4px rgba(245,184,28,.6)}
+.step h4{margin:8px 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
+.step h4 svg{width:20px;height:20px;color:var(--blue)}
+.step p{margin:0;color:var(--ink-2);font-size:14px}
+.kbd{display:inline-block;font-size:12.5px;padding:1px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel);font-weight:600;color:var(--ink);white-space:nowrap}
+.mock{margin-top:12px;border-radius:12px;background:var(--panel);border:1px solid var(--line);padding:10px 12px;font-family:'Sarabun',sans-serif;font-size:13.5px;line-height:1.7}
+.mock .bar{display:flex;gap:4px;margin-bottom:8px}
+.mock .bar i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.chip{display:inline-block;font-size:12px;padding:1px 9px;border-radius:999px;border:1px dashed var(--line);margin:2px 2px 0 0;color:var(--ink-2);font-family:'IBM Plex Sans Thai',sans-serif}
+ins{color:#08703a;background:#e3f6ea;text-decoration:underline;text-decoration-color:#21a35a}
+del{color:#c2271b;background:#fde9e7}
+.hl{background:linear-gradient(transparent 60%,rgba(245,184,28,.4) 60%)}
+.bub{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px 10px 10px 2px;background:var(--gold);color:var(--gold-ink);font:600 11px 'IBM Plex Sans Thai',sans-serif;padding:0 5px;vertical-align:middle}
+
+/* legend */
+.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.lg{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:14px;border:1px solid var(--line)}
+.lg .sw{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;font-weight:700}
+.lg b{display:block;font-size:14px}
+.lg small{color:var(--muted);font-size:12.5px;line-height:1.4;display:block}
+
+/* ai */
+.ai{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.aic{border-radius:18px;padding:20px;background:linear-gradient(160deg,var(--t1),var(--panel) 70%);border:1px solid var(--line)}
+.aic .ic{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#7353f5,#2f7cf6);color:#fff;display:grid;place-items:center;margin-bottom:12px}
+.aic .ic svg{width:22px;height:22px}
+.aic h4{margin:0 0 4px;font-size:16.5px}
+.aic p{margin:0;font-size:14px;color:var(--ink-2)}
+.aic .eg{margin-top:12px;font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:'Sarabun',sans-serif}
+.aic .eg span{display:block;color:var(--muted);font-family:'IBM Plex Sans Thai',sans-serif;font-size:11.5px}
+.warnbox{margin-top:16px;display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:var(--t6);font-size:14px;color:var(--ink-2)}
+.warnbox svg{width:22px;height:22px;color:var(--c6);margin-top:1px}
+
+/* setup */
+.setup{counter-reset:s;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.su{counter-increment:s;border-radius:16px;padding:16px 16px 16px 60px;position:relative;border:1px solid var(--line);background:var(--panel-2);min-height:100px}
+.su::before{content:counter(s);position:absolute;left:14px;top:14px;width:34px;height:34px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700}
+.su b{display:block;font-size:15px;margin-bottom:2px}
+.su p{margin:0;font-size:13.5px;color:var(--ink-2)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1px 6px;word-break:break-all}
+
+/* drive diagram */
+.arch{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;margin:6px 0 22px}
+.node{border-radius:16px;padding:16px;text-align:center;border:1px solid var(--line);background:var(--panel-2)}
+.node .ic{width:44px;height:44px;border-radius:12px;margin:0 auto 8px;display:grid;place-items:center;color:#fff}
+.node .ic svg{width:22px;height:22px}
+.node b{display:block;font-size:15px}
+.node small{color:var(--muted);font-size:12.5px}
+.arr{color:var(--muted);text-align:center;font-size:12px}
+.arr svg{width:40px;height:20px;display:block;margin:0 auto}
+
+/* faq */
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.faq details{border:1px solid var(--line);border-radius:14px;padding:12px 16px;background:var(--panel-2)}
+.faq summary{cursor:pointer;font-weight:600;font-size:14.5px}
+.faq p{margin:8px 0 0;font-size:14px;color:var(--ink-2)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 40px}
+
+@media (max-width: 900px){
+  .roles,.ai,.setup{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr;gap:18px}
+  .fstep{display:grid;grid-template-columns:74px 1fr;gap:14px;text-align:left;align-items:center}
+  .fstep .dot{margin:0}
+  .fstep:not(:last-child)::after{left:36px;right:auto;top:80px;width:3px;height:22px;background:repeating-linear-gradient(180deg,var(--line) 0 6px,transparent 6px 10px)}
+  .legend{grid-template-columns:1fr 1fr}
+  .faq{grid-template-columns:1fr}
+  .arch{grid-template-columns:1fr}
+  .arr svg{transform:rotate(90deg)}
+  .card{padding:22px 18px}
+}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff;font-size:13px}
+  .hero{padding:22px 0 30px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topnav .hbtn,.toc{display:none}
+  section{margin:0}
+  .card{box-shadow:none;break-inside:avoid;padding:18px;margin-bottom:12px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .faq details{break-inside:avoid}
+  .faq details:not([open]) p{display:block}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-loop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+  <symbol id="i-drive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="M8 3l6 10h8M2 13h12l4 7"/></symbol>
+  <symbol id="i-git" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="9" r="2.5"/><path d="M6 8.5v7M18 11.5c0 4-6 3-10 5"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 17-5-5 5-5M16 7l5 5-5 5"/></symbol>
+  <symbol id="i-word" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8.5 12l1.3 5 2.2-4 2.2 4 1.3-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 40 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10h34M30 4l6 6-6 6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+</defs></svg>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="topnav">
+      <div class="logo"><svg><use href="#i-doc"/></svg></div><b>TOR Builder</b><span class="sp"></span>
+      <button class="hbtn" onclick="print()"><svg><use href="#i-print"/></svg>พิมพ์ / PDF</button>
+      <a class="hbtn gold" href="./"><svg><use href="#i-edit"/></svg>เข้าใช้งานระบบ</a>
+    </div>
+    <h1>คู่มือการใช้งาน<br><em>TOR Builder</em> ฉบับภาพ</h1>
+    <p class="lead">ร่าง ตรวจ และส่งออกขอบเขตของงาน (TOR) ให้ถูกระเบียบพัสดุ — ทำงานร่วมกันระหว่างผู้จัดทำกับนักวิชาการพัสดุ มี AI ช่วยร่างและตรวจ</p>
+    <nav class="toc">
+      <a href="#roles">บทบาท</a><a href="#flow">ขั้นตอนงาน</a><a href="#maker">ผู้จัดทำ</a><a href="#reviewer">ผู้ตรวจสอบ</a><a href="#ai">AI ผู้ช่วย</a><a href="#setup">ติดตั้ง (ผู้ดูแล)</a><a href="#faq">คำถามที่พบบ่อย</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<section>
+  <!-- 1 roles -->
+  <div class="card" id="roles">
+    <div class="sh"><div class="no">1</div><div><h2>ใครใช้ระบบนี้</h2><p>เลือกบทบาทได้ที่มุมซ้ายล่างของระบบ — สลับได้ตลอด</p></div></div>
+    <div class="roles">
+      <div class="role" style="--t:var(--t2);--c:var(--c2)">
+        <div class="ic"><svg><use href="#i-edit"/></svg></div>
+        <div class="who">วิศวกร / ผู้กำหนดรายละเอียด</div><h3>ผู้จัดทำ</h3>
+        <ul><li>เลือกแม่แบบ หรือให้ AI ช่วยร่าง</li><li>กรอกรายการ สเปก และเงื่อนไข</li><li>กด <b>ส่งให้ผู้ตรวจ</b></li><li>ยอมรับ / ย้อนการแก้ไขของผู้ตรวจ</li></ul>
+      </div>
+      <div class="role" style="--t:var(--t4);--c:var(--c4)">
+        <div class="ic"><svg><use href="#i-check"/></svg></div>
+        <div class="who">นักวิชาการพัสดุ</div><h3>ผู้ตรวจสอบ</h3>
+        <ul><li>คลิกแก้คำบนเอกสารได้ทันที</li><li>เพิ่ม / ลบข้อ แนบความเห็นรายข้อ</li><li>ดูผลตรวจระเบียบ (อัตโนมัติ + AI)</li><li><b>ส่งกลับแก้ไข</b> หรือ <b>ผ่านการตรวจ</b></li></ul>
+      </div>
+      <div class="role" style="--t:var(--t6);--c:var(--c6)">
+        <div class="ic"><svg><use href="#i-gear"/></svg></div>
+        <div class="who">ทำครั้งเดียว</div><h3>ผู้ดูแลระบบ</h3>
+        <ul><li>ติดตั้งตัวเชื่อม Google Drive</li><li>ตั้งค่า AI (API key)</li><li>ส่งลิงก์เชิญให้ทีม</li><li>ดูแลรหัสทีม</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 flow -->
+  <div class="card" id="flow">
+    <div class="sh"><div class="no">2</div><div><h2>เส้นทางของ TOR หนึ่งฉบับ</h2><p>สถานะแสดงที่แถบด้านบนของหน้าแก้ไขเสมอ</p></div></div>
+    <div class="flow">
+      <div class="fstep" style="--t:var(--t2);--c:var(--c2)"><div class="dot"><svg><use href="#i-grid"/></svg></div><div><b>เริ่มร่าง</b><small>เลือกแม่แบบจากคลัง หรือให้ AI ร่างจากคำอธิบาย</small><span class="tag">ผู้จัดทำ</span></div></div>
+      <div class="fstep" style="--t:var(--t1);--c:var(--c1)"><div class="dot"><svg><use href="#i-send"/></svg></div><div><b>ส่งให้ผู้ตรวจ</b><small>ระบบเก็บฉบับนี้ไว้เทียบ เพื่อแสดงร่องรอยการแก้</small><span class="tag">รอตรวจ</span></div></div>
+      <div class="fstep" style="--t:var(--t4);--c:var(--c4)"><div class="dot"><svg><use href="#i-check"/></svg></div><div><b>ตรวจ & แก้ไข</b><small>แก้คำบนเอกสาร แนบความเห็น ตรวจระเบียบ</small><span class="tag">ผู้ตรวจสอบ</span></div></div>
+      <div class="fstep" style="--t:var(--t6);--c:var(--c6)"><div class="dot"><svg><use href="#i-shield"/></svg></div><div><b>ผ่านการตรวจ</b><small>ผู้ตรวจรับรองว่าถูกต้องตามระเบียบ</small><span class="tag">ผ่านการตรวจ</span></div></div>
+      <div class="fstep" style="--t:var(--t3);--c:var(--c3)"><div class="dot"><svg><use href="#i-word"/></svg></div><div><b>ส่งออก</b><small>Word (บันทึกลง Drive) หรือ PDF ฉบับสะอาด</small><span class="tag">ทุกคน</span></div></div>
+    </div>
+    <div class="loop"><svg><use href="#i-loop"/></svg><span>ถ้ายังไม่ถูกต้อง ผู้ตรวจกด <b>ส่งกลับแก้ไข</b> → ผู้จัดทำแก้ตามความเห็น แล้ว <b>ส่งให้ผู้ตรวจ</b> อีกครั้ง วนได้จนผ่าน</span></div>
+  </div>
+
+  <!-- 3 maker -->
+  <div class="card" id="maker">
+    <div class="sh"><div class="no" style="background:linear-gradient(135deg,#2f7cf6,#5a9bff)">3</div><div><h2>ผู้จัดทำ: ร่าง TOR ใน 5 ขั้น</h2><p>ฝั่งซ้ายกรอกข้อมูล ฝั่งขวาเห็นเอกสาร A4 เปลี่ยนตามทันที · บันทึกอัตโนมัติ</p></div></div>
+    <div class="steps">
+      <div class="step"><span class="n">ขั้น 1</span><h4><svg><use href="#i-grid"/></svg>เลือกจุดเริ่มต้น</h4><p>หน้าหลัก → เลือกการ์ด <b>ซื้อ / จ้าง / ซ่อมแซม / ปรับปรุง</b> หรือ <b>คลังแม่แบบ</b> ที่ทำจาก TOR จริงของคณะ</p></div>
+      <div class="step"><span class="n">ขั้น 2</span><h4><svg><use href="#i-doc"/></svg>ข้อมูลทั่วไป</h4><p>ประเภท ชื่องาน จำนวน วงเงิน สถานที่ — หัวเรื่องเอกสารสร้างให้อัตโนมัติ</p>
+        <div class="mock" style="text-align:center"><b>รายละเอียดคุณลักษณะเฉพาะของพัสดุ</b><br>เครื่องปรับอากาศพร้อมติดตั้ง จำนวน 2 เครื่อง</div></div>
+      <div class="step"><span class="n">ขั้น 3</span><h4><svg><use href="#i-edit"/></svg>รายละเอียด / สเปก</h4><p>เพิ่มข้อหลัก ข้อย่อย เลขข้อรันเอง · คลิกคำที่ใช้บ่อยเพื่อแทรก</p>
+        <div class="mock">1.1 ขนาดไม่น้อยกว่า 30,000 บีทียู<br><span class="chip">ไม่น้อยกว่า</span><span class="chip">หรือดีกว่า</span><span class="chip">(รื้อทิ้ง)</span></div></div>
+      <div class="step"><span class="n">ขั้น 4</span><h4><svg><use href="#i-shield"/></svg>เงื่อนไขอื่น ๆ</h4><p>เกณฑ์ราคา · ส่งมอบ · ยืนราคา · รับประกัน — ติ๊กและใส่ตัวเลข พร้อมเงื่อนไขสำเร็จรูปให้เลือก</p></div>
+      <div class="step"><span class="n">ขั้น 5</span><h4><svg><use href="#i-send"/></svg>ส่งให้ผู้ตรวจ</h4><p>กดปุ่มสีทอง <span class="kbd">ส่งให้ผู้ตรวจ</span> ถ้าเชื่อม Google Drive ผู้ตรวจจะเห็นงานทันที</p></div>
+    </div>
+    <div class="warnbox" style="background:var(--t2)"><svg style="color:var(--c2)"><use href="#i-doc"/></svg><span><b>มี TOR เดิมใน Word?</b> กด <span class="kbd">วางจากข้อความ</span> แล้ววางทั้งก้อน ระบบแยกเลขข้อ 1. / 1.1 / 1) และจำนวนให้เอง · กด <span class="kbd">⌘/Ctrl + S</span> บันทึก <span class="kbd">⌘/Ctrl + P</span> พิมพ์</span></div>
+  </div>
+
+  <!-- 4 reviewer -->
+  <div class="card" id="reviewer">
+    <div class="sh"><div class="no" style="background:linear-gradient(135deg,#0f9b82,#3cc9ad)">4</div><div><h2>ผู้ตรวจสอบ: ตรวจบนเอกสารจริง</h2><p>สลับบทบาทเป็น “ผู้ตรวจสอบ” → โหมด “แก้ไขบนเอกสาร” เปิดให้อัตโนมัติ</p></div></div>
+    <div class="steps">
+      <div class="step"><span class="n">แก้คำ</span><h4><svg><use href="#i-edit"/></svg>คลิกที่ข้อความ</h4><p>พิมพ์แก้ได้ทันที กด <span class="kbd">Enter</span> เพื่อบันทึก <span class="kbd">Esc</span> เพื่อยกเลิก</p>
+        <div class="mock">1.1 ความละเอียดไม่น้อยกว่า <del>2MP</del><ins>4MP หรือดีกว่า</ins></div></div>
+      <div class="step"><span class="n">เพิ่ม / ลบ</span><h4><svg><use href="#i-grid"/></svg>ชี้ที่ข้อ</h4><p>มีปุ่มขึ้นที่ขอบซ้าย: 💬 ความเห็น · ＋ ข้อถัดไป · ↳ ข้อย่อย · 🗑 ลบข้อ</p>
+        <div class="mock"><del>1.3 มีเทคโนโลยี WDR หรือดีกว่า</del></div></div>
+      <div class="step"><span class="n">ความเห็น</span><h4><svg><use href="#i-chat"/></svg>แนบรายข้อ</h4><p>ข้อที่มีความเห็นจะถูกไฮไลต์พร้อมเลขกำกับ · มีความเห็นสำเร็จรูป เช่น “ควรเพิ่ม หรือดีกว่า”</p>
+        <div class="mock"><span class="hl">1.4 ใช้งานกับ SD Card 256 GB</span> <span class="bub">1</span></div></div>
+      <div class="step"><span class="n">ตัดสิน</span><h4><svg><use href="#i-shield"/></svg>ส่งผล</h4><p><span class="kbd">ส่งกลับให้แก้ไข</span> พร้อมสรุปสิ่งที่ต้องแก้ หรือ <span class="kbd">ผ่านการตรวจ</span></p></div>
+    </div>
+    <div class="legend">
+      <div class="lg"><span class="sw" style="background:#e3f6ea;color:#08703a">ก</span><span><b>ตัวเขียวขีดเส้นใต้</b><small>คำ / ข้อที่เพิ่มใหม่</small></span></div>
+      <div class="lg"><span class="sw" style="background:#fde9e7;color:#c2271b;text-decoration:line-through">ก</span><span><b>ตัวแดงขีดฆ่า</b><small>คำ / ข้อที่ถูกลบ</small></span></div>
+      <div class="lg"><span class="sw" style="background:rgba(245,184,28,.35);color:var(--gold-ink)">1</span><span><b>ไฮไลต์สีทอง</b><small>ข้อที่มีความเห็นค้าง</small></span></div>
+      <div class="lg"><span class="sw" style="background:var(--t2);color:var(--c2)"><svg width="18" height="18"><use href="#i-check"/></svg></span><span><b>แผงตรวจทาน</b><small>การแก้ไข · ความเห็น · ระเบียบ · ประวัติ</small></span></div>
+    </div>
+    <div class="warnbox" style="background:var(--t4)"><svg style="color:var(--c4)"><use href="#i-loop"/></svg><span><b>ผู้จัดทำรับงานกลับ</b> เปิดแผง <span class="kbd">ตรวจทาน</span> → แท็บ “การแก้ไข” กด <b>ยอมรับ</b> หรือ <b>ย้อนกลับ</b> ทีละจุด (กู้ข้อที่ถูกลบได้) · ไฟล์ Word / PDF ที่ส่งออกเป็นฉบับสะอาดเสมอ</span></div>
+  </div>
+
+  <!-- 5 ai -->
+  <div class="card" id="ai">
+    <div class="sh"><div class="no" style="background:linear-gradient(135deg,#7353f5,#2f7cf6)">5</div><div><h2>AI ผู้ช่วย ✨</h2><p>ใช้ได้เมื่อผู้ดูแลตั้งค่า AI แล้ว (OpenRouter, Typhoon, OpenAI หรือโมเดลในเครื่อง)</p></div></div>
+    <div class="ai">
+      <div class="aic"><div class="ic"><svg><use href="#i-spark"/></svg></div><h4>AI ช่วยร่างสเปก</h4><p>บอกสั้น ๆ ว่าต้องการอะไร AI ร่างรายการคุณลักษณะตามรูปแบบ TOR ของคณะ ตรวจดูก่อนกด “ใช้รายการนี้”</p>
+        <div class="eg"><span>พิมพ์ว่า</span>กล้องวงจรปิด 4 ตัว พร้อมติดตั้ง ห้องเรียนรวมชั้น 6</div></div>
+      <div class="aic"><div class="ic"><svg><use href="#i-edit"/></svg></div><h4>ปรับภาษารายข้อ</h4><p>กด ✨ ที่ข้อใดก็ได้ AI เขียนใหม่ให้เป็นภาษาราชการ วัดผลได้ ไม่ระบุยี่ห้อ — เห็นเทียบก่อนยอมรับ</p>
+        <div class="eg"><span>ผลลัพธ์</span><del>แอร์เย็นเร็ว ยี่ห้อดัง</del> <ins>มีความสามารถในการทำความเย็นไม่น้อยกว่า 30,000 บีทียู/ชั่วโมง</ins></div></div>
+      <div class="aic"><div class="ic"><svg><use href="#i-shield"/></svg></div><h4>AI ตรวจตามระเบียบ</h4><p>แผงตรวจทาน → แท็บ “ระเบียบ” → <b>ให้ AI ตรวจละเอียด</b> ได้ประเด็นรายข้อพร้อมข้อความแนะนำ กดใช้ได้ทันที</p>
+        <div class="eg"><span>ตัวอย่างประเด็น</span>ข้อ 2.3 ระบุค่าตายตัว — แนะนำ “ไม่น้อยกว่า 50 วัตต์”</div></div>
+    </div>
+    <div class="warnbox"><svg><use href="#i-alert"/></svg><span><b>AI อาจผิดพลาดได้</b> ผู้จัดทำและผู้ตรวจสอบต้องตรวจทานทุกครั้ง ทุกการแก้ไขจาก AI ถูกบันทึกในประวัติและแสดงเป็นร่องรอยการแก้ไข · ไม่ควรใส่ข้อมูลลับหรือข้อมูลส่วนบุคคลในคำสั่งถึง AI</span></div>
+  </div>
+
+  <!-- 6 setup -->
+  <div class="card" id="setup">
+    <div class="sh"><div class="no" style="background:linear-gradient(135deg,#d79a00,#f5b81c)">6</div><div><h2>ผู้ดูแล: ติดตั้งครั้งเดียว</h2><p>ใช้เวลาประมาณ 10 นาที · ข้อมูลทั้งหมดอยู่ใน Google Drive ของหน่วยงาน</p></div></div>
+    <div class="arch">
+      <div class="node"><div class="ic" style="background:#24292f"><svg><use href="#i-git"/></svg></div><b>GitHub Pages</b><small>หน้าเว็บของระบบ<br>(ไม่มีข้อมูล / รหัส)</small></div>
+      <div class="arr"><svg><use href="#i-arrow"/></svg>รหัสทีม</div>
+      <div class="node"><div class="ic" style="background:linear-gradient(135deg,#1fa463,#4285f4)"><svg><use href="#i-code"/></svg></div><b>Google Apps Script</b><small>ตัวกลาง ตรวจรหัสทีม<br>เก็บ API key ของ AI</small></div>
+      <div class="arr"><svg><use href="#i-arrow"/></svg>อ่าน / เขียน</div>
+      <div class="node"><div class="ic" style="background:linear-gradient(135deg,#ffcd40,#f0701b)"><svg><use href="#i-drive"/></svg></div><b>Google Drive</b><small>ร่าง TOR · ความเห็น<br>ไฟล์ Word</small></div>
+    </div>
+    <div class="setup">
+      <div class="su"><b>สร้าง Apps Script</b><p>เข้า <code>script.google.com</code> → โปรเจกต์ใหม่ → วางโค้ด <code>google-apps-script/Code.gs</code></p></div>
+      <div class="su"><b>ตั้งรหัสทีม</b><p>แก้ <code>TEAM_KEY = 'CHANGE-ME'</code> เป็นรหัสที่เดายาก (12 ตัวขึ้นไป)</p></div>
+      <div class="su"><b>Run ฟังก์ชัน setup</b><p>อนุญาตสิทธิ์ Drive · ถ้าเตือน “unverified” กด Advanced → Go to… (เป็นสคริปต์ของคุณเอง)</p></div>
+      <div class="su"><b>Deploy เป็น Web app</b><p>Execute as: <b>Me</b> · Who has access: <b>Anyone</b> → คัดลอก URL ที่ลงท้าย <code>/exec</code></p></div>
+      <div class="su"><b>ใส่ AI key (ถ้าใช้)</b><p>Project Settings → Script Properties → เพิ่ม <code>AI_KEY</code> (เช่น key ของ OpenRouter)</p></div>
+      <div class="su"><b>เชื่อมต่อ & เชิญทีม</b><p>ในระบบ: ตั้งค่า → วาง URL + รหัสทีม → เชื่อมต่อ → <b>คัดลอกลิงก์เชิญทีม</b> ส่งให้ทุกคน</p></div>
+    </div>
+  </div>
+
+  <!-- 7 faq -->
+  <div class="card" id="faq">
+    <div class="sh"><div class="no">7</div><div><h2>คำถามที่พบบ่อย</h2></div></div>
+    <div class="faq">
+      <details><summary>ข้อมูลเก็บที่ไหน ปลอดภัยไหม?</summary><p>ถ้าเชื่อม Drive: อยู่ในโฟลเดอร์ “TOR Builder” ของบัญชีผู้ดูแล และมีสำเนาในเบราว์เซอร์ของแต่ละคน · ถ้าไม่เชื่อม: อยู่ในเบราว์เซอร์เครื่องนั้นเท่านั้น ควรกด “สำรองข้อมูล” เป็นระยะ</p></details>
+      <details><summary>สองคนแก้ฉบับเดียวกันพร้อมกันได้ไหม?</summary><p>ได้ ถ้ามีคนบันทึกแทรก ระบบจะถามว่าจะโหลดฉบับใน Drive, บันทึกทับ หรือเก็บของตัวเองเป็นสำเนา — ไม่มีข้อมูลหายเงียบ ๆ</p></details>
+      <details><summary>เน็ตหลุดระหว่างทำงาน?</summary><p>ทำต่อได้ ระบบบันทึกในเครื่องก่อน แล้วขึ้น Drive ให้อัตโนมัติเมื่อกลับมาออนไลน์ (สถานะดูได้ที่มุมซ้ายล่าง)</p></details>
+      <details><summary>ลบเอกสารผิด กู้ได้ไหม?</summary><p>ถ้าเชื่อม Drive ไฟล์จะไปอยู่ในถังขยะของ Drive กู้คืนได้ภายใน 30 วัน (ผู้ดูแลกู้ให้)</p></details>
+      <details><summary>ฟอนต์ในไฟล์ Word เป็นอะไร?</summary><p>TH SarabunPSK 16 pt ขนาด A4 ขอบตามหนังสือราชการ แก้ต่อใน Word ได้ทันที</p></details>
+      <details><summary>ระบบตรวจระเบียบแทนคนได้ไหม?</summary><p>ไม่ได้ — ทั้งการตรวจอัตโนมัติและ AI เป็นตัวช่วยชี้ประเด็นเบื้องต้น การรับรองยังเป็นหน้าที่ของผู้ตรวจสอบตามระเบียบ</p></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer>TOR Builder · คณะครุศาสตร์อุตสาหกรรม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ</footer>
+<script>
+try { const t = JSON.parse(localStorage.getItem('torb.settings.v1') || '{}').theme; if (t && t !== 'auto') document.documentElement.setAttribute('data-theme', t); } catch(e) {}
+</script>
+</body>
+</html>
