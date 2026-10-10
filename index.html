@@ -1,0 +1,2352 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOR Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+/* ฟอนต์เอกสาร: ใช้ TH SarabunPSK ในเครื่องถ้ามี ไม่มีก็ใช้ Sarabun ที่ย่อขนาดให้ใกล้เคียง */
+@font-face{font-family:'SarabunDoc';font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/sarabun@5/files/sarabun-thai-400-normal.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;size-adjust:72%}
+@font-face{font-family:'SarabunDoc';font-weight:700;src:url(https://cdn.jsdelivr.net/npm/@fontsource/sarabun@5/files/sarabun-thai-700-normal.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;size-adjust:72%}
+@font-face{font-family:'SarabunDoc';font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/sarabun@5/files/sarabun-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+20AC,U+2122;size-adjust:72%}
+@font-face{font-family:'SarabunDoc';font-weight:700;src:url(https://cdn.jsdelivr.net/npm/@fontsource/sarabun@5/files/sarabun-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+20AC,U+2122;size-adjust:72%}
+
+:root{
+  --bg:#f3f5fa; --panel:#ffffff; --panel-2:#f8f9fc; --ink:#14203a; --ink-2:#3a4762; --muted:#6b7590; --line:#e3e7f0; --line-2:#eef1f6;
+  --navy:#0f2350; --navy-2:#1a3a7a; --blue:#2563eb; --gold:#f5b81c; --gold-ink:#3d2c00;
+  --danger:#d92d20; --ok:#12a150; --focus:rgba(37,99,235,.22);
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05); --shadow:0 1px 3px rgba(16,24,40,.06),0 8px 24px -6px rgba(16,24,40,.08); --shadow-lg:0 16px 40px -12px rgba(15,35,80,.28);
+  --side:#0c1c40; --side-2:#132a5c; --side-ink:#c7d2ea; --side-muted:#7f8fb5;
+  --previewBg:#e7ebf2; --sheet:#fff; --sheet-ink:#000;
+  /* การ์ดสร้างเอกสาร */
+  --t1:#f2eeff; --c1:#7353f5; --t2:#e7f1ff; --c2:#2f7cf6; --t3:#fff0e3; --c3:#f0701b;
+  --t4:#e2f6f1; --c4:#0f9b82; --t5:#ffeaf0; --c5:#e2416b; --t6:#fff5d9; --c6:#d79a00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1220; --panel:#151c2e; --panel-2:#1a2236; --ink:#e8ecf5; --ink-2:#c3cbdc; --muted:#8c97b0; --line:#263049; --line-2:#1f2840;
+    --blue:#5b8ff9; --focus:rgba(91,143,249,.3); --danger:#f97066; --ok:#47cd89;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -8px rgba(0,0,0,.5); --shadow-lg:0 16px 40px -12px rgba(0,0,0,.6);
+    --side:#0a1124; --side-2:#111b36; --previewBg:#0a0f1b;
+    --t1:rgba(115,83,245,.14); --t2:rgba(47,124,246,.14); --t3:rgba(240,112,27,.14); --t4:rgba(15,155,130,.16); --t5:rgba(226,65,107,.14); --t6:rgba(215,154,0,.15);
+    --c1:#9d86ff; --c2:#6aa3ff; --c3:#ff9a52; --c4:#3cc9ad; --c5:#ff7598; --c6:#f2be3a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1220; --panel:#151c2e; --panel-2:#1a2236; --ink:#e8ecf5; --ink-2:#c3cbdc; --muted:#8c97b0; --line:#263049; --line-2:#1f2840;
+  --blue:#5b8ff9; --focus:rgba(91,143,249,.3); --danger:#f97066; --ok:#47cd89;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -8px rgba(0,0,0,.5); --shadow-lg:0 16px 40px -12px rgba(0,0,0,.6);
+  --side:#0a1124; --side-2:#111b36; --previewBg:#0a0f1b;
+  --t1:rgba(115,83,245,.14); --t2:rgba(47,124,246,.14); --t3:rgba(240,112,27,.14); --t4:rgba(15,155,130,.16); --t5:rgba(226,65,107,.14); --t6:rgba(215,154,0,.15);
+  --c1:#9d86ff; --c2:#6aa3ff; --c3:#ff9a52; --c4:#3cc9ad; --c5:#ff7598; --c6:#f2be3a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+svg{flex:none}
+[hidden]{display:none !important}
+
+/* ================= shell ================= */
+.app{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--side) 0%,var(--side-2) 100%);color:var(--side-ink);padding:18px 14px;z-index:40}
+.side .brand{display:flex;gap:12px;align-items:center;padding:6px 8px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#ffd970);color:var(--navy);display:grid;place-items:center;box-shadow:0 6px 16px -4px rgba(245,184,28,.5)}
+.logo svg{width:22px;height:22px}
+.side .brand b{display:block;color:#fff;font-size:17px;letter-spacing:.2px}
+.side .brand span{display:block;font-size:12px;color:var(--side-muted);line-height:1.35}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav .sec{font-size:11.5px;letter-spacing:.6px;color:var(--side-muted);padding:16px 12px 6px;text-transform:uppercase}
+.nav a,.nav button{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--side-ink);text-decoration:none;border:0;background:transparent;cursor:pointer;font-size:14.5px;text-align:left;width:100%;position:relative}
+.nav a svg,.nav button svg{width:19px;height:19px;opacity:.85}
+.nav a:hover,.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.on{background:#fff;color:var(--navy);font-weight:600;box-shadow:0 6px 18px -8px rgba(0,0,0,.5)}
+.nav a.on svg{opacity:1;color:var(--navy-2)}
+.nav a.on::before{content:'';position:absolute;left:-14px;top:8px;bottom:8px;width:4px;border-radius:0 4px 4px 0;background:var(--gold)}
+.nav .cur{font-size:12px;color:var(--side-muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.nav a.on .cur{color:var(--muted)}
+.side .foot{margin-top:auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+.side .foot b{color:#fff;font-size:13.5px;display:block;line-height:1.4}
+.side .foot span{font-size:12px;color:var(--side-muted);display:block;margin-top:2px}
+.side .foot .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:14px 28px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar h1{font-size:19px;margin:0;line-height:1.3;font-weight:700}
+.topbar .sub{font-size:13px;color:var(--muted)}
+.topbar .grow{flex:1;min-width:0}
+.menuBtn{display:none}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--panel);padding:8px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;font-size:14px;font-weight:500;color:var(--ink-2);box-shadow:var(--shadow-sm);transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--panel-2);border-color:color-mix(in srgb,var(--line) 60%,var(--muted))}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible,.icon:focus-visible,.nav a:focus-visible,.ccard:focus-visible{outline:none;box-shadow:0 0 0 3px var(--focus)}
+.btn svg{width:17px;height:17px}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-2)}
+:root[data-theme="dark"] .btn.primary{background:var(--blue);border-color:var(--blue)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{background:var(--blue);border-color:var(--blue)}}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink);font-weight:600}
+.btn.gold:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent;border-color:transparent;box-shadow:none}
+.btn.ghost:hover{background:var(--panel-2)}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+.btn.icon-only{padding:8px;width:38px;height:38px}
+.btn.danger{color:var(--danger)}
+
+.page{padding:24px 28px 48px;max-width:1360px;width:100%}
+
+/* ================= dashboard ================= */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat{position:relative;overflow:hidden;border-radius:18px;padding:18px 20px;color:#fff;min-height:112px;box-shadow:var(--shadow)}
+.stat::after{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1)}
+.stat .ico{position:absolute;right:16px;bottom:14px;width:40px;height:40px;opacity:.28}
+.stat .lbl{font-size:13.5px;opacity:.9;font-weight:500}
+.stat .val{font-size:34px;font-weight:700;line-height:1.15;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.stat .val small{font-size:15px;font-weight:500;opacity:.85;margin-left:4px}
+.stat.s1{background:linear-gradient(135deg,#0f2350,#1f4594)}
+.stat.s2{background:linear-gradient(135deg,#6d4cf0,#8f74ff)}
+.stat.s3{background:linear-gradient(135deg,#1d6fe8,#3fa0ff)}
+.stat.s4{background:linear-gradient(135deg,#f5b81c,#ffd35c);color:var(--gold-ink)}
+.stat.s4::after{background:rgba(255,255,255,.25)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+.hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:22px 26px;background:radial-gradient(circle at 85% 0%,rgba(245,184,28,.18),transparent 40%),linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;border-bottom:4px solid var(--gold)}
+.hero .plus{width:52px;height:52px;border-radius:50%;background:var(--gold);color:var(--navy);display:grid;place-items:center;box-shadow:0 8px 20px -6px rgba(245,184,28,.6)}
+.hero .plus svg{width:26px;height:26px}
+.hero h2{margin:0;font-size:24px;line-height:1.25}
+.hero p{margin:2px 0 0;font-size:14px;color:#c4d0ec}
+.hero .grow{flex:1;min-width:220px}
+.create{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:22px}
+.ccard{border:1px solid transparent;border-radius:16px;padding:20px;cursor:pointer;text-align:left;background:var(--t);transition:transform .18s,box-shadow .18s,border-color .18s;display:flex;flex-direction:column;gap:4px;min-height:150px}
+.ccard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--c) 30%,transparent)}
+.ccard .ti{width:50px;height:50px;border-radius:14px;background:var(--c);color:#fff;display:grid;place-items:center;margin-bottom:10px;box-shadow:0 8px 18px -8px var(--c)}
+.ccard .ti svg{width:24px;height:24px}
+.ccard b{font-size:17px;color:var(--ink)}
+.ccard span{font-size:13.5px;color:var(--muted)}
+.ccard .go{margin-top:auto;padding-top:10px;font-size:13px;color:var(--c);font-weight:600;display:flex;align-items:center;gap:4px;opacity:0;transform:translateX(-4px);transition:.18s}
+.ccard:hover .go{opacity:1;transform:none}
+
+.listHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid var(--line)}
+.listHead h3{margin:0;font-size:17px}
+.listHead .count{font-size:12.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:1px 10px;color:var(--muted)}
+.search{position:relative;margin-left:auto;min-width:240px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
+.search input{padding-left:36px !important}
+.pills{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.pills button{border:0;background:transparent;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--muted);font-weight:500}
+.pills button.on{background:var(--panel);color:var(--ink);box-shadow:var(--shadow-sm)}
+table.list{width:100%;border-collapse:collapse}
+table.list th{font-size:12.5px;font-weight:600;color:var(--muted);text-align:left;padding:10px 22px;background:var(--panel-2);border-bottom:1px solid var(--line);white-space:nowrap}
+table.list td{padding:13px 22px;border-bottom:1px solid var(--line-2);vertical-align:middle;font-size:14px}
+table.list tr:last-child td{border-bottom:0}
+table.list tbody tr{cursor:pointer;transition:background .12s}
+table.list tbody tr:hover{background:var(--panel-2)}
+.docName{display:flex;align-items:center;gap:12px;min-width:0}
+.docName .fi{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none}
+.docName .fi svg{width:19px;height:19px}
+.docName b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.docName small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.badge.buy{background:var(--t1);color:var(--c1)}
+.badge.hire{background:var(--t3);color:var(--c3)}
+.badge.mine{background:var(--t4);color:var(--c4)}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
+.st::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.st.draft::before{background:#98a2b3}.st.review::before{background:#f5b81c}.st.revise::before{background:var(--danger)}.st.done::before{background:var(--ok)}
+.num-r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rowAct{display:flex;gap:2px;justify-content:flex-end}
+.emptyBox{padding:48px 20px;text-align:center;color:var(--muted)}
+.emptyBox .big{width:64px;height:64px;border-radius:18px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 12px;color:var(--blue)}
+.emptyBox .big svg{width:30px;height:30px}
+.emptyBox b{display:block;color:var(--ink);font-size:16px;margin-bottom:2px}
+
+/* ================= library ================= */
+.libHead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.tplGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.tpl{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s}
+.tpl:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.tpl .thumb{height:132px;background:var(--previewBg);position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.tpl .mini{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:200px;background:#fff;border-radius:4px 4px 0 0;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:12px 14px;font-family:'Sarabun',sans-serif;font-size:6px;line-height:1.5;color:#333;height:140px}
+.tpl .mini .mt{text-align:center;font-weight:600;font-size:6.5px;color:#111}
+.tpl .mini .mr{border-top:1px dashed #bbb;margin:4px 30px 5px}
+.tpl .mini p{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpl .mini p.s{padding-left:8px;color:#666}
+.tpl .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.tpl .body b{font-size:15.5px}
+.tpl .body span{font-size:13px;color:var(--muted)}
+.tpl .meta{display:flex;gap:8px;align-items:center;margin-top:auto;padding-top:12px}
+.tpl .meta .btn{margin-left:auto}
+
+/* ================= editor ================= */
+.edTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.edTop .titleBox{min-width:0;flex:1}
+.edTop .titleBox h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saveState{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.saveState::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.saveState.busy::before{background:var(--gold)}
+.saveState.err::before{background:var(--danger)}
+.edLayout{display:grid;grid-template-columns:minmax(400px,580px) 1fr;flex:1;min-height:0}
+.editor{padding:22px 22px 60px;border-right:1px solid var(--line);overflow:auto;height:calc(100vh - 71px)}
+.previewWrap{background:var(--previewBg);overflow:auto;height:calc(100vh - 71px);padding:26px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.previewbar{width:100%;max-width:794px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12.5px}
+.steps{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.steps a{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px 6px 6px;border-radius:999px;border:1px solid var(--line);background:var(--panel);white-space:nowrap}
+.steps a i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--navy-2)}
+.steps a:hover{border-color:var(--blue);color:var(--ink)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);scroll-margin-top:16px}
+.card > summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:12px;font-weight:600;font-size:15.5px}
+.card > summary::-webkit-details-marker{display:none}
+.card > summary .step{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;display:grid;place-items:center;font-size:13.5px;font-weight:700;flex:none}
+.card > summary small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+.card > summary .chev{margin-left:auto;transition:transform .2s;color:var(--muted);width:18px;height:18px}
+.card[open] > summary .chev{transform:rotate(180deg)}
+.card .body{padding:2px 18px 18px;border-top:1px solid var(--line-2);padding-top:14px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label,.lbl{font-size:13px;color:var(--ink-2);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > .field{flex:1;min-width:110px}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px;outline:none;transition:border-color .15s,box-shadow .15s}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--line) 50%,var(--muted))}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--focus)}
+textarea{resize:vertical;min-height:40px;line-height:1.5}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{border:1.5px solid var(--line);background:var(--panel);padding:10px 12px;cursor:pointer;border-radius:12px;text-align:left;display:flex;gap:10px;align-items:center}
+.seg button svg{width:20px;height:20px;color:var(--muted)}
+.seg button b{display:block;font-size:14.5px}
+.seg button small{display:block;font-size:12px;color:var(--muted)}
+.seg button.on{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 7%,var(--panel))}
+.seg button.on svg{color:var(--blue)}
+.check{display:flex;align-items:center;gap:9px;font-size:14px;margin:7px 0;cursor:pointer;color:var(--ink-2)}
+.check input{width:17px;height:17px;accent-color:var(--blue);flex:none}
+.hint{font-size:12.5px;color:var(--muted);margin:2px 0 8px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px;padding:10px;background:var(--panel-2);border-radius:12px;border:1px dashed var(--line)}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:2px 11px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.node{border-left:2px solid var(--line);padding-left:10px;margin:8px 0}
+.node.l1{border-left-color:var(--blue);background:var(--panel-2);border-radius:0 12px 12px 0;padding:8px 10px}
+.node.group{border-left-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,var(--panel));border-radius:0 12px 12px 0;padding:8px 10px}
+.nrow{display:flex;gap:8px;align-items:flex-start}
+.num{min-width:40px;padding-top:9px;font-weight:700;color:var(--navy-2);font-size:13.5px;font-variant-numeric:tabular-nums}
+:root[data-theme="dark"] .num{color:var(--blue)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .num{color:var(--blue)}}
+.nrow textarea{flex:1}
+.qty{display:flex;gap:6px;margin:6px 0 0 48px;align-items:center;flex-wrap:wrap}
+.qty input{width:80px;padding:5px 9px;font-size:13px}
+.qty .lbl{font-size:12.5px}
+.tools{display:flex;gap:2px;flex-wrap:wrap;margin:4px 0 0 44px}
+.icon{border:0;background:transparent;border-radius:7px;padding:3px 7px;cursor:pointer;color:var(--muted);font-size:12.5px;display:inline-flex;align-items:center;gap:4px}
+.icon:hover{background:var(--line-2);color:var(--ink)}
+.icon.del:hover{color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent)}
+.icon svg{width:14px;height:14px}
+.children{margin-left:16px}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:12px;font-size:14px}
+.condRow{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap;font-size:14px}
+.condRow input[type=number]{width:76px;padding:6px 10px}
+.condRow select{width:auto;padding:6px 10px}
+.extra{display:flex;gap:6px;margin:6px 0}
+.sigRow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin:6px 0}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.imgCard{border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--panel-2)}
+.imgCard img{width:100%;height:90px;object-fit:cover;border-radius:8px;display:block}
+.imgCard input{margin-top:6px;font-size:12.5px;padding:5px 8px}
+.upload{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);cursor:pointer;font-size:14px}
+.upload:hover{border-color:var(--blue);color:var(--blue)}
+.upload svg{width:18px;height:18px}
+.prefix{position:relative}
+.prefix input{padding-right:44px}
+.prefix span{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted)}
+
+/* ================= A4 sheet ================= */
+.sheet{width:794px;min-height:1123px;background:var(--sheet);color:var(--sheet-ink);box-shadow:0 10px 40px -10px rgba(15,35,80,.35),0 2px 6px rgba(0,0,0,.06);border-radius:2px;
+  padding:94px 76px 76px 113px; /* บน 2.5 ขวา 2 ล่าง 2 ซ้าย 3 ซม. */
+  font-family:'TH SarabunPSK','TH Sarabun New','THSarabunNew','SarabunDoc',serif;font-size:16pt;line-height:1.18;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 1122px,#c7ccd4 1122px,#c7ccd4 1123px);
+  transform-origin:top center;flex:none}
+.sheet .t{text-align:center;font-weight:700;margin:0}
+.sheet .t + .t{margin-top:2pt}
+.sheet .rule{text-align:center;margin:6pt 0 10pt;color:#000;font-weight:400}
+.sheet .p{margin:0;display:flex;align-items:baseline;gap:12px}
+.sheet .p .c{flex:1;min-width:0;word-break:normal;overflow-wrap:anywhere}
+.sheet .p .r{flex:none;white-space:nowrap}
+.sheet .b{font-weight:700}
+.sheet .gap{height:10pt}
+.sheet .sig{display:grid;grid-template-columns:1fr 1fr;gap:26pt 20pt;margin-top:34pt;text-align:center}
+.sheet .sig .one{grid-column:1 / -1;justify-self:center;min-width:50%}
+.sheet .pb{height:0;border-top:1px dashed #9aa3af;margin:16pt -76px 16pt -113px;position:relative}
+.sheet .pb::after{content:'ขึ้นหน้าใหม่';position:absolute;right:8px;top:-9px;background:#fff;color:#8a93a0;font:12px Sarabun,sans-serif;padding:0 6px}
+.sheet figure{margin:10pt 0 14pt;text-align:center;break-inside:avoid}
+.sheet figure img{max-width:100%;max-height:420px}
+.sheet figcaption{margin-top:4pt}
+.sheet .placeholder{color:#a0a7b1}
+
+/* ================= review ================= */
+.cnt{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--danger);color:#fff;font-size:11.5px;font-weight:700;display:inline-grid;place-items:center}
+.flow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 28px;background:var(--panel);border-bottom:1px solid var(--line)}
+.flowSteps{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fs{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);padding:4px 11px 4px 5px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2)}
+.fs i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--line);color:var(--muted)}
+.fs.past i{background:var(--ok);color:#fff}
+.fs.now{border-color:var(--blue);color:var(--ink);background:color-mix(in srgb,var(--blue) 8%,var(--panel));font-weight:600}
+.fs.now i{background:var(--blue);color:#fff}
+.fs.now.bad{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--panel))}
+.fs.now.bad i{background:var(--danger)}
+.fArrow{color:var(--line);width:14px;height:14px}
+.flow .msg{font-size:13px;color:var(--muted)}
+.flow .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn.okb{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.warnb{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,var(--line))}
+.pvTools{display:flex;gap:6px;flex-wrap:wrap}
+.tog{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 12px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.tog svg{width:14px;height:14px}
+.tog.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.role{margin:auto 0 10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.role .lbl2{font-size:11.5px;color:var(--side-muted);margin-bottom:8px;letter-spacing:.4px}
+.rolePills{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:rgba(0,0,0,.2);padding:3px;border-radius:10px}
+.rolePills button{border:0;background:transparent;color:var(--side-ink);padding:7px 6px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;gap:6px;align-items:center;justify-content:center}
+.rolePills button svg{width:15px;height:15px}
+.rolePills button.on{background:var(--gold);color:var(--navy);font-weight:600}
+.who{display:flex;gap:10px;align-items:center;margin-top:10px;width:100%;background:transparent;border:0;color:var(--side-ink);cursor:pointer;text-align:left;padding:4px;border-radius:8px}
+.who:hover{background:rgba(255,255,255,.06)}
+.who .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4c6fd6,#7a5cf0);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.who b{display:block;font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+.who small{display:block;font-size:11.5px;color:var(--side-muted)}
+.side .foot{margin-top:0}
+
+/* ข้อความบนเอกสาร */
+.sheet .p,.sheet .t{position:relative}
+.sheet .tx{outline:none;border-radius:2px}
+.sheet.editing .tx[contenteditable]{cursor:text}
+.sheet.editing .tx[contenteditable]:hover{background:rgba(37,99,235,.07);box-shadow:0 0 0 2px rgba(37,99,235,.07)}
+.sheet .tx[contenteditable]:focus{background:#fffbe6;box-shadow:0 0 0 2px #f5b81c}
+.sheet ins{color:#08703a;text-decoration:underline;text-decoration-color:#21a35a;text-underline-offset:2px;background:#e3f6ea}
+.sheet del{color:#c2271b;text-decoration:line-through;background:#fde9e7}
+.sheet .delp{opacity:.85}
+.sheet .hasC > .c,.sheet .t.hasC{background:linear-gradient(transparent 60%,rgba(245,184,28,.35) 60%)}
+.sheet .cmark{position:absolute;right:-58px;top:2px;min-width:22px;height:22px;padding:0 6px;border-radius:11px 11px 11px 2px;background:#f5b81c;color:#3d2c00;font:600 12px/22px 'IBM Plex Sans Thai',sans-serif;text-align:center;cursor:pointer;text-indent:0}
+.sheet .pa{position:absolute;right:calc(100% + 6px);top:0;display:none;gap:2px;font-family:'IBM Plex Sans Thai',sans-serif;text-indent:0;z-index:2;background:#fff;border:1px solid #e3e7f0;border-radius:8px;padding:2px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.sheet.editing .p:hover > .pa,.sheet.editing .t:hover > .pa,.sheet.editing .p:focus-within > .pa{display:flex}
+.sheet .pa button{border:0;background:transparent;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;cursor:pointer;color:#5b667f;padding:0}
+.sheet .pa button:hover{background:#eef2fb;color:#14203a}
+.sheet .pa button.d:hover{background:#fde9e7;color:#c2271b}
+.sheet .pa svg{width:14px;height:14px}
+.sheet .flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:rgba(245,184,28,.45)}100%{background:transparent}}
+
+.drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);z-index:60;display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s}
+.drawer.open{transform:none}
+.drHead{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.drHead b{display:block;font-size:16px}
+.drHead small{display:block;font-size:12.5px;color:var(--muted)}
+.drHead .btn{margin-left:auto}
+.drTabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);padding:0 8px}
+.drTabs button{border:0;background:transparent;padding:10px 4px;font-size:12.5px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;position:relative}
+.drTabs button svg{width:18px;height:18px}
+.drTabs button.on{color:var(--ink);border-bottom-color:var(--blue);font-weight:600}
+.drTabs i{font-style:normal;position:absolute;top:5px;right:calc(50% - 22px);font-size:10.5px;min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;display:none;place-items:center;padding:0 4px;font-weight:700}
+.drTabs i.show{display:grid}
+.drTabs i.ok{background:var(--ok)}
+.drBody{flex:1;overflow:auto;padding:16px 18px 40px}
+.drBody .tip{font-size:12.5px;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.ritem{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:10px;background:var(--panel)}
+.ritem .rh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.ritem .rh a{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none}
+.ritem .rh .k{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px}
+.k.mod{background:var(--t2);color:var(--c2)}.k.ins{background:var(--t4);color:var(--c4)}.k.del{background:var(--t5);color:var(--c5)}
+.ritem .rt{font-family:'Sarabun',sans-serif;font-size:14px;line-height:1.6;word-break:break-word}
+.ritem .rt ins{color:#08703a;background:#e3f6ea;text-decoration:underline}
+.ritem .rt del{color:#c2271b;background:#fde9e7}
+.ritem .ra{display:flex;gap:6px;margin-top:9px;justify-content:flex-end}
+.ritem.resolved{opacity:.6}
+.ritem .who2{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);margin-top:8px}
+.ritem .who2 b{color:var(--ink);font-weight:600}
+.rpl{border-left:2px solid var(--line);margin:8px 0 0 4px;padding-left:10px;font-size:13.5px}
+.rpl small{display:block;color:var(--muted);font-size:12px}
+.replyBox{display:flex;gap:6px;margin-top:8px}
+.replyBox input{padding:5px 10px;font-size:13px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);margin-bottom:8px;cursor:default}
+.chk[data-ref]{cursor:pointer}
+.chk[data-ref]:hover{border-color:var(--blue)}
+.chk .dt{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;margin-top:1px}
+.chk.err .dt{background:var(--danger)}.chk.warn .dt{background:#e79a00}.chk.info .dt{background:var(--blue)}.chk.ok .dt{background:var(--ok)}
+.chk b{display:block;font-size:13.5px;font-weight:600}
+.chk small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.logi{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.logi .ld{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:7px;flex:none}
+.logi small{display:block;color:var(--muted);font-size:12px}
+.quote{font-family:'Sarabun',sans-serif;background:var(--panel-2);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;color:var(--ink-2);max-height:120px;overflow:auto}
+
+/* ================= cloud ================= */
+.cloud{display:flex;align-items:center;gap:7px;margin-top:10px;background:transparent;border:0;color:var(--side-muted);font-size:12px;cursor:pointer;padding:0;text-align:left;line-height:1.35}
+.cloud:hover{color:#fff}
+.cloud .dot{flex:none}
+.cloud.off .dot{background:#8b97b5;box-shadow:0 0 0 3px rgba(139,151,181,.18)}
+.cloud.ok .dot{background:#3ddc84;box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.cloud.busy .dot,.cloud.pend .dot{background:var(--gold);box-shadow:0 0 0 3px rgba(245,184,28,.2);animation:pulse 1s infinite alternate}
+.cloud.err .dot{background:#f97066;box-shadow:0 0 0 3px rgba(249,112,102,.2)}
+@keyframes pulse{to{opacity:.4}}
+.cloudLink{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--gold);text-decoration:none}
+.cloudLink svg{width:14px;height:14px}
+.cloudLink:hover{text-decoration:underline}
+.driveBox{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel-2)}
+.driveBox .dh{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.driveBox .dh b{display:block}
+.driveBox .dh small{color:var(--muted);font-size:12.5px}
+.driveBox .gd{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1fa463,#4285f4 55%,#ffcd40);color:#fff;display:grid;place-items:center;flex:none}
+.driveBox .gd svg{width:19px;height:19px}
+
+/* ================= dialogs / toast ================= */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;transition:.25s;pointer-events:none;z-index:80;box-shadow:var(--shadow-lg);display:flex;gap:8px;align-items:center}
+.toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+dialog{border:1px solid var(--line);border-radius:20px;padding:0;background:var(--panel);color:var(--ink);width:min(640px,calc(100vw - 32px));max-height:calc(100vh - 40px);box-shadow:var(--shadow-lg)}
+dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
+.dlgHead{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.dlgHead .di{width:38px;height:38px;border-radius:11px;background:var(--t2);color:var(--c2);display:grid;place-items:center}
+.dlgHead .di svg{width:19px;height:19px}
+.dlgHead h2{font-size:17px;margin:0}
+.dlgHead .btn{margin-left:auto}
+.dlgBody{padding:20px;overflow:auto;max-height:calc(100vh - 170px)}
+.dlgFoot{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line);background:var(--panel-2)}
+.mobileTabs{display:none}
+.scrim{display:none}
+
+/* ================= responsive ================= */
+@media (max-width: 1180px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .create{grid-template-columns:repeat(2,1fr)}
+  .colHide{display:none}
+}
+@media (max-width: 1024px){
+  .edLayout{grid-template-columns:1fr}
+  .editor,.previewWrap{height:auto;overflow:visible;border-right:0}
+  .mobileTabs{display:flex;gap:6px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:67px;z-index:25}
+  .mobileTabs .btn{flex:1}
+  .mobileTabs .btn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  body[data-pane="edit"] .previewWrap{display:none}
+  body[data-pane="preview"] .editor{display:none}
+  .previewWrap{padding:16px;overflow-x:hidden}
+}
+@media (max-width: 860px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:268px;transform:translateX(-100%);transition:transform .25s}
+  body.navOpen .side{transform:none;box-shadow:var(--shadow-lg)}
+  body.navOpen .scrim{display:block;position:fixed;inset:0;background:rgba(8,15,35,.45);z-index:35}
+  .menuBtn{display:inline-flex}
+  .topbar{padding:12px 16px}
+  .page{padding:16px 16px 40px}
+  .editor{padding:16px}
+  .hero{padding:18px}
+  .hero h2{font-size:20px}
+  .create{grid-template-columns:1fr;padding:16px}
+  .stats{gap:10px}
+  .stat{padding:14px 16px;min-height:96px}
+  .stat .val{font-size:26px}
+  .flow{padding:10px 16px}
+  .flow .acts{margin-left:0;width:100%}
+  .sheet .cmark{right:-40px}
+  .search{min-width:0;width:100%;margin-left:0}
+  .listHead{padding:14px 16px}
+  table.list td,table.list th{padding:11px 14px}
+  .docName b,.docName small{max-width:190px}
+  .hideSm{display:none}
+}
+
+@page{size:A4;margin:2.5cm 2cm 2cm 3cm}
+@media print{
+  body{background:#fff}
+  .side,.topbar,.editor,.previewbar,.mobileTabs,.toast,dialog,.scrim,#viewHome,#viewLibrary,.flow,.drawer,.sheet .pa,.sheet .cmark,.sheet .delp,.sheet del{display:none !important}
+  .sheet ins{all:unset}
+  .sheet .hasC > .c,.sheet .t.hasC{background:none}
+  .sheet .tx:focus{background:none;box-shadow:none}
+  .app{display:block}
+  .edLayout{display:block}
+  .previewWrap{display:block !important;padding:0;overflow:visible;height:auto;background:#fff}
+  .sheet{box-shadow:none;padding:0;width:auto;min-height:0;background-image:none;transform:none !important;margin:0 !important;border-radius:0}
+  .sheet .pb{border:0;margin:0;break-after:page}
+  .sheet .pb::after{display:none}
+  .sheet .placeholder{color:#000}
+}
+</style>
+</head>
+<body data-pane="edit">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.8 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3.2 14H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8M7 21v-7h10v7"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3h3l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21.5 7H6.2"/></symbol>
+    <symbol id="i-brief" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></symbol>
+    <symbol id="i-build" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01"/></symbol>
+    <symbol id="i-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 1.7-1.3a4 4 0 0 0-5-5L3 10l3-3 1.3 1.7"/><path d="m14.7 6.3-3.4-3.4L9 5.2"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></symbol>
+    <symbol id="i-word" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8.5 12l1.3 5 2.2-4 2.2 4 1.3-5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H5a2 2 0 0 1 0-4h13v4M3 5v14a2 2 0 0 0 2 2h15V7"/><path d="M16 14h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+    <symbol id="i-track" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M4 12h6M4 17h8"/><path d="m15 15 2 2 4-4"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+    <symbol id="i-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v9a3 3 0 0 0 3 3h11M15 12l4 4-4 4"/></symbol>
+    <symbol id="i-drive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="M8 3l6 10h8M2 13h12l4 7"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="logo"><svg><use href="#i-doc"/></svg></div>
+      <div><b>TOR Builder</b><span>ระบบร่างขอบเขตของงาน<br>ตาม พ.ร.บ. จัดซื้อจัดจ้างฯ 2560</span></div>
+    </div>
+    <nav class="nav">
+      <a href="#/home" data-nav="home"><svg><use href="#i-home"/></svg><span>หน้าหลัก<span class="cur">ภาพรวมและร่างทั้งหมด</span></span></a>
+      <a href="#/library" data-nav="library"><svg><use href="#i-grid"/></svg><span>คลังแม่แบบ<span class="cur" id="navTplCount">แม่แบบพร้อมใช้</span></span></a>
+      <a href="#/edit" data-nav="edit" id="navEdit" hidden><svg><use href="#i-edit"/></svg><span>กำลังแก้ไข<span class="cur" id="navEditName">—</span></span></a>
+      <div class="sec">จัดการข้อมูล</div>
+      <button id="navSettings"><svg><use href="#i-gear"/></svg>ตั้งค่าหน่วยงาน</button>
+      <button id="navExport"><svg><use href="#i-save"/></svg>สำรองข้อมูล (.json)</button>
+      <label class="navLabel"><button type="button" id="navImport"><svg><use href="#i-upload"/></svg>นำเข้าข้อมูล</button><input type="file" id="importInput" accept=".json,application/json" hidden></label>
+    </nav>
+    <div class="role">
+      <div class="lbl2">ใช้งานในบทบาท</div>
+      <div class="rolePills" id="rolePills"><button data-role="maker"><svg><use href="#i-edit"/></svg>ผู้จัดทำ</button><button data-role="reviewer"><svg><use href="#i-check"/></svg>ผู้ตรวจสอบ</button></div>
+      <button class="who" id="whoBtn"><span class="av" id="whoAv">?</span><span><b id="whoName">ตั้งชื่อผู้ใช้งาน</b><small id="whoRole">ผู้จัดทำ</small></span></button>
+    </div>
+    <div class="foot">
+      <b id="footAgency">คณะครุศาสตร์อุตสาหกรรม</b>
+      <span id="footUni">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ</span>
+      <button class="cloud off" id="cloudState" title="ตั้งค่าการเชื่อม Google Drive"><i class="dot"></i><span>บันทึกในเครื่องนี้</span></button>
+      <a class="cloudLink" id="cloudLink" href="#" target="_blank" rel="noopener" hidden><svg><use href="#i-drive"/></svg>เปิดโฟลเดอร์ใน Google Drive</a>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main">
+    <!-- ============ HOME ============ -->
+    <section id="viewHome">
+      <header class="topbar">
+        <button class="btn icon-only ghost menuBtn" data-menu aria-label="เมนู"><svg><use href="#i-menu"/></svg></button>
+        <div class="grow"><h1>ระบบร่างขอบเขตของงาน (TOR)</h1><div class="sub" data-agency>—</div></div>
+        <button class="btn icon-only" data-theme-toggle aria-label="สลับธีม"><svg><use href="#i-moon"/></svg></button>
+      </header>
+      <div class="page">
+        <div class="stats">
+          <div class="stat s1"><div class="lbl">TOR ทั้งหมด</div><div class="val" id="stTotal">0</div><svg class="ico"><use href="#i-doc"/></svg></div>
+          <div class="stat s2"><div class="lbl">งานซื้อ</div><div class="val" id="stBuy">0</div><svg class="ico"><use href="#i-cart"/></svg></div>
+          <div class="stat s3"><div class="lbl">งานจ้าง</div><div class="val" id="stHire">0</div><svg class="ico"><use href="#i-brief"/></svg></div>
+          <div class="stat s4"><div class="lbl">วงเงินรวม (บาท)</div><div class="val" id="stBudget">0</div><svg class="ico"><use href="#i-wallet"/></svg></div>
+        </div>
+
+        <div class="panel">
+          <div class="hero">
+            <div class="plus"><svg><use href="#i-plus"/></svg></div>
+            <div class="grow"><h2>สร้าง TOR ใหม่</h2><p>เลือกประเภทงาน ระบบจะเตรียมหัวข้อและเงื่อนไขมาตรฐานให้ทันที</p></div>
+            <a class="btn gold" href="#/library"><svg><use href="#i-grid"/></svg>ดูคลังแม่แบบทั้งหมด</a>
+          </div>
+          <div class="create" id="createGrid"></div>
+        </div>
+
+        <div class="panel">
+          <div class="listHead">
+            <h3>ร่าง TOR ทั้งหมด</h3><span class="count" id="listCount">0 ฉบับ</span>
+            <button class="btn sm" id="btnSync" hidden title="ดึงข้อมูลล่าสุดจาก Google Drive"><svg><use href="#i-sync"/></svg>ซิงก์</button>
+            <div class="pills" id="listFilter"><button data-f="all" class="on">ทั้งหมด</button><button data-f="buy">ซื้อ</button><button data-f="hire">จ้าง</button></div>
+            <div class="search"><svg><use href="#i-search"/></svg><input type="search" id="listSearch" placeholder="ค้นหาชื่อโครงการ…"></div>
+          </div>
+          <div id="listBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LIBRARY ============ -->
+    <section id="viewLibrary" hidden>
+      <header class="topbar">
+        <button class="btn icon-only ghost menuBtn" data-menu aria-label="เมนู"><svg><use href="#i-menu"/></svg></button>
+        <div class="grow"><h1>คลังแม่แบบ TOR</h1><div class="sub">แม่แบบจาก TOR ที่ใช้จริงของหน่วยงาน และแม่แบบที่คุณบันทึกไว้</div></div>
+        <button class="btn icon-only" data-theme-toggle aria-label="สลับธีม"><svg><use href="#i-moon"/></svg></button>
+      </header>
+      <div class="page">
+        <div class="libHead">
+          <div class="pills" id="libFilter"><button data-f="all" class="on">ทั้งหมด</button><button data-f="buy">ซื้อ</button><button data-f="hire">จ้าง</button><button data-f="mine">ของฉัน</button></div>
+          <div class="search"><svg><use href="#i-search"/></svg><input type="search" id="libSearch" placeholder="ค้นหาแม่แบบ…"></div>
+        </div>
+        <div class="tplGrid" id="tplGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ EDITOR ============ -->
+    <section id="viewEditor" hidden style="display:flex;flex-direction:column;min-height:100vh">
+      <header class="topbar edTop">
+        <button class="btn icon-only ghost menuBtn" data-menu aria-label="เมนู"><svg><use href="#i-menu"/></svg></button>
+        <a class="btn icon-only" href="#/home" title="กลับหน้าหลัก"><svg><use href="#i-back"/></svg></a>
+        <div class="titleBox"><h1 id="draftName">ร่างใหม่</h1><span class="saveState" id="saveState">บันทึกแล้ว</span></div>
+        <button class="btn" id="btnReview"><svg><use href="#i-check"/></svg><span class="hideSm">ตรวจทาน</span><span class="cnt" id="reviewCnt" hidden>0</span></button>
+        <button class="btn icon-only hideSm" id="btnDup" title="ทำสำเนา"><svg><use href="#i-copy"/></svg></button>
+        <button class="btn icon-only hideSm" id="btnSaveTpl" title="บันทึกเป็นแม่แบบ"><svg><use href="#i-bookmark"/></svg></button>
+        <button class="btn icon-only hideSm" id="btnShare" title="ส่งออกไฟล์ฉบับนี้ เพื่อส่งต่อให้ผู้ตรวจ/ผู้จัดทำ"><svg><use href="#i-send"/></svg></button>
+        <button class="btn" id="btnWord"><svg><use href="#i-word"/></svg><span class="hideSm">Word</span></button>
+        <button class="btn primary" id="btnPrint"><svg><use href="#i-print"/></svg><span class="hideSm">พิมพ์ / PDF</span></button>
+      </header>
+      <div class="flow" id="flowBar"></div>
+      <div class="mobileTabs">
+        <button class="btn on" data-pane="edit"><svg><use href="#i-edit"/></svg>กรอกข้อมูล</button>
+        <button class="btn" data-pane="preview"><svg><use href="#i-doc"/></svg>ดูตัวอย่าง</button>
+      </div>
+      <div class="edLayout">
+        <section class="editor" id="editor">
+          <nav class="steps">
+            <a href="#s1" data-jump><i>1</i>ข้อมูลทั่วไป</a>
+            <a href="#s2" data-jump><i>2</i>รายละเอียด</a>
+            <a href="#s3" data-jump><i>3</i>เงื่อนไข</a>
+            <a href="#s4" data-jump><i>4</i>แนบท้าย</a>
+          </nav>
+
+          <details class="card" id="s1" open>
+            <summary><span class="step">1</span><span>ข้อมูลทั่วไป<small>ประเภท ชื่องาน และหัวเรื่องเอกสาร</small></span><svg class="chev"><use href="#i-chev"/></svg></summary>
+            <div class="body">
+              <div class="field">
+                <span class="lbl">ประเภท</span>
+                <div class="seg" id="segType">
+                  <button data-v="buy"><svg><use href="#i-cart"/></svg><span><b>ซื้อ</b><small>คุณลักษณะเฉพาะของพัสดุ</small></span></button>
+                  <button data-v="hire"><svg><use href="#i-brief"/></svg><span><b>จ้าง</b><small>รายละเอียดงานจ้าง</small></span></button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fName">ชื่อรายการ / ชื่องาน</label>
+                <input type="text" id="fName" data-bind="name" placeholder="เช่น เครื่องปรับอากาศพร้อมติดตั้ง / ซ่อมแซมกระเบื้องพื้น">
+              </div>
+              <div class="row">
+                <div class="field"><label for="fQty">จำนวน</label><input type="text" id="fQty" data-bind="qty" placeholder="1"></div>
+                <div class="field"><label for="fUnit">หน่วย</label><input type="text" id="fUnit" data-bind="unit" list="unitList" placeholder="งาน / เครื่อง"></div>
+                <div class="field" style="flex:1.6"><label for="fBudget">วงเงินงบประมาณ</label><div class="prefix"><input type="text" id="fBudget" data-bind="budget" inputmode="decimal" placeholder="0.00"><span>บาท</span></div></div>
+              </div>
+              <div class="field">
+                <label for="fPlace">สถานที่ / ใช้สำหรับ <span class="hint">(ไม่บังคับ)</span></label>
+                <input type="text" id="fPlace" data-bind="place" placeholder="เช่น ห้อง 52-205 อาคารคณะครุศาสตร์อุตสาหกรรม">
+              </div>
+              <div class="field">
+                <label for="fAsset">หมายเลขครุภัณฑ์ <span class="hint">(งานซ่อม)</span></label>
+                <input type="text" id="fAsset" data-bind="asset" placeholder="เช่น 231000040001-30201-00001">
+              </div>
+              <label class="check"><input type="checkbox" data-bind="showAgency">แสดงชื่อหน่วยงานในหัวเรื่อง</label>
+              <label class="check"><input type="checkbox" data-bind="showUni">แสดงชื่อมหาวิทยาลัยต่อท้ายหน่วยงาน</label>
+              <label class="check"><input type="checkbox" id="chkManualTitle">แก้หัวเรื่องเอง</label>
+              <div class="field" id="manualTitleBox" hidden>
+                <label for="fTitle">หัวเรื่อง (1 บรรทัดต่อ 1 บรรทัดในเอกสาร)</label>
+                <textarea id="fTitle" rows="3"></textarea>
+              </div>
+              <div class="field" style="margin-top:8px">
+                <label for="fIntro">ข้อความนำก่อนรายการ <span class="hint">(ไม่บังคับ)</span></label>
+                <input type="text" id="fIntro" data-bind="intro" list="introList" placeholder="เช่น มีรายละเอียดดังต่อไปนี้">
+              </div>
+            </div>
+          </details>
+
+          <details class="card" id="s2" open>
+            <summary><span class="step">2</span><span>รายละเอียด / คุณลักษณะ<small>รายการ สเปก และงานย่อย</small></span><svg class="chev"><use href="#i-chev"/></svg></summary>
+            <div class="body">
+              <div class="lbl" style="margin-bottom:4px">คำที่ใช้บ่อย — คลิกเพื่อแทรกในช่องที่กำลังพิมพ์</div>
+              <div class="chips" id="chips"></div>
+              <div id="tree"></div>
+              <div class="row" style="margin-top:12px">
+                <button class="btn sm" id="addItem"><svg><use href="#i-plus"/></svg>รายการหลัก</button>
+                <button class="btn sm" id="addGroup" title="หัวข้อจัดกลุ่ม ไม่มีเลขลำดับ เช่น 'สำหรับห้องเครือข่าย อาคาร 52'"><svg><use href="#i-plus"/></svg>หัวข้อกลุ่ม</button>
+                <button class="btn sm" id="btnPaste" title="วางข้อความที่มีเลขข้อ 1. 1.1 1) ระบบจะแยกลำดับให้"><svg><use href="#i-clip"/></svg>วางจากข้อความ</button>
+              </div>
+              <div class="row" style="margin-top:14px">
+                <div class="field"><label for="fL3">รูปแบบเลขระดับ 3</label>
+                  <select id="fL3" data-bind="l3style"><option value="paren">1) 2) 3)</option><option value="dot">1.1.1 1.1.2</option></select></div>
+                <div class="field"><label for="fWrap">การตัดบรรทัด</label>
+                  <select id="fWrap" data-bind="wrap"><option value="hang">ตรงกับข้อความ (แขวน)</option><option value="thai">ชิดซ้ายแบบหนังสือราชการ</option></select></div>
+              </div>
+              <label class="check"><input type="checkbox" data-bind="boldL1">ตัวหนารายการหลัก (ข้อ 1. 2. 3.)</label>
+            </div>
+          </details>
+
+          <details class="card" id="s3" open>
+            <summary><span class="step">3</span><span>เงื่อนไขอื่น ๆ<small>เกณฑ์ ส่งมอบ ยืนราคา รับประกัน</small></span><svg class="chev"><use href="#i-chev"/></svg></summary>
+            <div class="body" id="condBox"></div>
+          </details>
+
+          <details class="card" id="s4">
+            <summary><span class="step">4</span><span>เอกสารแนบท้าย<small>ภาพประกอบ และผู้กำหนดรายละเอียด</small></span><svg class="chev"><use href="#i-chev"/></svg></summary>
+            <div class="body">
+              <div class="lbl" style="margin-bottom:6px">ภาพประกอบ (แนบท้ายเอกสาร ขึ้นหน้าใหม่)</div>
+              <div class="imgs" id="imgs" style="margin-bottom:10px"></div>
+              <label class="upload"><svg><use href="#i-image"/></svg>เพิ่มรูปภาพ<input type="file" id="imgInput" accept="image/*" multiple hidden></label>
+              <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+              <div class="field"><label for="fSig">ส่วนลงนาม</label>
+                <select id="fSig" data-bind="sigMode">
+                  <option value="none">ไม่แสดง (ลงชื่อย่อเอง)</option>
+                  <option value="list">แสดงรายชื่อผู้กำหนดรายละเอียด / คณะกรรมการ</option>
+                </select></div>
+              <div id="sigBox"></div>
+            </div>
+          </details>
+        </section>
+
+        <section class="previewWrap" id="previewWrap">
+          <div class="previewbar"><span>ตัวอย่างเอกสาร · A4</span>
+            <span class="pvTools">
+              <button class="tog" id="togEdit" title="คลิกที่ข้อความบนเอกสารเพื่อแก้ไขได้ทันที"><svg><use href="#i-edit"/></svg>แก้ไขบนเอกสาร</button>
+              <button class="tog" id="togTrack" title="แสดงคำที่เพิ่ม (เขียว) และคำที่ลบ (แดง) เทียบกับฉบับที่ส่งตรวจ"><svg><use href="#i-track"/></svg>แสดงร่องรอยการแก้ไข</button>
+            </span></div>
+          <div class="sheet" id="sheet"></div>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+
+<datalist id="unitList"><option>งาน</option><option>รายการ</option><option>เครื่อง</option><option>ชุด</option><option>ตัว</option><option>คัน</option><option>หลัง</option><option>ระบบ</option><option>จุด</option><option>แห่ง</option><option>อัน</option><option>เส้น</option><option>ม้วน</option><option>กล่อง</option><option>แผ่น</option><option>ตารางเมตร</option><option>เมตร</option><option>เที่ยว</option></datalist>
+<datalist id="introList"><option>มีรายละเอียดดังต่อไปนี้</option><option>มีรายละเอียดงาน ดังนี้</option><option>รายละเอียดของงาน ดังนี้</option></datalist>
+
+<dialog id="dlgPaste">
+  <div class="dlgHead"><div class="di"><svg><use href="#i-clip"/></svg></div><h2>วางรายละเอียดจากข้อความ</h2><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgBody">
+    <p class="hint">วางข้อความจาก Word/PDF เดิม ระบบจะแยกลำดับจากเลขข้อ เช่น <b>1.</b> <b>1.1</b> <b>1)</b> บรรทัดที่ไม่มีเลขจะต่อท้ายข้อก่อนหน้า และบรรทัดที่ลงท้ายด้วย “จำนวน 2 เครื่อง” จะถูกแยกเป็นจำนวนให้</p>
+    <textarea id="pasteText" rows="12" placeholder="1. เครื่องปรับอากาศ แบบแยกส่วน จำนวน 1 เครื่อง&#10;1.1 มีความสามารถในการทำความเย็น ขนาดไม่น้อยกว่า 30,000 บีทียู/ชั่วโมง&#10;1.2 ..."></textarea>
+  </div>
+  <div class="dlgFoot">
+    <label class="check" style="margin:0 auto 0 0"><input type="checkbox" id="pasteReplace" checked>แทนที่รายการเดิมทั้งหมด</label>
+    <button class="btn" data-close>ยกเลิก</button>
+    <button class="btn primary" id="pasteGo">แยกรายการ</button>
+  </div>
+</dialog>
+
+<dialog id="dlgSettings">
+  <div class="dlgHead"><div class="di"><svg><use href="#i-gear"/></svg></div><h2>ตั้งค่าหน่วยงาน</h2><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgBody">
+    <p class="hint" style="margin-bottom:14px">ใช้กับร่างทุกฉบับ — บันทึกทันทีเมื่อแก้ไข</p>
+    <div class="field"><label for="sUser">ชื่อ-นามสกุล ผู้ใช้งาน <span class="hint">(ใช้บันทึกว่าใครแก้ไข/ให้ความเห็น)</span></label><input type="text" id="sUser" data-set="userName" placeholder="เช่น นายสมชาย ใจดี"></div>
+    <div class="field"><label for="sAgency">ชื่อหน่วยงาน</label><input type="text" id="sAgency" data-set="agency"></div>
+    <div class="field"><label for="sUni">ชื่อมหาวิทยาลัย / ส่วนราชการ</label><input type="text" id="sUni" data-set="uni"></div>
+    <div class="field"><label for="sOrg">คำเรียกหน่วยงานในเงื่อนไข</label><input type="text" id="sOrg" data-set="org" placeholder="มหาวิทยาลัย"></div>
+    <div class="row">
+      <div class="field"><label for="sSize">ขนาดตัวอักษร (pt)</label><input type="number" id="sSize" data-set="fontSize" min="12" max="20"></div>
+      <div class="field"><label for="sPageNo">เลขหน้า</label><select id="sPageNo" data-set="pageNo"><option value="frac">1/2 มุมขวาบน</option><option value="none">ไม่แสดง</option></select></div>
+      <div class="field"><label for="sTheme">ธีมหน้าจอ</label><select id="sTheme" data-set="theme"><option value="auto">ตามระบบ</option><option value="light">สว่าง</option><option value="dark">มืด</option></select></div>
+    </div>
+    <p class="hint">ไฟล์ Word ใช้ฟอนต์ TH SarabunPSK · หน้า PDF ใช้ TH SarabunPSK ถ้ามีในเครื่อง ไม่มีจะใช้ Sarabun แทน</p>
+    <div class="driveBox">
+      <div class="dh"><span class="gd"><svg><use href="#i-drive"/></svg></span><div><b>เก็บข้อมูลใน Google Drive</b><small>ให้ทั้งทีมเปิดเอกสารชุดเดียวกัน · ดูวิธีติดตั้งใน README</small></div></div>
+      <div class="field"><label for="cUrl">Web app URL (จาก Google Apps Script)</label><input type="text" id="cUrl" placeholder="https://script.google.com/macros/s/…/exec" spellcheck="false"></div>
+      <div class="field"><label for="cKey">รหัสทีม (TEAM_KEY)</label><input type="password" id="cKey" placeholder="รหัสที่ตั้งไว้ใน Apps Script" autocomplete="off"></div>
+      <div class="hint" id="cStatus"></div>
+      <div class="row"><button class="btn primary sm" id="cConnect">เชื่อมต่อ</button><button class="btn sm" id="cInvite" hidden>คัดลอกลิงก์เชิญทีม</button><button class="btn sm danger" id="cDisconnect" hidden>ยกเลิกการเชื่อมต่อ</button></div>
+    </div>
+  </div>
+</dialog>
+
+<aside class="drawer" id="drawer" aria-label="แผงตรวจทาน">
+  <div class="drHead">
+    <div><b>แผงตรวจทาน</b><small id="drSub">—</small></div>
+    <button class="btn icon-only ghost" id="drClose" aria-label="ปิด"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="drTabs" id="drTabs">
+    <button data-tab="changes"><svg><use href="#i-track"/></svg>การแก้ไข<i id="tcChanges"></i></button>
+    <button data-tab="comments"><svg><use href="#i-chat"/></svg>ความเห็น<i id="tcComments"></i></button>
+    <button data-tab="checks"><svg><use href="#i-shield"/></svg>ระเบียบ<i id="tcChecks"></i></button>
+    <button data-tab="log"><svg><use href="#i-clock"/></svg>ประวัติ</button>
+  </div>
+  <div class="drBody" id="drBody"></div>
+</aside>
+
+<dialog id="dlgComment">
+  <div class="dlgHead"><div class="di"><svg><use href="#i-chat"/></svg></div><h2 id="cmTitle">เพิ่มความเห็น</h2><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgBody">
+    <div class="quote" id="cmQuote"></div>
+    <textarea id="cmText" rows="4" placeholder="เช่น ควรเปลี่ยนเป็น “ไม่น้อยกว่า” เพื่อไม่ให้จำกัดผู้เสนอราคา"></textarea>
+    <div class="chips" id="cmPresets" style="margin-top:10px"></div>
+  </div>
+  <div class="dlgFoot"><button class="btn" data-close>ยกเลิก</button><button class="btn primary" id="cmSave">บันทึกความเห็น</button></div>
+</dialog>
+
+<dialog id="dlgConflict">
+  <div class="dlgHead"><div class="di" style="background:var(--t3);color:var(--c3)"><svg><use href="#i-sync"/></svg></div><h2>มีฉบับใหม่กว่าใน Google Drive</h2></div>
+  <div class="dlgBody"><p id="cfMsg" style="margin-top:0"></p><p class="hint">เลือกว่าจะเก็บฉบับไหน — ทุกตัวเลือกไม่ทำให้ข้อมูลหายถาวร (ไฟล์เดิมใน Drive มีประวัติเวอร์ชัน)</p></div>
+  <div class="dlgFoot" style="flex-wrap:wrap">
+    <button class="btn" data-cf="copy">เก็บของฉันเป็นสำเนาใหม่</button>
+    <button class="btn" data-cf="mine">บันทึกทับด้วยของฉัน</button>
+    <button class="btn primary" data-cf="remote">โหลดฉบับใน Drive</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   storage (ห่อ try/catch — โหมดส่วนตัวอาจใช้ไม่ได้)
+   ========================================================= */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+const K_DRAFTS='torb.drafts.v1', K_CUR='torb.current.v1', K_SET='torb.settings.v1', K_TPL='torb.usertpl.v1';
+
+const DEFAULT_SETTINGS = {
+  agency:'คณะครุศาสตร์อุตสาหกรรม',
+  uni:'มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ',
+  org:'มหาวิทยาลัย', fontSize:16, pageNo:'frac', theme:'auto', role:'maker', userName:''
+};
+let settings = Object.assign({}, DEFAULT_SETTINGS, store.get(K_SET, {}));
+
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* =========================================================
+   โมเดลข้อมูล
+   ========================================================= */
+function N(text, kids, extra){ return Object.assign({id:uid(), kind:'item', text, qty:'', unit:'', tech:false, children:(kids||[]).map(k => typeof k==='string' ? N(k) : k)}, extra||{}); }
+function G(text){ return {id:uid(), kind:'group', text, children:[]}; }
+
+function baseDoc(type){
+  return {
+    id:uid(), type, name:'', qty:'1', unit: type==='buy' ? 'รายการ' : 'งาน', place:'', asset:'',
+    showAgency:true, showUni:false, manualTitle:null, intro: type==='hire' ? 'มีรายละเอียดดังต่อไปนี้' : '',
+    l3style:'paren', wrap:'hang', boldL1: type==='buy',
+    items:[],
+    cond:{
+      criteria:{on:true, v:'เกณฑ์ราคา'},
+      delivery:{on:true, days:15, ref: type==='buy' ? 'ใบสั่งซื้อ' : 'ใบสั่งจ้าง'},
+      validity:{on:true, days:30},
+      warranty:{on:true, n:1, unit:'ปี', detailed:false},
+      extras:[]
+    },
+    images:[], budget:'', status:'draft', condText:{}, comments:[], log:[], baseline:null, sigMode:'none', sigs:[{name:'',role:'ประธานกรรมการ'},{name:'',role:'กรรมการ'},{name:'',role:'กรรมการ'}],
+    updated:Date.now()
+  };
+}
+
+/* แม่แบบ — สรุปจากตัวอย่าง TOR ที่ใช้จริงของหน่วยงาน */
+const TEMPLATES = [
+  {key:'blank-buy', tag:'ซื้อ', title:'ซื้อ — เอกสารเปล่า', desc:'รายละเอียดคุณลักษณะเฉพาะของพัสดุ', make(){ const d=baseDoc('buy'); d.items=[N('',[],{qty:'1',unit:'',tech:true})]; return d; }},
+  {key:'blank-hire', tag:'จ้าง', title:'จ้าง — เอกสารเปล่า', desc:'รายละเอียดงานจ้าง', make(){ const d=baseDoc('hire'); d.items=[N('')]; return d; }},
+  {key:'aircon', tag:'ซื้อ', title:'เครื่องปรับอากาศพร้อมติดตั้ง', desc:'แบบแยกส่วน แขวน · สเปก + งานติดตั้ง', make(){
+    const d=baseDoc('buy'); Object.assign(d,{name:'เครื่องปรับอากาศพร้อมติดตั้ง',qty:'1',unit:'เครื่อง',place:'',showAgency:false});
+    d.items=[N('เครื่องปรับอากาศ แบบแยกส่วนแบบแขวน พร้อมติดตั้ง',[
+      'มีความสามารถในการทำความเย็น ขนาดไม่น้อยกว่า 30,000 บีทียู/ชั่วโมง',
+      'มีประสิทธิภาพตามฤดูกาล 13 Btu/Hr/Watt หรือดีกว่า',
+      'สามารถใช้แรงดันไฟฟ้า 220 V ชนิด 1 เฟส ความถี่ 50 Hz ได้ หรือดีกว่า',
+      'มีระบบการใช้สารทำความเย็นชนิด R-32 หรือดีกว่า ที่ต้องเป็นมิตรต่อสิ่งแวดล้อม',
+      'มีการติดตั้งขาวางเหล็ก ที่มีขนาดไม่น้อยกว่า 90 x 30 x 45 เซนติเมตร',
+      'มีการติดตั้งยางรองชุดคอยล์ร้อน สำหรับป้องกันการสั่นสะเทือน หรือดีกว่า',
+      'มีการติดตั้งท่อระบายน้ำ มีความยาวไม่น้อยกว่า 5 เมตร',
+      N('มีการติดตั้งเครื่องปรับอากาศ ที่มีรายละเอียดดังนี้',[
+        'มีระบบท่อทองแดงพร้อมฉนวน ที่มีเส้นผ่านศูนย์กลางไม่น้อยกว่า 3/8" มีความยาวไม่น้อยกว่า 7 เมตร',
+        'มีระบบท่อทองแดงพร้อมฉนวน ที่มีเส้นผ่านศูนย์กลางไม่น้อยกว่า 5/8" มีความยาวไม่น้อยกว่า 7 เมตร',
+        'มีรางครอบท่อเครื่องปรับอากาศ เบอร์ 100 หรือดีกว่า มีความยาวไม่น้อยกว่า 6 เมตร',
+        'มีชุดสวิตช์เบรกเกอร์ สำหรับการควบคุมเปิดปิดระบบไฟฟ้า',
+        'มีการติดตั้งระบบไฟฟ้าด้วยสายไฟชนิด THW หรือดีกว่า ที่มีขนาดไม่น้อยกว่า 2x4 sq.mm. และสายกราวด์ขนาดไม่น้อยกว่า 1x1.5 sq.mm. ที่มีความยาวไม่น้อยกว่า 20 เมตร'
+      ])
+    ],{qty:'1',unit:'เครื่อง',tech:true})];
+    d.cond.delivery.days=60; d.cond.validity.days=45; return d; }},
+  {key:'cctv', tag:'ซื้อ', title:'ครุภัณฑ์ห้องเรียน (กล้องวงจรปิด/เครื่องเสียง)', desc:'หลายรายการ แต่ละรายการมีสเปกย่อย', make(){
+    const d=baseDoc('buy'); Object.assign(d,{name:'ครุภัณฑ์สำหรับห้องเรียนรวม',qty:'2',unit:'รายการ',place:'ชั้น 6'});
+    d.items=[
+      N('กล้องวงจรปิด',['เป็นกล้องวงจรปิด ที่มีความละเอียดของภาพไม่น้อยกว่า 2MP','มีเทคโนโลยีการบีบอัดแบบ H.265+ หรือดีกว่า','มีเทคโนโลยี WDR หรือดีกว่า','สามารถใช้งานกับการ์ด SD Card ได้ หรือดีกว่า ที่มีหน่วยความจำไม่น้อยกว่า 256 GB','มีมาตรฐานกันน้ำ และฝุ่นแบบ IP66 หรือดีกว่า','มีมาตรฐาน PoE (802.3af) หรือดีกว่า','งานติดตั้ง ผู้รับจ้างจะต้องเดินสายแลน พร้อมร้อยท่อ PVC สีขาว หรือดีกว่า จำนวนไม่น้อยกว่า 15 เมตร'],{qty:'2',unit:'ตัว'}),
+      N('ชุดเครื่องเสียง',['มีกำลังขับเอาต์พุตไม่น้อยกว่า 50 วัตต์','มีช่องสัญญาณเข้าสำหรับไมโครโฟน Mic Input ไม่น้อยกว่า 3 ช่อง','มีลำโพงขยายเสียง ชนิดติดผนัง 2 ทาง ขนาดไม่น้อยกว่า 4 นิ้ว จำนวนไม่น้อยกว่า 100 วัตต์','งานติดตั้ง ผู้รับจ้างต้องเดินสายลำโพงขนาดไม่น้อยกว่า 2 x 2.5 มิลลิเมตร พร้อมร้อยท่อ PVC สีขาว หรือดีกว่า จำนวนไม่น้อยกว่า 12 เมตร'],{qty:'2',unit:'ชุด',tech:true})
+    ]; return d; }},
+  {key:'furniture', tag:'ซื้อ', title:'โต๊ะเรียน และเก้าอี้', desc:'ครุภัณฑ์สำนักงาน/การศึกษา', make(){
+    const d=baseDoc('buy'); Object.assign(d,{name:'โต๊ะเรียน และเก้าอี้',qty:'2',unit:'รายการ',wrap:'thai'});
+    d.items=[
+      N('โต๊ะเรียน',['โต๊ะมีขนาดความกว้างไม่น้อยกว่า 50 เซนติเมตร ความยาวไม่น้อยกว่า 75 เซนติเมตร และมีความสูงไม่น้อยกว่า 75 เซนติเมตร','โครงโต๊ะ และขาทำจากเหล็กกล่องพร้อมทาสีขาว ขนาดไม่น้อยกว่า 30 x 30 มิลลิเมตร มีความหนาไม่น้อยกว่า 1.4 มิลลิเมตร','หน้าโต๊ะทำจากไม้ปาร์ติเกิลบอร์ด มีความหนาไม่น้อยกว่า 20 มิลลิเมตร และปิดทับผิวทั้งสองด้านด้วยแผ่นลามิเนต หรือดีกว่า ปิดขอบด้วย PVC ความหนาไม่น้อยกว่า 1 มิลลิเมตร'],{qty:'98',unit:'ตัว'}),
+      N('เก้าอี้',['เก้าอี้มีขนาดความกว้างไม่น้อยกว่า 45 เซนติเมตร ความยาวไม่น้อยกว่า 50 เซนติเมตร และมีความสูงไม่น้อยกว่า 80 เซนติเมตร','โครงขาเก้าอี้ทำจากเหล็กกลมขนาดเส้นผ่านศูนย์กลางไม่น้อยกว่า 20 มิลลิเมตร มีความหนาไม่น้อยกว่า 1.2 มิลลิเมตร ชุบโครเมียม หรือดีกว่า','ปลายขามีพลาสติกรองขา'],{qty:'98',unit:'ตัว'})
+    ]; d.cond.delivery.ref='สัญญา'; return d; }},
+  {key:'tile', tag:'จ้าง', title:'ซ่อมแซมกระเบื้องพื้น', desc:'งานซ่อมหลายจุด · ตรวจสอบ-รื้อ-ปู-ทำความสะอาด', make(){
+    const d=baseDoc('hire'); Object.assign(d,{name:'ซ่อมแซมกระเบื้องพื้น',qty:'1',unit:'งาน'});
+    d.items=[N('งานซ่อมแซมกระเบื้องพื้นบริเวณ...',['งานตรวจสอบพื้นที่กระเบื้องชำรุด','งานรื้อถอนพื้นกระเบื้องเดิมขนาด 60x60 เซนติเมตร จำนวนไม่น้อยกว่า ... ตารางเมตร','งานปูกระเบื้องใหม่ขนาดไม่น้อยกว่า 60x60 เซนติเมตร จำนวนไม่น้อยกว่า ... ตารางเมตร','งานทำความสะอาดในพื้นที่ที่เกี่ยวข้อง'])];
+    d.cond.warranty={on:true,n:3,unit:'เดือน',detailed:false}; return d; }},
+  {key:'seat', tag:'จ้าง', title:'ซ่อมแซมครุภัณฑ์ (มีเลขครุภัณฑ์)', desc:'เช่น ซ่อมเบาะรถตู้ · รายการเดียว', make(){
+    const d=baseDoc('hire'); Object.assign(d,{name:'ซ่อมแซมที่นั่งรถโดยสาร ขนาด 12 ที่นั่ง',qty:'1',unit:'ตัว',asset:'',showAgency:false});
+    d.items=[N('งานตรวจสอบ...เพื่อหาสาเหตุของการชำรุด'),N('งานรื้อถอนอุปกรณ์...ของเดิม'),N('งานติดตั้งอุปกรณ์...ของใหม่'),N('งานทดสอบระบบการทำงานอุปกรณ์ และทำความสะอาดในพื้นที่ที่เกี่ยวข้อง')];
+    d.cond.warranty={on:true,n:3,unit:'เดือน',detailed:false}; return d; }},
+  {key:'renovate', tag:'จ้าง', title:'ปรับปรุงห้อง', desc:'รื้อ-ติดตั้งแอร์ ไฟฟ้า LAN · ประกันแบบละเอียด', make(){
+    const d=baseDoc('hire'); Object.assign(d,{name:'ปรับปรุงห้อง ...',qty:'1',unit:'งาน',intro:'รายละเอียดของงาน ดังนี้'});
+    d.items=[
+      N('งานรื้อถอนเครื่องปรับอากาศ ขนาดไม่น้อยกว่า 24,000 บีทียู จำนวน 1 เครื่อง'),
+      N('งานติดตั้งเครื่องปรับอากาศ ขนาดไม่น้อยกว่า 24,000 บีทียู จำนวน 1 เครื่อง โดยผู้รับจ้างจะต้องดำเนินการดังนี้',['งานเดินท่อสารทำความเย็น ท่อน้ำทิ้ง สายไฟฟ้าที่เกี่ยวข้อง ที่มีความยาวไม่น้อยกว่า 5 เมตร','งานติดตั้งเบรกเกอร์ภายในขนาดไม่น้อยกว่า 10 แอมแปร์ จำนวนไม่น้อยกว่า 1 ตัว','งานทดสอบการทำงานของเครื่องปรับอากาศหลังจากติดตั้งและซ่อมแซมเสร็จเรียบร้อยแล้ว']),
+      N('งานติดตั้งเต้ารับไฟฟ้า ชนิดมีสายดิน พร้อมเดินสายไฟฟ้าและอุปกรณ์ประกอบให้ครบถ้วน จำนวน ... จุด'),
+      N('งานติดตั้งเต้ารับสายสัญญาณเครือข่าย (LAN) ชนิด RJ45 สามารถใช้งานกับสายสัญญาณมาตรฐานได้ไม่น้อยกว่า CAT6 พร้อมเดินสายสัญญาณ และอุปกรณ์ประกอบให้ครบถ้วน จำนวน ... จุด'),
+      N('งานติดตั้งโคมไฟฟ้าแสงสว่าง พร้อมเดินสายไฟฟ้าและสวิตช์ควบคุม จำนวน ... จุด')
+    ];
+    d.l3style='dot'; d.cond.warranty={on:true,n:1,unit:'ปี',detailed:true}; return d; }},
+  {key:'demolish', tag:'จ้าง', title:'รื้อถอนวัสดุและสิ่งก่อสร้าง', desc:'ระบุ (รื้อทิ้ง)/(รื้อเก็บ) · ขนย้ายขยะ', make(){
+    const d=baseDoc('hire'); Object.assign(d,{name:'รื้อถอนวัสดุ และสิ่งก่อสร้าง ...',qty:'1',unit:'งาน',showUni:true,intro:'มีรายละเอียดงานดังนี้'});
+    d.items=[N('งานรื้อถอนผนังปูนพร้อมกระจกบานตาย พื้นที่ไม่น้อยกว่า ... ตารางเมตร (รื้อทิ้ง)'),N('งานรื้อถอนกระเบื้องยาง พื้นที่ไม่น้อยกว่า ... ตารางเมตร (รื้อทิ้ง)'),N('งานรื้อถอนเครื่องปรับอากาศ จำนวน ... เครื่อง (รื้อเก็บ)'),N('งานรื้อถอนฝ้าเพดานเดิมพร้อมโครงคร่าว พื้นที่ไม่น้อยกว่า ... ตารางเมตร (รื้อทิ้ง)'),N('งานขนย้ายขยะทิ้งออกภายนอกมหาวิทยาลัย จำนวนไม่น้อยกว่า ... เที่ยว')];
+    d.cond.warranty={on:true,n:6,unit:'เดือน',detailed:false}; return d; }},
+];
+
+const CHIPS = ['ไม่น้อยกว่า','หรือดีกว่า','จำนวนไม่น้อยกว่า','มีความยาวไม่น้อยกว่า','ขนาดไม่น้อยกว่า','ตารางเมตร','เซนติเมตร','มิลลิเมตร','เมตร','บีทียู/ชั่วโมง','พร้อมอุปกรณ์ประกอบให้ครบถ้วน','งานตรวจสอบ','งานรื้อถอน','งานติดตั้ง','งานทดสอบ','งานทำความสะอาดในพื้นที่ที่เกี่ยวข้อง','(รื้อทิ้ง)','(รื้อเก็บ)','ผู้รับจ้างจะต้อง'];
+
+/* =========================================================
+   state
+   ========================================================= */
+let drafts = store.get(K_DRAFTS, {});
+let userTpl = store.get(K_TPL, []);
+let doc = drafts[store.get(K_CUR, '')] || null;
+let lastFocus = null;
+
+/* =========================================================
+   สร้างเนื้อหาเอกสารเป็น "บล็อก" กลาง แล้วแปลงไป HTML และ DOCX
+   ========================================================= */
+function agencyLine(){
+  return [settings.agency, doc.showUni ? settings.uni : ''].filter(Boolean).join(' ');
+}
+function autoTitle(){
+  const qtyTxt = doc.qty ? `จำนวน ${doc.qty} ${doc.unit||''}`.trim() : '';
+  const name = doc.name || '...';
+  const lines = [];
+  if (doc.type === 'buy'){
+    lines.push('รายละเอียดคุณลักษณะเฉพาะของพัสดุ');
+    lines.push(`${name}${doc.place ? ' '+doc.place : ''} ${qtyTxt}`.trim());
+    if (doc.showAgency) lines.push(agencyLine());
+  } else {
+    if (doc.place && !doc.showAgency){
+      lines.push(`รายละเอียดงานจ้าง${name}`);
+      lines.push(`${doc.place} ${qtyTxt}`.trim());
+    } else if (doc.showAgency){
+      lines.push(`รายละเอียดงานจ้าง${name}${doc.place ? ' '+doc.place : ''}`);
+      lines.push(`${agencyLine()} ${qtyTxt}`.trim());
+    } else {
+      lines.push(`รายละเอียดงานจ้าง${name} ${qtyTxt}`.trim());
+    }
+  }
+  return lines.filter(Boolean);
+}
+function titleLines(){ return doc.manualTitle != null ? doc.manualTitle.split('\n').filter(l => l.trim()) : autoTitle(); }
+
+const CM = 1; // หน่วยเยื้องเป็นเซนติเมตร
+function numLabel(path, depth){
+  if (depth === 1) return path[0] + '.';
+  if (depth === 2) return path.join('.');
+  if (depth === 3) return doc.l3style === 'paren' ? path[2] + ')' : path.join('.');
+  return '(' + path[depth-1] + ')';
+}
+function numWidth(depth, label){
+  // ความกว้างช่องเลขข้อ (ซม.) — คงที่ต่อระดับเพื่อให้ข้อความตรงกัน
+  if (depth === 1) return label.length > 2 ? 0.8 : 0.65;
+  if (depth === 2) return label.length > 3 ? 1.15 : 0.95;
+  if (depth === 3) return doc.l3style === 'paren' ? 0.7 : 1.35;
+  return 0.8;
+}
+
+function buildBlocks(){
+  const B = [];
+  const org = settings.org || 'มหาวิทยาลัย';
+  titleLines().forEach((t, i) => B.push({t:'title', text:t, ref:'t:'+i}));
+  B.push({t:'rule'});
+
+  if (doc.asset){
+    B.push({t:'p', text:`${doc.name || '...'} (หมายเลขครุภัณฑ์ ${doc.asset})`, ind:0, txt:0});
+  }
+  if (doc.intro) B.push({t:'p', ref:'intro', text:doc.intro, ind: doc.asset ? 0.5 : 0, txt: doc.asset ? 0.5 : 0, bold: !doc.asset && doc.type==='hire' && /^รายละเอียดของงาน/.test(doc.intro)});
+
+  // รายการ
+  let top = 0;
+  const walk = (nodes, depth, parentPath, baseInd) => {
+    let n = 0;
+    nodes.forEach(node => {
+      if (node.kind === 'group'){
+        B.push({t:'gap'}); B.push({t:'p', ref:'n:'+node.id, text:node.text, empty:!node.text, ind:0, txt:0, bold:true}); return;
+      }
+      n++;
+      const path = parentPath.concat(n);
+      const label = numLabel(path, depth);
+      const w = numWidth(depth, label);
+      const ind = baseInd;
+      const right = depth === 1 && node.qty ? `จำนวน ${node.qty} ${node.unit||''}`.trim() : '';
+      if (depth === 1 && top > 0 && hasRich()) B.push({t:'gap'});
+      if (depth === 1) top++;
+      B.push({t:'p', ref:'n:'+node.id, item:true, num:label, text:node.text, ind, txt:ind + w, bold: depth===1 && doc.boldL1, right, empty:!node.text});
+      const childInd = depth === 1 ? 0.75 : ind + w;
+      if (node.tech) B.push({t:'p', text:'รายละเอียดคุณสมบัติทางเทคนิค ดังนี้', ind:childInd, txt:childInd, bold:true});
+      if (node.children && node.children.length) walk(node.children, depth+1, path, childInd);
+    });
+  };
+  walk(doc.items, 1, [], doc.intro || doc.asset ? 0.75 : 0);
+
+  // เงื่อนไข
+  const c = doc.cond, lines = [];
+  const ct = doc.condText || {};
+  const cpush = (key, text) => lines.push({ref:'c:'+key, text: ct[key] != null ? ct[key] : text});
+  if (c.criteria.on) cpush('criteria', `ในการพิจารณาผลการยื่นข้อเสนอครั้งนี้ ${org}จะพิจารณาตัดสินโดยใช้${c.criteria.v}`);
+  if (c.delivery.on) cpush('delivery', `กำหนดส่งมอบภายใน ${c.delivery.days||'...'} วัน นับถัดจากวันที่ลงนามใน${c.delivery.ref}`);
+  if (c.validity.on) cpush('validity', `กำหนดการยืนราคาไม่น้อยกว่า ${c.validity.days||'...'} วัน นับตั้งแต่วันเสนอราคา`);
+  if (c.warranty.on){
+    const per = `${c.warranty.n||'...'} ${c.warranty.unit}`;
+    if (c.warranty.detailed){
+      const who = doc.type==='buy' ? 'ผู้ขาย' : 'ผู้รับจ้าง', what = doc.type==='buy' ? 'พัสดุ' : 'งาน', from = doc.type==='buy' ? 'วันที่ส่งมอบพัสดุ' : 'วันที่ส่งมอบงาน';
+      cpush('warranty', `${who}ต้องรับประกันความชำรุดบกพร่องของ${what} เป็นระยะเวลาไม่น้อยกว่า ${per} นับถัดจาก${from} หากเกิดความชำรุดบกพร่องอันเนื่องมาจากการปฏิบัติงานของ${who} ${who}ต้องดำเนินการแก้ไขให้แล้วเสร็จโดยไม่คิดค่าใช้จ่ายจาก${org}`);
+    } else cpush('warranty', `มีการรับประกันความชำรุดบกพร่อง ไม่น้อยกว่า ${per}`);
+  }
+  c.extras.forEach((x, i) => { if (x.trim()) lines.push({ref:'x:'+i, text:x.trim()}); });
+  if (lines.length){
+    B.push({t:'gap'});
+    B.push({t:'p', text:'เงื่อนไขอื่น ๆ', ind:0, txt:0, bold:true});
+    lines.forEach((l, i) => B.push({t:'p', ref:l.ref, num:(i+1)+'.', text:l.text, ind:0.75, txt:0.75+0.65}));
+  }
+  B.push({t:'rule', end:true});
+
+  if (doc.sigMode === 'list'){
+    const rows = doc.sigs.filter(s => s.name.trim() || s.role.trim());
+    if (rows.length) B.push({t:'sig', rows});
+  }
+  if (doc.images.length){
+    B.push({t:'pb'});
+    B.push({t:'title', text:`ภาพประกอบ${doc.type==='hire' ? 'งานจ้าง' : ''}${doc.name||''}`});
+    B.push({t:'rule'});
+    doc.images.forEach((im, i) => B.push({t:'img', src:im.src, w:im.w, h:im.h, caption: im.caption || `ภาพที่ ${i+1}`}));
+  }
+  return B;
+}
+function hasRich(){ return doc.items.some(n => n.kind==='item' && (n.children.length || n.tech)); }
+
+/* ---------- HTML preview: อยู่ในส่วนตรวจทาน (review) ด้านล่าง ---------- */
+function fitSheet(){
+  const wrap = document.getElementById('previewWrap'), sheet = document.getElementById('sheet');
+  const avail = wrap.clientWidth - 32;
+  const s = Math.min(1, avail / 794);
+  sheet.style.transform = s < 1 ? `scale(${s})` : '';
+  sheet.style.marginBottom = s < 1 ? `-${(sheet.offsetHeight * (1 - s)).toFixed(0)}px` : '';
+}
+
+/* ---------- DOCX ---------- */
+async function exportDocx(){
+  if (!window.docx){ toast('โหลดตัวสร้าง Word ไม่สำเร็จ — ต้องต่ออินเทอร์เน็ตครั้งแรก'); return; }
+  const D = window.docx;
+  const FONT = 'TH SarabunPSK', SZ = (settings.fontSize||16) * 2;
+  const tw = cm => Math.round(cm * 567);
+  const TEXT_W = 11906 - tw(3) - tw(2);
+  const font = {ascii:FONT, hAnsi:FONT, cs:FONT, eastAsia:FONT};
+  const run = (text, o={}) => new D.TextRun(Object.assign({text, font, size:SZ, sizeComplexScript:SZ}, o.bold ? {bold:true, boldComplexScript:true} : {}));
+  const hang = doc.wrap === 'hang';
+  const children = [];
+  const B = buildBlocks();
+  for (const b of B){
+    if (b.t === 'title') children.push(new D.Paragraph({alignment:D.AlignmentType.CENTER, children:[run(b.text, {bold:true})]}));
+    else if (b.t === 'rule') children.push(new D.Paragraph({alignment:D.AlignmentType.CENTER, spacing:{before:80, after: b.end ? 0 : 160}, children:[run('-'.repeat(b.end ? 40 : 46))]}));
+    else if (b.t === 'gap') children.push(new D.Paragraph({spacing:{after:0}, children:[run('', {})], }));
+    else if (b.t === 'pb') children.push(new D.Paragraph({children:[new D.PageBreak()]}));
+    else if (b.t === 'p'){
+      const tabs = [{type:D.TabStopType.RIGHT, position:TEXT_W}];
+      const parts = [];
+      let indent;
+      if (b.num && hang){
+        indent = {left:tw(b.txt), hanging:tw(b.txt - b.ind)};
+        tabs.unshift({type:D.TabStopType.LEFT, position:tw(b.txt)});
+        parts.push(run(b.num + '\t', {bold:b.bold}));
+      } else {
+        indent = {firstLine:tw(b.ind)};
+        if (b.num) parts.push(run(b.num + ' ', {bold:b.bold}));
+      }
+      parts.push(run(b.empty || !b.text ? '...' : b.text, {bold:b.bold}));
+      if (b.right) parts.push(run('\t' + b.right, {bold:b.bold}));
+      children.push(new D.Paragraph({indent, tabStops:tabs, children:parts}));
+    }
+    else if (b.t === 'sig'){
+      const cell = r => new D.TableCell({borders:noBorders(D), width:{size:50, type:D.WidthType.PERCENTAGE}, children:[
+        new D.Paragraph({alignment:D.AlignmentType.CENTER, spacing:{before:480}, children:[run('ลงชื่อ.......................................................')]}),
+        new D.Paragraph({alignment:D.AlignmentType.CENTER, children:[run(`(${r.name || '.......................................................'})`)]}),
+        new D.Paragraph({alignment:D.AlignmentType.CENTER, children:[run(r.role)]})]});
+      const empty = () => new D.TableCell({borders:noBorders(D), children:[new D.Paragraph('')]});
+      const rows = []; const list = b.rows.slice();
+      if (list.length % 2) rows.push(new D.TableRow({children:[new D.TableCell({borders:noBorders(D), columnSpan:2, children:cell(list.shift()).options.children})]}));
+      for (let i = 0; i < list.length; i += 2) rows.push(new D.TableRow({children:[cell(list[i]), list[i+1] ? cell(list[i+1]) : empty()]}));
+      children.push(new D.Table({width:{size:100, type:D.WidthType.PERCENTAGE}, borders:noBorders(D), rows}));
+    }
+    else if (b.t === 'img'){
+      const maxW = 15 * 37.8, maxH = 10 * 37.8; // พิกเซล ~ ซม.
+      const r = Math.min(maxW / b.w, maxH / b.h, 1);
+      children.push(new D.Paragraph({alignment:D.AlignmentType.CENTER, spacing:{before:160}, children:[new D.ImageRun({data:dataUrlToBytes(b.src), transformation:{width:Math.round(b.w*r), height:Math.round(b.h*r)}})]}));
+      children.push(new D.Paragraph({alignment:D.AlignmentType.CENTER, spacing:{after:200}, children:[run(b.caption)]}));
+    }
+  }
+  const headers = settings.pageNo === 'frac' ? {default: new D.Header({children:[new D.Paragraph({alignment:D.AlignmentType.RIGHT, children:[
+    new D.TextRun({children:[D.PageNumber.CURRENT, '/', D.PageNumber.TOTAL_PAGES], font, size:SZ, sizeComplexScript:SZ})]})]})} : undefined;
+  const file = new D.Document({
+    creator:'TOR Builder', title:titleLines().join(' '),
+    styles:{default:{document:{run:{font, size:SZ, sizeComplexScript:SZ}, paragraph:{spacing:{line:240, before:0, after:0}}}}},
+    sections:[{properties:{page:{size:{width:11906, height:16838}, margin:{top:tw(2.5), right:tw(2), bottom:tw(2), left:tw(3), header:tw(1.25)}}}, headers, children}]
+  });
+  const blob = await D.Packer.toBlob(file);
+  download(blob, fileBase() + '.docx');
+  if (cloudOn()){
+    toast('ดาวน์โหลดแล้ว · กำลังบันทึกสำเนาลง Google Drive…');
+    try { const url = await uploadToDrive(blob, fileBase() + '.docx'); doc.wordUrl = url; doc.wordAt = Date.now(); changed(false); renderFlow(); toast('บันทึกไฟล์ Word ลงโฟลเดอร์ “เอกสาร Word” ใน Drive แล้ว'); }
+    catch(e){ toast('ดาวน์โหลดแล้ว แต่บันทึกลง Drive ไม่สำเร็จ: ' + e.message); }
+  } else toast('ดาวน์โหลดไฟล์ Word แล้ว');
+}
+function noBorders(D){ const n = {style:D.BorderStyle.NONE, size:0, color:'FFFFFF'}; return {top:n, bottom:n, left:n, right:n, insideHorizontal:n, insideVertical:n}; }
+function dataUrlToBytes(u){ const b = atob(u.split(',')[1]); const a = new Uint8Array(b.length); for (let i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a; }
+function fileBase(){ return ('TOR-' + (doc.name || 'ร่าง')).replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 80); }
+function download(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+
+/* =========================================================
+   editor
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const ICON = {
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  sub:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v10h12M12 10l4 4-4 4"/></svg>',
+  out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
+  dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
+};
+
+function findParent(id, list = doc.items, parent = null){
+  for (const n of list){
+    if (n.id === id) return {list, parent, node:n};
+    if (n.children){ const r = findParent(id, n.children, n); if (r) return r; }
+  }
+  return null;
+}
+
+function renderTree(){
+  const box = $('#tree');
+  if (!doc.items.length){ box.innerHTML = '<div class="empty">ยังไม่มีรายการ — กด “+ รายการหลัก” หรือ “วางจากข้อความ”</div>'; return; }
+  const html = [];
+  const walk = (nodes, depth, path) => {
+    let n = 0;
+    nodes.forEach(node => {
+      if (node.kind === 'group'){
+        html.push(`<div class="node group" data-id="${node.id}"><div class="nrow"><span class="num" title="หัวข้อกลุ่ม">กลุ่ม</span>
+          <textarea rows="1" data-f="text" placeholder="เช่น สำหรับห้องเครือข่าย อาคาร 52">${esc(node.text)}</textarea></div>
+          <div class="tools">${tool('up','ขึ้น')}${tool('down','ลง')}${tool('del','ลบ','del')}</div></div>`);
+        return;
+      }
+      n++;
+      const p = path.concat(n);
+      html.push(`<div class="node l${depth}" data-id="${node.id}"><div class="nrow"><span class="num">${esc(numLabel(p, depth))}</span>
+        <textarea rows="1" data-f="text" placeholder="${depth===1 ? (doc.type==='buy' ? 'ชื่อพัสดุ เช่น กล้องวงจรปิด' : 'เช่น งานตรวจสอบพื้นที่ชำรุด') : 'รายละเอียด เช่น มีขนาดไม่น้อยกว่า ...'}">${esc(node.text)}</textarea></div>`);
+      if (depth === 1){
+        html.push(`<div class="qty"><span class="lbl">จำนวน</span><input type="text" data-f="qty" value="${esc(node.qty)}" placeholder="—"><input type="text" data-f="unit" list="unitList" value="${esc(node.unit)}" placeholder="หน่วย">
+          <label class="check" style="margin:0 0 0 6px;font-size:12.5px"><input type="checkbox" data-f="tech" ${node.tech ? 'checked' : ''}>มีหัวข้อ “รายละเอียดคุณสมบัติทางเทคนิค”</label></div>`);
+      }
+      html.push(`<div class="tools">${tool('sub','ข้อย่อย')}${depth>1 ? tool('out','เลื่อนออก') : ''}${tool('up','ขึ้น')}${tool('down','ลง')}${tool('dup','สำเนา')}${tool('del','ลบ','del')}</div>`);
+      if (node.children.length){ html.push('<div class="children">'); walk(node.children, depth+1, p); html.push('</div>'); }
+      html.push('</div>');
+    });
+  };
+  walk(doc.items, 1, []);
+  box.innerHTML = html.join('');
+  box.querySelectorAll('textarea').forEach(autoGrow);
+}
+function tool(act, label, cls=''){ return `<button class="icon ${cls}" data-act="${act}" title="${label}">${ICON[act]}${label}</button>`; }
+function autoGrow(t){ t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+
+$('#tree').addEventListener('input', e => {
+  const el = e.target, nodeEl = el.closest('.node'); if (!nodeEl) return;
+  const {node} = findParent(nodeEl.dataset.id); const f = el.dataset.f;
+  if (f === 'tech') node.tech = el.checked; else node[f] = el.value;
+  if (el.tagName === 'TEXTAREA') autoGrow(el);
+  changed(false);
+});
+$('#tree').addEventListener('change', e => { if (e.target.dataset.f === 'tech'){ changed(false); } });
+$('#tree').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.closest('.node').dataset.id; const r = findParent(id); const i = r.list.indexOf(r.node);
+  switch (b.dataset.act){
+    case 'sub': r.node.children.push(N('')); break;
+    case 'up': if (i > 0) [r.list[i-1], r.list[i]] = [r.list[i], r.list[i-1]]; break;
+    case 'down': if (i < r.list.length-1) [r.list[i+1], r.list[i]] = [r.list[i], r.list[i+1]]; break;
+    case 'dup': r.list.splice(i+1, 0, cloneNode(r.node)); break;
+    case 'del':
+      if ((r.node.children||[]).length && !confirm('ลบข้อนี้พร้อมข้อย่อยทั้งหมด?')) return;
+      r.list.splice(i, 1); break;
+    case 'out': {
+      const gp = findParent(r.parent.id); r.list.splice(i, 1);
+      gp.list.splice(gp.list.indexOf(r.parent)+1, 0, r.node); break;
+    }
+  }
+  changed(true);
+  if (b.dataset.act === 'sub'){ const t = document.querySelector(`.node[data-id="${r.node.children.at(-1).id}"] textarea`); t && t.focus(); }
+});
+document.addEventListener('focusin', e => { if (e.target.matches('#editor textarea, #editor input[type=text]')) lastFocus = e.target; });
+function cloneNode(n){ const c = JSON.parse(JSON.stringify(n)); const re = x => { x.id = uid(); (x.children||[]).forEach(re); }; re(c); return c; }
+
+$('#addItem').onclick = () => { doc.items.push(N('', [], doc.type==='buy' ? {qty:'1'} : {})); changed(true); const ts = $('#tree').querySelectorAll('.node.l1 > .nrow textarea'); ts[ts.length-1]?.focus(); };
+$('#addGroup').onclick = () => { doc.items.push(G('')); changed(true); };
+
+// chips
+$('#chips').innerHTML = CHIPS.map(c => `<button class="chip" type="button">${esc(c)}</button>`).join('');
+$('#chips').addEventListener('mousedown', e => e.preventDefault());
+$('#chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const t = lastFocus && document.contains(lastFocus) ? lastFocus : null;
+  if (!t){ toast('คลิกช่องข้อความที่ต้องการก่อน'); return; }
+  const s = t.selectionStart ?? t.value.length, en = t.selectionEnd ?? s;
+  const before = t.value.slice(0, s), word = c.textContent;
+  const pad = before && !/\s$/.test(before) ? ' ' : '';
+  t.value = before + pad + word + ' ' + t.value.slice(en);
+  const pos = (before + pad + word + ' ').length; t.focus(); t.setSelectionRange(pos, pos);
+  t.dispatchEvent(new Event('input', {bubbles:true}));
+});
+
+/* ---------- bindings ---------- */
+function bindFields(){
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const k = el.dataset.bind;
+    if (el.type === 'checkbox') el.checked = !!doc[k]; else el.value = doc[k] ?? '';
+  });
+  document.querySelectorAll('#segType button').forEach(b => b.classList.toggle('on', b.dataset.v === doc.type));
+  $('#chkManualTitle').checked = doc.manualTitle != null;
+  $('#manualTitleBox').hidden = doc.manualTitle == null;
+  $('#fTitle').value = doc.manualTitle ?? autoTitle().join('\n');
+}
+document.querySelectorAll('[data-bind]').forEach(el => {
+  el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input', () => {
+    const k = el.dataset.bind; doc[k] = el.type === 'checkbox' ? el.checked : el.value;
+    const structural = ['l3style','sigMode'].includes(k);
+    changed(structural);
+    if (k === 'sigMode') renderSigs();
+  });
+});
+document.querySelectorAll('#segType button').forEach(b => b.onclick = () => {
+  if (doc.type === b.dataset.v) return;
+  doc.type = b.dataset.v;
+  if (doc.cond.delivery.ref !== 'สัญญา') doc.cond.delivery.ref = doc.type === 'buy' ? 'ใบสั่งซื้อ' : 'ใบสั่งจ้าง';
+  bindFields(); renderCond(); changed(true);
+});
+$('#chkManualTitle').onchange = e => {
+  doc.manualTitle = e.target.checked ? autoTitle().join('\n') : null;
+  bindFields(); changed(false);
+};
+$('#fTitle').oninput = e => { doc.manualTitle = e.target.value; changed(false); };
+
+/* ---------- conditions ---------- */
+function renderCond(){
+  const c = doc.cond;
+  $('#condBox').innerHTML = `
+    <div class="condRow"><label class="check"><input type="checkbox" data-c="criteria.on" ${c.criteria.on?'checked':''}>พิจารณาตัดสินโดยใช้</label>
+      <select data-c="criteria.v"><option ${c.criteria.v==='เกณฑ์ราคา'?'selected':''}>เกณฑ์ราคา</option><option ${c.criteria.v==='เกณฑ์ราคาประกอบเกณฑ์อื่น'?'selected':''}>เกณฑ์ราคาประกอบเกณฑ์อื่น</option></select></div>
+    <div class="condRow"><label class="check"><input type="checkbox" data-c="delivery.on" ${c.delivery.on?'checked':''}>ส่งมอบภายใน</label>
+      <input type="number" min="1" data-c="delivery.days" value="${c.delivery.days}"> วัน นับถัดจากวันที่ลงนามใน
+      <select data-c="delivery.ref">${['ใบสั่งซื้อ','ใบสั่งจ้าง','สัญญา','ข้อตกลง'].map(o => `<option ${c.delivery.ref===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="condRow"><label class="check"><input type="checkbox" data-c="validity.on" ${c.validity.on?'checked':''}>ยืนราคาไม่น้อยกว่า</label>
+      <input type="number" min="1" data-c="validity.days" value="${c.validity.days}"> วัน</div>
+    <div class="condRow"><label class="check"><input type="checkbox" data-c="warranty.on" ${c.warranty.on?'checked':''}>รับประกันไม่น้อยกว่า</label>
+      <input type="number" min="1" data-c="warranty.n" value="${c.warranty.n}">
+      <select data-c="warranty.unit">${['วัน','เดือน','ปี'].map(o => `<option ${c.warranty.unit===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    <label class="check" style="margin-left:24px"><input type="checkbox" data-c="warranty.detailed" ${c.warranty.detailed?'checked':''}>ใช้ข้อความรับประกันแบบละเอียด (ต้องแก้ไขโดยไม่คิดค่าใช้จ่าย)</label>
+    <div class="lbl" style="margin-top:10px">เงื่อนไขเพิ่มเติม</div>
+    <div id="extras">${c.extras.map((x, i) => `<div class="extra"><textarea rows="1" data-x="${i}" placeholder="พิมพ์เงื่อนไข">${esc(x)}</textarea><button class="icon del" data-xdel="${i}" title="ลบ">${ICON.del}</button></div>`).join('')}</div>
+    <div class="row" style="margin-top:6px">
+      <button class="btn sm" id="addExtra">+ เพิ่มเงื่อนไข</button>
+      <select id="extraPreset" style="width:auto;flex:1"><option value="">— เลือกเงื่อนไขสำเร็จรูป —</option>
+        <option>ผู้รับจ้างต้องจัดหาวัสดุ อุปกรณ์ และเครื่องมือที่ใช้ในการปฏิบัติงานเองทั้งหมด</option>
+        <option>ผู้รับจ้างต้องทำความสะอาด และขนย้ายเศษวัสดุออกจากพื้นที่ปฏิบัติงานให้เรียบร้อยก่อนส่งมอบงาน</option>
+        <option>ผู้รับจ้างต้องสำรวจสถานที่จริงก่อนเสนอราคา</option>
+        <option>ผู้รับจ้างต้องปฏิบัติงานโดยไม่รบกวนการเรียนการสอน และต้องประสานงานกับเจ้าหน้าที่ก่อนเข้าปฏิบัติงาน</option>
+        <option>พัสดุที่เสนอต้องเป็นของใหม่ ไม่เคยผ่านการใช้งานมาก่อน</option>
+        <option>ผู้ขายต้องติดตั้ง และทดสอบการใช้งานให้เรียบร้อยพร้อมใช้งาน</option>
+        <option>ผู้เสนอราคาต้องแนบแคตตาล็อก หรือเอกสารแสดงรายละเอียดคุณลักษณะของพัสดุที่เสนอ</option>
+        <option>มีศูนย์บริการ หรือตัวแทนจำหน่ายในประเทศไทย</option>
+      </select>
+    </div>`;
+  $('#condBox').querySelectorAll('textarea').forEach(autoGrow);
+}
+$('#condBox').addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.c){
+    const [a, b] = el.dataset.c.split('.');
+    doc.cond[a][b] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? '' : +el.value) : el.value;
+    changed(false);
+  } else if (el.dataset.x != null){ doc.cond.extras[+el.dataset.x] = el.value; autoGrow(el); changed(false); }
+});
+$('#condBox').addEventListener('change', e => {
+  if (e.target.id === 'extraPreset' && e.target.value){ doc.cond.extras.push(e.target.value); renderCond(); changed(false); }
+  else if (e.target.dataset.c && e.target.tagName === 'SELECT'){ /* handled by input */ }
+});
+$('#condBox').addEventListener('click', e => {
+  if (e.target.id === 'addExtra'){ doc.cond.extras.push(''); renderCond(); changed(false); $('#extras textarea:last-of-type')?.focus(); const ts = $('#extras').querySelectorAll('textarea'); ts[ts.length-1]?.focus(); }
+  const d = e.target.closest('[data-xdel]'); if (d){ doc.cond.extras.splice(+d.dataset.xdel, 1); renderCond(); changed(false); }
+});
+
+/* ---------- signatures ---------- */
+function renderSigs(){
+  const box = $('#sigBox');
+  if (doc.sigMode !== 'list'){ box.innerHTML = ''; return; }
+  box.innerHTML = doc.sigs.map((s, i) => `<div class="sigRow"><input type="text" data-s="${i}.name" value="${esc(s.name)}" placeholder="ชื่อ-นามสกุล"><input type="text" data-s="${i}.role" value="${esc(s.role)}" list="roleList" placeholder="ตำแหน่ง"><button class="icon del" data-sdel="${i}" title="ลบ">${ICON.del}</button></div>`).join('')
+    + `<datalist id="roleList"><option>ประธานกรรมการ</option><option>กรรมการ</option><option>กรรมการและเลขานุการ</option><option>ผู้กำหนดรายละเอียด</option></datalist><button class="btn sm" id="addSig">+ เพิ่มผู้ลงนาม</button>`;
+}
+$('#sigBox').addEventListener('input', e => { const s = e.target.dataset.s; if (!s) return; const [i, k] = s.split('.'); doc.sigs[+i][k] = e.target.value; changed(false); });
+$('#sigBox').addEventListener('click', e => {
+  if (e.target.id === 'addSig'){ doc.sigs.push({name:'', role:'กรรมการ'}); renderSigs(); changed(false); }
+  const d = e.target.closest('[data-sdel]'); if (d){ doc.sigs.splice(+d.dataset.sdel, 1); renderSigs(); changed(false); }
+});
+
+/* ---------- images ---------- */
+function renderImgs(){
+  $('#imgs').innerHTML = doc.images.map((im, i) => `<div class="imgCard"><img src="${im.src}" alt=""><input type="text" data-cap="${i}" value="${esc(im.caption)}" placeholder="คำอธิบายภาพ"><div class="tools">${i>0?`<button class="icon" data-imv="${i}" data-dir="-1">${ICON.up}ก่อน</button>`:''}<button class="icon del" data-idel="${i}">${ICON.del}ลบ</button></div></div>`).join('');
+}
+$('#imgInput').onchange = async e => {
+  for (const f of e.target.files){
+    try { doc.images.push(Object.assign({caption:''}, await shrink(f))); } catch(err){ toast('อ่านรูปไม่ได้: ' + f.name); }
+  }
+  e.target.value = ''; renderImgs(); changed(false);
+};
+$('#imgs').addEventListener('input', e => { const i = e.target.dataset.cap; if (i != null){ doc.images[+i].caption = e.target.value; changed(false); } });
+$('#imgs').addEventListener('click', e => {
+  const d = e.target.closest('[data-idel]'); if (d){ doc.images.splice(+d.dataset.idel, 1); renderImgs(); changed(false); }
+  const m = e.target.closest('[data-imv]'); if (m){ const i = +m.dataset.imv; [doc.images[i-1], doc.images[i]] = [doc.images[i], doc.images[i-1]]; renderImgs(); changed(false); }
+});
+function shrink(file){
+  return new Promise((res, rej) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1400, r = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width*r); c.height = Math.round(img.height*r);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res({src:c.toDataURL('image/jpeg', .8), w:c.width, h:c.height});
+    };
+    img.onerror = rej; img.src = url;
+  });
+}
+
+/* ---------- paste parser ---------- */
+function parseText(txt){
+  const roots = []; const stack = []; // stack[d-1] = node at depth d
+  let last = null;
+  const qtyRe = /\s+จำนวน\s+([\d,\.]+)\s+(\S+)\s*$/;
+  txt.split(/\r?\n/).forEach(raw => {
+    const line = raw.replace(/ /g, ' ').trim(); if (!line) return;
+    let m, depth = null, text = line;
+    if ((m = line.match(/^(\d+(?:\.\d+)*)\.?\s+(.*)$/)) && !/^\d+(\.\d+)?\s*(เมตร|ซม|มม|ตาราง)/.test(line)){
+      depth = m[1].split('.').length; text = m[2];
+    } else if ((m = line.match(/^\(?(\d+)\)\s*(.*)$/)) || (m = line.match(/^([-•●▪])\s*(.*)$/))){
+      // 1) หรือ • : ถ้าข้อก่อนหน้าเป็นแบบเดียวกันให้อยู่ระดับเดียวกัน ไม่งั้นเป็นข้อย่อยของข้อก่อนหน้า
+      const kind = /^\(?\d/.test(line) ? '_paren' : '_bullet';
+      depth = last && last[kind] ? stack.indexOf(last) + 1 : stack.length + 1;
+      text = m[2];
+    }
+    if (depth == null){
+      if (/^รายละเอียดคุณสมบัติทางเทคนิค/.test(line) && stack[0]){ stack[0].tech = true; return; }
+      if (last) last.text += (/[ก-๙]$/.test(last.text) && /^[ก-๙]/.test(line) ? '' : ' ') + line;
+      else roots.push(last = N(line));
+      return;
+    }
+    depth = Math.min(depth, stack.length + 1);
+    const node = N(text);
+    if (/^\(?\d+\)/.test(line)) node._paren = true;
+    if (/^[-•●▪]/.test(line)) node._bullet = true;
+    if (depth === 1){
+      const q = text.match(qtyRe); if (q){ node.text = text.replace(qtyRe, ''); node.qty = q[1]; node.unit = q[2]; }
+      roots.push(node);
+    } else stack[depth-2].children.push(node);
+    stack.length = depth - 1; stack.push(node); last = node;
+  });
+  const clean = n => { delete n._paren; delete n._bullet; n.children.forEach(clean); };
+  roots.forEach(clean);
+  return roots;
+}
+$('#btnPaste').onclick = () => { $('#pasteText').value = ''; $('#dlgPaste').showModal(); $('#pasteText').focus(); };
+$('#pasteGo').onclick = () => {
+  const items = parseText($('#pasteText').value);
+  if (!items.length){ toast('ไม่พบข้อความ'); return; }
+  doc.items = $('#pasteReplace').checked ? items : doc.items.concat(items);
+  $('#dlgPaste').close(); changed(true); toast(`แยกได้ ${items.length} รายการหลัก`);
+};
+
+
+/* =========================================================
+   ตรวจทาน: แก้บนเอกสาร · ร่องรอยการแก้ไข · ความเห็น · ตรวจระเบียบ
+   ========================================================= */
+let editMode = false, showTrack = true, drawerTab = 'changes';
+const ROLE = {maker:'ผู้จัดทำ', reviewer:'ผู้ตรวจสอบ'};
+const me = () => ({by: settings.userName || ROLE[settings.role || 'maker'], role: settings.role || 'maker'});
+
+/* ---- ตัดคำภาษาไทยเพื่อเทียบความต่างระดับคำ ---- */
+const segmenter = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('th', {granularity:'word'}) : null;
+const toks = s => segmenter ? Array.from(segmenter.segment(s), x => x.segment) : Array.from(s);
+function diffHtml(a, b){
+  const A = toks(a || ''), B = toks(b || ''), n = A.length, m = B.length;
+  if (n * m > 400000) return `<del>${esc(a)}</del><ins>${esc(b)}</ins>`;
+  const dp = Array.from({length:n+1}, () => new Uint16Array(m+1));
+  for (let i = n-1; i >= 0; i--) for (let j = m-1; j >= 0; j--) dp[i][j] = A[i] === B[j] ? dp[i+1][j+1] + 1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const out = []; let i = 0, j = 0;
+  const push = (t, s) => { const l = out[out.length-1]; if (l && l.t === t) l.s += s; else out.push({t, s}); };
+  while (i < n && j < m){
+    if (A[i] === B[j]){ push('=', A[i]); i++; j++; }
+    else if (dp[i+1][j] >= dp[i][j+1]) push('-', A[i++]); else push('+', B[j++]);
+  }
+  while (i < n) push('-', A[i++]); while (j < m) push('+', B[j++]);
+  return out.map(x => x.t === '=' ? esc(x.s) : x.t === '-' ? `<del>${esc(x.s)}</del>` : `<ins>${esc(x.s)}</ins>`).join('');
+}
+
+/* ---- ภาพรวมข้อความแต่ละย่อหน้า (ใช้เป็นฉบับเทียบ) ---- */
+const rawOf = b => b.empty ? '' : (b.text || '');
+function snapshot(){ return buildBlocks().filter(b => b.ref).map(b => ({ref:b.ref, text:rawOf(b), num:b.num || '', ind:b.ind || 0})); }
+function setBaseline(){ doc.baseline = {at:Date.now(), by:me().by, blocks:snapshot()}; }
+function changesList(B){
+  if (!doc.baseline) return [];
+  B = (B || buildBlocks()).filter(b => b.ref);
+  const base = new Map(doc.baseline.blocks.map(x => [x.ref, x])), cur = new Set(B.map(b => b.ref)), L = [];
+  B.forEach(b => {
+    const o = base.get(b.ref), t = rawOf(b);
+    if (!o) L.push({kind:'ins', ref:b.ref, num:b.num, now:t});
+    else if (o.text !== t) L.push({kind:'mod', ref:b.ref, num:b.num, old:o.text, now:t});
+  });
+  doc.baseline.blocks.forEach(o => { if (!cur.has(o.ref)) L.push({kind:'del', ref:o.ref, num:o.num, old:o.text}); });
+  return L;
+}
+function refLabel(ref, B){
+  if (ref === 'doc') return 'ภาพรวมทั้งฉบับ';
+  if (ref.startsWith('t:')) return 'หัวเรื่อง';
+  if (ref === 'intro') return 'ข้อความนำ';
+  const b = (B || buildBlocks()).find(x => x.ref === ref) || (doc.baseline && doc.baseline.blocks.find(x => x.ref === ref));
+  const pre = ref.startsWith('c:') || ref.startsWith('x:') ? 'เงื่อนไข ข้อ ' : 'ข้อ ';
+  if (b && b.num) return pre + b.num;
+  const t = b ? (b.text || '') : '';
+  return t ? '“' + t.slice(0, 24) + (t.length > 24 ? '…' : '') + '”' : 'ข้อที่ถูกลบ';
+}
+function logEvent(type, text, extra){
+  doc.log = doc.log || [];
+  doc.log.push(Object.assign({at:Date.now(), type, text}, me(), extra || {}));
+  if (doc.log.length > 400) doc.log.splice(0, doc.log.length - 400);
+}
+
+/* ---- เขียนข้อความกลับเข้าโมเดลตาม ref ---- */
+function setRefText(ref, text){
+  const i = ref.indexOf(':'), k = i < 0 ? ref : ref.slice(0, i), v = i < 0 ? '' : ref.slice(i+1);
+  switch (k){
+    case 'n': { const r = findParent(v); if (r) r.node.text = text; break; }
+    case 'intro': doc.intro = text; break;
+    case 't': { const ls = titleLines(); ls[+v] = text; doc.manualTitle = ls.filter(x => x.trim()).join('\n'); break; }
+    case 'c': doc.condText = doc.condText || {}; doc.condText[v] = text; break;
+    case 'x': doc.cond.extras[+v] = text; break;
+  }
+}
+function afterModelChange(){ bindFields(); renderTree(); renderCond(); changed(false); }
+
+/* ---- แสดงผลเอกสาร ---- */
+function renderPreview(){
+  const B = buildBlocks();
+  const sheet = $('#sheet');
+  sheet.style.fontSize = (settings.fontSize||16) + 'pt';
+  sheet.classList.toggle('editing', editMode);
+  const hang = doc.wrap === 'hang';
+  const base = showTrack && doc.baseline ? new Map(doc.baseline.blocks.map(x => [x.ref, x.text])) : null;
+  const cur = new Set(B.filter(b => b.ref).map(b => b.ref));
+  // ความเห็นที่ยังเปิดอยู่ เรียงเลข 1, 2, 3 ตามลำดับในเอกสาร
+  const openC = (doc.comments || []).filter(c => !c.resolved && c.ref !== 'doc');
+  const cNum = new Map(); let cn = 0;
+  B.forEach(b => { if (b.ref && openC.some(c => c.ref === b.ref)) cNum.set(b.ref, ++cn); });
+  // ย่อหน้าที่ถูกลบ: แทรกต่อจากย่อหน้าก่อนหน้าที่ยังอยู่
+  const delAfter = new Map();
+  if (base){ let prev = '^'; doc.baseline.blocks.forEach(x => { if (cur.has(x.ref)) prev = x.ref; else { if (!delAfter.has(prev)) delAfter.set(prev, []); delAfter.get(prev).push(x); } }); }
+  const delHtml = list => (list || []).map(x => `<div class="p delp"><div class="c" style="text-indent:${x.ind||0}cm"><del>${esc(x.num ? x.num + ' ' : '')}${esc(x.text)}</del></div></div>`).join('');
+
+  const textHtml = b => {
+    const raw = rawOf(b);
+    let inner;
+    if (base && b.ref){
+      const old = base.get(b.ref);
+      inner = old === undefined ? (raw ? `<ins>${esc(raw)}</ins>` : '<span class="placeholder">...</span>') : old !== raw ? diffHtml(old, raw) : esc(raw);
+      if (!raw && old === '') inner = '<span class="placeholder">...</span>';
+    } else inner = raw ? esc(raw) : '<span class="placeholder">...</span>';
+    const ed = editMode && b.ref ? ' contenteditable="true" spellcheck="false"' : '';
+    return `<span class="tx" data-ref="${b.ref || ''}" data-raw="${esc(raw)}"${ed}>${inner}</span>`;
+  };
+  const extras = b => {
+    if (!b.ref) return '';
+    const n = cNum.get(b.ref);
+    const mark = n ? `<span class="cmark" data-cref="${b.ref}" title="ดูความเห็น">${n}</span>` : '';
+    if (!editMode) return mark;
+    const isNode = b.ref.startsWith('n:');
+    const btn = (act, icon, tip, cls='') => `<button class="${cls}" data-pa="${act}" data-ref="${b.ref}" title="${tip}"><svg><use href="#i-${icon}"/></svg></button>`;
+    return mark + `<span class="pa">${btn('comment','chat','เพิ่มความเห็น')}${isNode ? btn('after','plus','เพิ่มข้อถัดไป') : ''}${isNode && b.item ? btn('child','sub','เพิ่มข้อย่อย') : ''}${isNode || b.ref.startsWith('x:') ? btn('delete','trash','ลบข้อนี้','d') : ''}</span>`;
+  };
+
+  const out = [delHtml(delAfter.get('^'))];
+  B.forEach(b => {
+    const hc = b.ref && cNum.has(b.ref) ? ' hasC' : '';
+    switch (b.t){
+      case 'title': out.push(`<p class="t${hc}">${extras(b)}${textHtml(b)}</p>`); break;
+      case 'rule': out.push(`<div class="rule">${'-'.repeat(b.end ? 40 : 46)}</div>`); break;
+      case 'gap': out.push(`<div class="gap"></div>`); break;
+      case 'pb': out.push(`<div class="pb"></div>`); break;
+      case 'p': {
+        const numHtml = b.num ? `${esc(b.num)}${hang ? '' : ' '}` : '';
+        const style = b.num && hang ? `padding-left:${b.txt}cm;text-indent:-${(b.txt-b.ind).toFixed(2)}cm` : `text-indent:${b.ind}cm`;
+        const numSpan = b.num && hang ? `<span style="display:inline-block;width:${(b.txt-b.ind).toFixed(2)}cm;text-indent:0">${numHtml}</span>` : numHtml;
+        const body = b.ref ? textHtml(b) : esc(b.text);
+        out.push(`<div class="p${b.bold ? ' b' : ''}${hc}">${extras(b)}<div class="c" style="${style}">${numSpan}${body}</div>${b.right ? `<div class="r">${esc(b.right)}</div>` : ''}</div>`);
+        break;
+      }
+      case 'sig': {
+        const one = b.rows.length === 1;
+        out.push(`<div class="sig">${b.rows.map((r, i) => `<div class="${one || (b.rows.length%2 && i===0) ? 'one' : ''}">ลงชื่อ.......................................................<br>(${esc(r.name || '.......................................................')})<br>${esc(r.role)}</div>`).join('')}</div>`);
+        break;
+      }
+      case 'img': out.push(`<figure><img src="${b.src}" alt=""><figcaption>${esc(b.caption)}</figcaption></figure>`); break;
+    }
+    if (b.ref && delAfter.has(b.ref)) out.push(delHtml(delAfter.get(b.ref)));
+  });
+  sheet.innerHTML = out.join('');
+  fitSheet();
+  refreshReview(B);
+}
+
+/* ---- แก้ไขบนเอกสาร ---- */
+const sheetEl = $('#sheet');
+sheetEl.addEventListener('focusin', e => {
+  const t = e.target.closest('.tx[contenteditable]'); if (!t) return;
+  t.textContent = t.dataset.raw;               // เอาเครื่องหมายร่องรอยออกระหว่างพิมพ์
+  const r = document.createRange(); r.selectNodeContents(t); r.collapse(false);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+});
+sheetEl.addEventListener('focusout', e => {
+  const t = e.target.closest('.tx[contenteditable]'); if (!t) return;
+  const now = t.textContent.replace(/\s+/g, ' ').trim(), before = t.dataset.raw;
+  if (now === before){ setTimeout(() => { if (!sheetEl.contains(document.activeElement)) renderPreview(); }, 0); return; }
+  setRefText(t.dataset.ref, now);
+  logEvent('edit', refLabel(t.dataset.ref), {before, after:now});
+  afterModelChange();
+});
+sheetEl.addEventListener('keydown', e => {
+  const t = e.target.closest('.tx[contenteditable]'); if (!t) return;
+  if (e.key === 'Enter'){ e.preventDefault(); t.blur(); }
+  if (e.key === 'Escape'){ t.textContent = t.dataset.raw; t.blur(); }
+});
+sheetEl.addEventListener('paste', e => {
+  if (!e.target.closest('.tx[contenteditable]')) return;
+  e.preventDefault(); document.execCommand('insertText', false, (e.clipboardData.getData('text/plain') || '').replace(/\s+/g, ' '));
+});
+sheetEl.addEventListener('mousedown', e => { if (e.target.closest('.pa')) e.preventDefault(); });
+sheetEl.addEventListener('click', e => {
+  const cm = e.target.closest('[data-cref]'); if (cm){ openDrawer('comments', cm.dataset.cref); return; }
+  const b = e.target.closest('[data-pa]'); if (!b) return;
+  const ref = b.dataset.ref, act = b.dataset.pa;
+  if (act === 'comment') return openComment(ref);
+  if (ref.startsWith('x:')){
+    const i = +ref.slice(2), old = doc.cond.extras[i];
+    doc.cond.extras.splice(i, 1); logEvent('delete', 'เงื่อนไขเพิ่มเติม', {before:old}); afterModelChange(); return;
+  }
+  const r = findParent(ref.slice(2)); if (!r) return;
+  if (act === 'delete'){
+    if (r.node.children && r.node.children.length && !confirm('ลบข้อนี้พร้อมข้อย่อยทั้งหมด?')) return;
+    const label = refLabel(ref);
+    r.list.splice(r.list.indexOf(r.node), 1);
+    logEvent('delete', label, {before:r.node.text}); afterModelChange(); toast('ลบ' + label + 'แล้ว');
+    return;
+  }
+  const nn = N('');
+  if (act === 'after') r.list.splice(r.list.indexOf(r.node) + 1, 0, nn); else r.node.children.push(nn);
+  logEvent('add', act === 'after' ? 'เพิ่มข้อต่อจาก' + refLabel(ref) : 'เพิ่มข้อย่อยใต้' + refLabel(ref));
+  afterModelChange();
+  const el = sheetEl.querySelector(`.tx[data-ref="n:${nn.id}"]`); el && el.focus();
+});
+
+/* ---- ความเห็น ---- */
+let cmRef = null;
+const CM_PRESETS = ['ควรใช้ “ไม่น้อยกว่า” แทนค่าตายตัว','ควรเพิ่ม “หรือดีกว่า”','อาจเข้าข่ายระบุยี่ห้อ/รุ่น (มาตรา 9)','ระบุหน่วยนับให้ชัดเจน','ตรวจสอบตัวเลข/ขนาดอีกครั้ง','ข้อความกำกวม ควรเขียนให้ชัดเจน','ควรแยกเป็นข้อย่อย'];
+$('#cmPresets').innerHTML = CM_PRESETS.map(t => `<button class="chip" type="button">${esc(t)}</button>`).join('');
+$('#cmPresets').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; const ta = $('#cmText'); ta.value = (ta.value ? ta.value.trim() + ' ' : '') + c.textContent; ta.focus(); });
+function openComment(ref){
+  cmRef = ref;
+  const b = buildBlocks().find(x => x.ref === ref);
+  $('#cmTitle').textContent = 'ความเห็น · ' + refLabel(ref);
+  $('#cmQuote').textContent = ref === 'doc' ? 'ความเห็นต่อเอกสารทั้งฉบับ' : (b ? (b.num ? b.num + ' ' : '') + (rawOf(b) || '...') : '');
+  $('#cmText').value = '';
+  $('#dlgComment').showModal(); $('#cmText').focus();
+}
+$('#cmSave').onclick = () => {
+  const text = $('#cmText').value.trim(); if (!text){ $('#cmText').focus(); return; }
+  doc.comments = doc.comments || [];
+  doc.comments.push(Object.assign({id:uid(), ref:cmRef, text, at:Date.now(), resolved:false, replies:[]}, me()));
+  logEvent('comment', refLabel(cmRef), {after:text});
+  $('#dlgComment').close(); changed(false); openDrawer('comments');
+};
+
+/* ---- ตรวจตามระเบียบ (ตัวช่วยเบื้องต้น) ---- */
+function runChecks(){
+  const R = [], add = (lv, msg, note, ref) => R.push({lv, msg, note, ref});
+  const B = buildBlocks(); const numOf = id => (B.find(b => b.ref === 'n:' + id) || {}).num || '';
+  if (!doc.name.trim()) add('err', 'ยังไม่ได้ระบุชื่อรายการ / ชื่องาน');
+  if (!countItems(doc.items)) add('err', 'ยังไม่มีรายละเอียดของงานหรือคุณลักษณะเฉพาะ');
+  const brand = /ยี่ห้อ|แบรนด์|เครื่องหมายการค้า|\bbrand\b|\bmodel\b|รุ่น\s*[A-Za-z0-9]/i;
+  const bound = /(ไม่น้อยกว่า|ไม่เกิน|ไม่มากกว่า|ไม่ต่ำกว่า|หรือดีกว่า|หรือมากกว่า|อย่างน้อย|ระหว่าง|±|\+\/-|ขึ้นไป)/;
+  (function walk(list, depth){
+    list.forEach(n => {
+      const ref = 'n:' + n.id, at = n.kind === 'group' ? 'หัวข้อกลุ่ม' : 'ข้อ ' + numOf(n.id);
+      if (!n.text.trim() || /\.\.\./.test(n.text)) add('err', `${at} ยังมีข้อความที่ต้องเติม`, 'ช่องว่างหรือเครื่องหมาย ... ที่ยังไม่ได้แทนค่า', ref);
+      if (brand.test(n.text)) add('err', `${at} อาจเป็นการระบุยี่ห้อ / รุ่น`, 'พ.ร.บ. จัดซื้อจัดจ้างฯ 2560 มาตรา 9 ห้ามกำหนดคุณลักษณะเฉพาะให้ใกล้เคียงยี่ห้อใดยี่ห้อหนึ่ง', ref);
+      if (n.kind === 'item' && doc.type === 'buy' && depth >= 2 && /\d/.test(n.text) && !bound.test(n.text))
+        add('warn', `${at} กำหนดตัวเลขแบบตายตัว`, 'ควรใช้ “ไม่น้อยกว่า / ไม่เกิน” หรือ “หรือดีกว่า” เพื่อไม่ให้จำกัดผู้เสนอราคา', ref);
+      if (n.kind === 'item' && doc.type === 'buy' && depth === 1 && !String(n.qty).trim()) add('warn', `${at} ยังไม่ได้ระบุจำนวน`, null, ref);
+      walk(n.children || [], depth + 1);
+    });
+  })(doc.items, 1);
+  const c = doc.cond;
+  if (!c.criteria.on) add('warn', 'ไม่ได้ระบุเกณฑ์การพิจารณาคัดเลือกข้อเสนอ', 'พ.ร.บ. จัดซื้อจัดจ้างฯ 2560 มาตรา 65');
+  if (!c.delivery.on) add('warn', 'ไม่ได้กำหนดระยะเวลาส่งมอบ');
+  if (!c.validity.on) add('warn', 'ไม่ได้กำหนดระยะเวลายืนราคา');
+  if (!c.warranty.on) add('warn', 'ไม่ได้กำหนดการรับประกันความชำรุดบกพร่อง');
+  c.extras.forEach((x, i) => { if (brand.test(x)) add('err', 'เงื่อนไขเพิ่มเติมอาจระบุยี่ห้อ / รุ่น', 'มาตรา 9', 'x:' + i); });
+  if (!money(doc.budget)) add('info', 'ยังไม่ได้ระบุวงเงินงบประมาณ', 'ใช้สรุปยอดและส่งต่อเข้าระบบ ERP');
+  const oc = (doc.comments || []).filter(x => !x.resolved).length;
+  if (oc) add('warn', `ยังมีความเห็นที่ยังไม่ได้แก้ไข ${oc} รายการ`);
+  const ch = changesList(B).length;
+  if (ch) add('info', `มีการแก้ไขที่ยังไม่ได้ยอมรับ ${ch} จุด`);
+  return R;
+}
+
+/* ---- แผงตรวจทาน ---- */
+function openDrawer(tab, focusRef){
+  if (tab) drawerTab = tab;
+  $('#drawer').classList.add('open'); renderDrawer(focusRef);
+}
+$('#drClose').onclick = () => $('#drawer').classList.remove('open');
+$('#btnReview').onclick = () => $('#drawer').classList.contains('open') ? $('#drawer').classList.remove('open') : openDrawer();
+$('#drTabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b){ drawerTab = b.dataset.tab; renderDrawer(); } });
+function whoLine(x){ return `<div class="who2"><span class="badge ${x.role === 'reviewer' ? 'hire' : 'buy'}">${ROLE[x.role] || ''}</span><b>${esc(x.by)}</b><span>· ${ago(x.at)}</span></div>`; }
+function renderDrawer(focusRef){
+  if (!doc || !$('#drawer').classList.contains('open')) return;
+  document.querySelectorAll('#drTabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === drawerTab));
+  const B = buildBlocks(); let h = '';
+  if (drawerTab === 'changes'){
+    if (!doc.baseline){
+      h = `<div class="tip">ระบบจะเริ่มเก็บร่องรอยการแก้ไขเมื่อผู้จัดทำกด <b>“ส่งให้ผู้ตรวจ”</b> หลังจากนั้นทุกคำที่ถูกเพิ่ม ลบ หรือแก้ จะแสดงที่นี่และบนเอกสาร</div><button class="btn sm" data-rv="start">${svg('track')}เริ่มติดตามการแก้ไขตั้งแต่ตอนนี้</button>`;
+    } else {
+      const L = changesList(B);
+      h = `<div class="tip">เทียบกับฉบับวันที่ ${new Date(doc.baseline.at).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})} (${esc(doc.baseline.by)}) · <span style="color:#08703a">เขียว = เพิ่ม</span> · <span style="color:#c2271b">แดง = ลบ</span></div>`;
+      if (!L.length) h += `<div class="emptyBox" style="padding:24px 10px"><div class="big">${svg('check')}</div><b>ไม่มีการแก้ไขค้างอยู่</b>เนื้อหาตรงกับฉบับที่ส่งตรวจ</div>`;
+      else {
+        h += `<div class="row" style="margin-bottom:10px"><button class="btn sm okb" data-rv="acceptAll">${svg('check')}ยอมรับทั้งหมด (${L.length})</button></div>`;
+        h += L.map(x => `<div class="ritem"><div class="rh"><span class="k ${x.kind}">${x.kind === 'mod' ? 'แก้ไข' : x.kind === 'ins' ? 'เพิ่มใหม่' : 'ลบออก'}</span><a data-goto="${x.ref}">${esc(refLabel(x.ref, B))}</a></div>
+          <div class="rt">${x.kind === 'mod' ? diffHtml(x.old, x.now) : x.kind === 'ins' ? `<ins>${esc(x.now || '(ว่าง)')}</ins>` : `<del>${esc(x.old)}</del>`}</div>
+          <div class="ra"><button class="btn sm" data-rv="revert" data-ref="${x.ref}">${svg('undo')}${x.kind === 'del' ? 'กู้คืน' : 'ย้อนกลับ'}</button><button class="btn sm okb" data-rv="accept" data-ref="${x.ref}">${svg('check')}ยอมรับ</button></div></div>`).join('');
+      }
+    }
+  }
+  if (drawerTab === 'comments'){
+    const list = (doc.comments || []).slice().sort((a, b) => (a.resolved - b.resolved) || (b.at - a.at));
+    h = `<button class="btn sm" data-rv="docComment" style="margin-bottom:12px">${svg('chat')}ความเห็นต่อทั้งฉบับ</button><div class="tip">เปิด “แก้ไขบนเอกสาร” แล้วชี้ที่ข้อใดก็ได้ จะมีปุ่ม ${svg('chat')} ให้แนบความเห็นรายข้อ</div>`;
+    h += list.length ? list.map(c => `<div class="ritem ${c.resolved ? 'resolved' : ''}" data-cid="${c.id}" ${focusRef === c.ref ? 'style="border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,184,28,.2)"' : ''}>
+      <div class="rh"><a data-goto="${c.ref}">${esc(refLabel(c.ref, B))}</a>${c.resolved ? '<span class="k ins">แก้ไขแล้ว</span>' : ''}</div>
+      <div class="rt">${esc(c.text)}</div>${whoLine(c)}
+      ${(c.replies || []).map(r => `<div class="rpl">${esc(r.text)}<small>${ROLE[r.role] || ''} · ${esc(r.by)} · ${ago(r.at)}</small></div>`).join('')}
+      <div class="replyBox"><input type="text" placeholder="ตอบกลับ…" data-reply="${c.id}"><button class="btn sm" data-rv="reply" data-id="${c.id}">ส่ง</button></div>
+      <div class="ra">${c.resolved ? `<button class="btn sm" data-rv="reopen" data-id="${c.id}">เปิดอีกครั้ง</button>` : `<button class="btn sm okb" data-rv="resolve" data-id="${c.id}">${svg('check')}แก้ไขแล้ว</button>`}<button class="icon del" data-rv="delComment" data-id="${c.id}" title="ลบ">${svg('trash')}</button></div></div>`).join('')
+      : `<div class="emptyBox" style="padding:24px 10px"><div class="big">${svg('chat')}</div><b>ยังไม่มีความเห็น</b></div>`;
+  }
+  if (drawerTab === 'checks'){
+    const R = runChecks();
+    h = `<div class="tip">ตรวจเบื้องต้นตามหลักการ พ.ร.บ. การจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ. 2560 — เป็นตัวช่วยเท่านั้น ผู้ตรวจสอบควรพิจารณาประกอบระเบียบอีกครั้ง</div>`;
+    h += R.length ? R.map(r => `<div class="chk ${r.lv}" ${r.ref ? `data-goto="${r.ref}"` : ''}><span class="dt">${r.lv === 'err' ? '!' : r.lv === 'warn' ? '?' : 'i'}</span><span><b>${esc(r.msg)}</b>${r.note ? `<small>${esc(r.note)}</small>` : ''}</span></div>`).join('')
+      : `<div class="chk ok"><span class="dt">✓</span><span><b>ไม่พบประเด็นจากการตรวจอัตโนมัติ</b><small>พร้อมส่งตรวจ / พิจารณาต่อ</small></span></div>`;
+  }
+  if (drawerTab === 'log'){
+    const T = {edit:'แก้ไข', add:'เพิ่ม', delete:'ลบ', comment:'ความเห็น', submit:'ส่งให้ผู้ตรวจ', return:'ส่งกลับแก้ไข', approve:'ผ่านการตรวจ', accept:'ยอมรับการแก้ไข', revert:'ย้อนการแก้ไข', resolve:'แก้ไขตามความเห็น', create:'สร้างเอกสาร'};
+    const L = (doc.log || []).slice().reverse();
+    h = L.length ? L.map(x => `<div class="logi"><span class="ld"></span><span style="min-width:0"><b>${T[x.type] || x.type}</b> · ${esc(x.text || '')}
+      ${x.before != null && x.after != null ? `<div class="rt" style="font-family:Sarabun,sans-serif;margin-top:3px">${diffHtml(x.before, x.after)}</div>` : x.after ? `<div style="margin-top:2px">${esc(x.after)}</div>` : ''}
+      <small>${ROLE[x.role] || ''} · ${esc(x.by)} · ${new Date(x.at).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})}</small></span></div>`).join('')
+      : `<div class="emptyBox" style="padding:24px 10px"><div class="big">${svg('clock')}</div><b>ยังไม่มีประวัติ</b>การส่งตรวจ การแก้ไขบนเอกสาร และความเห็นจะถูกบันทึกที่นี่</div>`;
+  }
+  $('#drBody').innerHTML = h;
+  $('#drSub').textContent = `${doc.name || 'ร่างไม่มีชื่อ'} · ${STATUS[doc.status || 'draft']}`;
+}
+function jumpTo(ref){
+  if (matchMedia('(max-width:1024px)').matches){ document.body.dataset.pane = 'preview'; document.querySelectorAll('.mobileTabs .btn').forEach(x => x.classList.toggle('on', x.dataset.pane === 'preview')); fitSheet(); }
+  const el = sheetEl.querySelector(`.tx[data-ref="${ref}"]`); if (!el){ toast('ข้อนี้ไม่อยู่ในเอกสารแล้ว'); return; }
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+$('#drBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.reply){ e.preventDefault(); e.target.nextElementSibling.click(); } });
+$('#drBody').addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]'); if (g && !e.target.closest('[data-rv]')){ jumpTo(g.dataset.goto); return; }
+  const b = e.target.closest('[data-rv]'); if (!b) return;
+  const act = b.dataset.rv, ref = b.dataset.ref, cm = (doc.comments || []).find(c => c.id === b.dataset.id);
+  if (act === 'start'){ setBaseline(); logEvent('accept', 'เริ่มติดตามการแก้ไข'); }
+  if (act === 'acceptAll'){ setBaseline(); logEvent('accept', 'ยอมรับการแก้ไขทั้งหมด'); toast('ยอมรับการแก้ไขทั้งหมดแล้ว'); }
+  if (act === 'accept'){
+    const x = changesList().find(c => c.ref === ref), bl = doc.baseline.blocks;
+    if (x.kind === 'mod') bl.find(o => o.ref === ref).text = x.now;
+    if (x.kind === 'del') bl.splice(bl.findIndex(o => o.ref === ref), 1);
+    if (x.kind === 'ins'){ // แทรกในตำแหน่งต่อจากย่อหน้าก่อนหน้าที่มีอยู่ในฉบับเทียบ
+      const S = snapshot(), i = S.findIndex(o => o.ref === ref); let at = 0;
+      for (let k = i - 1; k >= 0; k--){ const j = bl.findIndex(o => o.ref === S[k].ref); if (j >= 0){ at = j + 1; break; } }
+      bl.splice(at, 0, S[i]);
+    }
+    logEvent('accept', refLabel(ref));
+  }
+  if (act === 'revert'){
+    const x = changesList().find(c => c.ref === ref);
+    if (x.kind === 'mod') setRefText(ref, x.old);
+    if (x.kind === 'ins'){
+      if (ref.startsWith('n:')){ const r = findParent(ref.slice(2)); r && r.list.splice(r.list.indexOf(r.node), 1); }
+      else if (ref.startsWith('x:')) doc.cond.extras.splice(+ref.slice(2), 1);
+      else if (ref.startsWith('c:')) doc.cond[ref.slice(2)].on = false;
+      else setRefText(ref, '');
+    }
+    if (x.kind === 'del'){
+      if (ref.startsWith('n:')){ // กู้คืนข้อเดิม (id เดิม) ต่อจากข้อก่อนหน้าที่ยังอยู่
+        const bl = doc.baseline.blocks, i = bl.findIndex(o => o.ref === ref); let placed = false;
+        const node = N(x.old); node.id = ref.slice(2);
+        for (let k = i - 1; k >= 0 && !placed; k--){
+          if (!bl[k].ref.startsWith('n:')) continue;
+          const r = findParent(bl[k].ref.slice(2)); if (r){ r.list.splice(r.list.indexOf(r.node) + 1, 0, node); placed = true; }
+        }
+        if (!placed) doc.items.unshift(node);
+      } else if (ref.startsWith('c:')) doc.cond[ref.slice(2)].on = true;
+      else if (ref.startsWith('x:')) doc.cond.extras.splice(+ref.slice(2), 0, x.old);
+      else if (ref === 'intro') doc.intro = x.old;
+    }
+    logEvent('revert', refLabel(ref));
+    afterModelChange();
+  }
+  if (act === 'docComment') return openComment('doc');
+  if (act === 'reply'){
+    const inp = $(`[data-reply="${b.dataset.id}"]`), t = inp.value.trim(); if (!t) return;
+    cm.replies = cm.replies || []; cm.replies.push(Object.assign({text:t, at:Date.now()}, me()));
+  }
+  if (act === 'resolve'){ cm.resolved = true; logEvent('resolve', refLabel(cm.ref), {after:cm.text}); }
+  if (act === 'reopen') cm.resolved = false;
+  if (act === 'delComment'){ if (!confirm('ลบความเห็นนี้?')) return; doc.comments.splice(doc.comments.indexOf(cm), 1); }
+  changed(false); renderDrawer();
+});
+$('#drawer').addEventListener('click', e => { const g = e.target.closest('.chk[data-goto]'); if (g) jumpTo(g.dataset.goto); });
+
+/* ---- ขั้นตอนงาน (workflow) ---- */
+function renderFlow(){
+  const st = doc.status || 'draft', role = settings.role || 'maker';
+  const steps = [['draft','ร่าง'],['review','รอตรวจ'],['revise','ส่งกลับแก้ไข'],['done','ผ่านการตรวจ']];
+  const idx = {draft:0, review:1, revise:2, done:3}[st];
+  const stepHtml = steps.filter(([k]) => k !== 'revise' || st === 'revise').map(([k, l], i) => {
+    const cls = k === st ? 'now' + (k === 'revise' ? ' bad' : '') : {draft:0, review:1, revise:2, done:3}[k] < idx ? 'past' : '';
+    return `<span class="fs ${cls}"><i>${cls === 'past' ? '✓' : i + 1}</i>${l}</span>`;
+  }).join(`<svg class="fArrow"><use href="#i-arrow"/></svg>`);
+  let acts = '', msg = '';
+  if (role === 'maker'){
+    if (st === 'review'){ msg = 'ส่งให้ผู้ตรวจแล้ว — รอผลการตรวจ'; acts = `<button class="btn sm" data-flow="share">${svg('send')}ส่งออกไฟล์อีกครั้ง</button>`; }
+    else if (st === 'done'){ msg = 'เอกสารผ่านการตรวจแล้ว พร้อมส่งออก Word / PDF'; acts = `<button class="btn sm" data-flow="reopen">${svg('edit')}เปิดแก้ไขใหม่</button>`; }
+    else { if (st === 'revise') msg = 'ผู้ตรวจส่งกลับมาให้แก้ไข — ดูความเห็นและการแก้ไขในแผงตรวจทาน'; acts = `<button class="btn sm gold" data-flow="submit">${svg('send')}ส่งให้ผู้ตรวจ</button>`; }
+  } else {
+    msg = {review:'คลิกข้อความบนเอกสารเพื่อแก้ไข · ชี้ที่ข้อเพื่อเพิ่ม/ลบข้อหรือแนบความเห็น', done:'เอกสารผ่านการตรวจแล้ว', revise:'ส่งกลับให้ผู้จัดทำแล้ว — รอฉบับแก้ไข', draft:'ผู้จัดทำยังไม่ได้ส่งตรวจ — ตรวจได้เลย ระบบจะเก็บร่องรอยการแก้ไขให้'}[st];
+    acts = `<button class="btn sm warnb" data-flow="return">${svg('undo')}ส่งกลับให้แก้ไข</button><button class="btn sm okb" data-flow="approve">${svg('check')}ผ่านการตรวจ</button>`;
+  }
+  if (doc.wordUrl) acts = `<a class="btn sm" href="${esc(doc.wordUrl)}" target="_blank" rel="noopener" title="บันทึกเมื่อ ${doc.wordAt ? ago(doc.wordAt) : ''}">${svg('drive')}Word ใน Drive</a>` + acts;
+  $('#flowBar').innerHTML = `<div class="flowSteps">${stepHtml}</div><span class="msg">${msg}</span><div class="acts">${acts}</div>`;
+}
+function shareDoc(){
+  persist();
+  const data = {app:'TOR Builder', version:2, kind:'tor', exported:new Date().toISOString(), exportedBy:me(), drafts:[doc]};
+  const st = STATUS[doc.status || 'draft'];
+  download(new Blob([JSON.stringify(data, null, 1)], {type:'application/json'}), `TOR-${(doc.name || 'ร่าง').replace(/[\\/:*?"<>|]+/g, ' ').slice(0, 60)}-${st}.json`);
+  toast('ดาวน์โหลดไฟล์แล้ว — ส่งไฟล์นี้ให้อีกฝ่ายเปิดด้วย “นำเข้าข้อมูล”');
+}
+$('#btnShare').onclick = shareDoc;
+$('#flowBar').addEventListener('click', e => {
+  const b = e.target.closest('[data-flow]'); if (!b) return;
+  const f = b.dataset.flow;
+  if (f === 'share') return shareDoc();
+  if (f === 'submit'){
+    const errs = runChecks().filter(r => r.lv === 'err');
+    if (errs.length && !confirm(`พบประเด็นที่ควรแก้ ${errs.length} รายการ:\n• ${errs.slice(0, 5).map(r => r.msg).join('\n• ')}\n\nต้องการส่งให้ผู้ตรวจเลยหรือไม่?`)){ openDrawer('checks'); return; }
+    if (doc.baseline && changesList().length && !confirm('ยังมีการแก้ไขของผู้ตรวจที่ยังไม่ได้ยอมรับ — ส่งต่อจะถือว่ายอมรับทั้งหมด ดำเนินการต่อ?')) return;
+    setBaseline(); doc.status = 'review'; logEvent('submit', 'ส่งให้ผู้ตรวจ');
+    changed(false); renderFlow();
+    if (cloudOn()) toast('ส่งแล้ว — นักวิชาการพัสดุจะเห็นเอกสารนี้ใน Google Drive ทันที');
+    else if (confirm('ส่งแล้ว — ดาวน์โหลดไฟล์เพื่อส่งให้นักวิชาการพัสดุตอนนี้เลยไหม?\n(ถ้าใช้เครื่องเดียวกัน ไม่ต้องดาวน์โหลด)')) shareDoc();
+  }
+  if (f === 'reopen'){ doc.status = 'draft'; logEvent('submit', 'เปิดแก้ไขใหม่'); changed(false); renderFlow(); }
+  if (f === 'return' || f === 'approve'){
+    if (!doc.baseline) setBaseline();
+    if (f === 'return'){
+      const note = prompt('สรุปสิ่งที่ต้องแก้ไข (ไม่บังคับ)', '');
+      if (note === null) return;
+      if (note.trim()){ doc.comments.push(Object.assign({id:uid(), ref:'doc', text:note.trim(), at:Date.now(), resolved:false, replies:[]}, me())); }
+      doc.status = 'revise'; logEvent('return', 'ส่งกลับให้ผู้จัดทำแก้ไข', note.trim() ? {after:note.trim()} : {});
+    } else {
+      const open = (doc.comments || []).filter(c => !c.resolved).length;
+      if (!confirm(open ? `ยังมีความเห็นค้าง ${open} รายการ ยืนยันผ่านการตรวจ?` : 'ยืนยันว่าเอกสารนี้ผ่านการตรวจ?')) return;
+      doc.status = 'done'; logEvent('approve', 'ผ่านการตรวจ');
+    }
+    changed(false); renderFlow();
+    if (cloudOn()) toast('บันทึกผลการตรวจแล้ว — ผู้จัดทำจะเห็นใน Google Drive ทันที');
+    else if (confirm('ดาวน์โหลดไฟล์เพื่อส่งกลับให้ผู้จัดทำไหม?\n(ถ้าใช้เครื่องเดียวกัน ไม่ต้องดาวน์โหลด)')) shareDoc();
+  }
+});
+
+/* ---- ตัวนับ / ปุ่มสลับ ---- */
+function refreshReview(B){
+  const ch = changesList(B).length, oc = (doc.comments || []).filter(c => !c.resolved).length;
+  const errs = runChecks().filter(r => r.lv === 'err').length;
+  const set = (id, n, ok) => { const el = $(id); el.textContent = n; el.className = n ? 'show' : ''; };
+  set('#tcChanges', ch); set('#tcComments', oc); set('#tcChecks', errs);
+  const tot = ch + oc; $('#reviewCnt').hidden = !tot; $('#reviewCnt').textContent = tot;
+  if ($('#drawer').classList.contains('open') && !$('#drawer').contains(document.activeElement)) renderDrawer();
+}
+function setEditMode(on){ editMode = on; $('#togEdit').classList.toggle('on', on); renderPreview(); }
+$('#togEdit').onclick = () => setEditMode(!editMode);
+$('#togTrack').onclick = () => { showTrack = !showTrack; $('#togTrack').classList.toggle('on', showTrack); renderPreview(); };
+
+/* ---- บทบาทผู้ใช้ ---- */
+function applyRole(){
+  const role = settings.role || 'maker';
+  document.querySelectorAll('#rolePills button').forEach(b => b.classList.toggle('on', b.dataset.role === role));
+  const name = settings.userName || '';
+  $('#whoName').textContent = name || 'ตั้งชื่อผู้ใช้งาน';
+  $('#whoRole').textContent = ROLE[role] + (role === 'reviewer' ? ' · นักวิชาการพัสดุ' : ' · ผู้กำหนดรายละเอียด');
+  $('#whoAv').textContent = name ? name.replace(/^(นาย|นางสาว|นาง|ดร\.|ผศ\.|รศ\.|อ\.)\s*/, '').trim().charAt(0) : '?';
+  if (doc && !$('#viewEditor').hidden) renderFlow();
+}
+$('#rolePills').addEventListener('click', e => {
+  const b = e.target.closest('[data-role]'); if (!b || b.dataset.role === settings.role) return;
+  settings.role = b.dataset.role; store.set(K_SET, settings); applyRole();
+  if (doc){ setEditMode(settings.role === 'reviewer'); }
+  toast('สลับเป็น' + ROLE[settings.role] + 'แล้ว');
+  if (!settings.userName) setTimeout(() => $('#whoBtn').click(), 400);
+});
+$('#whoBtn').onclick = () => { $('#navSettings').click(); setTimeout(() => $('#sUser').focus(), 50); };
+
+/* =========================================================
+   บันทึก / โหลดร่าง
+   ========================================================= */
+let saveTimer = null;
+function changed(rerenderTree){
+  doc.updated = Date.now();
+  if (rerenderTree) renderTree();
+  if (doc.manualTitle == null) $('#fTitle').value = autoTitle().join('\n');
+  renderPreview();
+  updateDocLabels();
+  const s = $('#saveState'); s.textContent = 'กำลังบันทึก…'; s.className = 'saveState busy';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persist, 400);
+  if (cloudOn()) queueSave(doc.id);
+}
+function persist(){
+  if (!doc) return;
+  drafts[doc.id] = doc;
+  const ok = store.set(K_DRAFTS, drafts) && store.set(K_CUR, doc.id);
+  const s = $('#saveState');
+  s.textContent = ok ? 'บันทึกแล้ว' : 'บันทึกในเบราว์เซอร์ไม่ได้ — ใช้ “สำรองข้อมูล”';
+  s.className = 'saveState' + (ok ? '' : ' err');
+}
+function saveAll(){ store.set(K_DRAFTS, drafts); }
+function updateDocLabels(){
+  const name = doc.name || 'ร่างไม่มีชื่อ';
+  $('#draftName').textContent = name;
+  $('#navEditName').textContent = name;
+  document.title = name + ' · TOR Builder';
+}
+function loadDoc(d){
+  doc = d; drafts[doc.id] = doc;
+  // เติมค่าที่อาจขาดจากร่างรุ่นเก่า
+  const base = baseDoc(doc.type);
+  for (const k in base) if (doc[k] === undefined) doc[k] = base[k];
+  for (const k in base.cond) if (doc.cond[k] === undefined) doc.cond[k] = base.cond[k];
+  editMode = (settings.role || 'maker') === 'reviewer'; $('#togEdit').classList.toggle('on', editMode); $('#togTrack').classList.toggle('on', showTrack);
+  $('#drawer').classList.remove('open');
+  bindFields(); renderTree(); renderCond(); renderSigs(); renderImgs(); renderPreview(); updateDocLabels(); renderFlow();
+  $('#navEdit').hidden = false; $('#navEdit').href = '#/edit/' + doc.id;
+  store.set(K_CUR, doc.id);
+  $('#editor').scrollTop = 0;
+}
+function cloneDoc(src, newName){
+  const c = JSON.parse(JSON.stringify(src)); c.id = uid(); c.updated = Date.now();
+  (c.items||[]).forEach(function re(n){ n.id = uid(); (n.children||[]).forEach(re); });
+  if (newName != null) c.name = newName;
+  return c;
+}
+function openNew(d){
+  d.updated = Date.now(); d.log = [Object.assign({at:Date.now(), type:'create', text:d.name || 'ร่างใหม่'}, me())]; drafts[d.id] = d; saveAll(); queueSave(d.id, 0);
+  go('#/edit/' + d.id);
+}
+
+/* =========================================================
+   แม่แบบ — ไอคอนและสีของแต่ละแบบ
+   ========================================================= */
+const TPL_META = {
+  'blank-buy':{icon:'cart', c:1}, 'blank-hire':{icon:'brief', c:2}, 'aircon':{icon:'box', c:5}, 'cctv':{icon:'box', c:1},
+  'furniture':{icon:'cart', c:6}, 'tile':{icon:'tool', c:3}, 'seat':{icon:'tool', c:3}, 'renovate':{icon:'build', c:4}, 'demolish':{icon:'build', c:5}
+};
+const CREATE = [
+  {t:'ซื้อ', d:'วัสดุ ครุภัณฑ์ คอมพิวเตอร์ เริ่มจากเอกสารเปล่า', icon:'cart', c:1, key:'blank-buy'},
+  {t:'จ้าง', d:'จ้างเหมาบริการ งานทั่วไป เริ่มจากเอกสารเปล่า', icon:'brief', c:2, key:'blank-hire'},
+  {t:'จ้างซ่อมแซม', d:'ซ่อมครุภัณฑ์ที่มีเลขครุภัณฑ์ เช่น ซ่อมเบาะรถตู้', icon:'tool', c:3, key:'seat'},
+  {t:'จ้างปรับปรุง / ก่อสร้าง', d:'ปรับปรุงห้อง งานระบบไฟฟ้า แอร์ เครือข่าย', icon:'build', c:4, key:'renovate'},
+  {t:'ซื้อพร้อมติดตั้ง', d:'เครื่องปรับอากาศ กล้องวงจรปิด เครื่องเสียง', icon:'box', c:5, key:'aircon'},
+  {t:'เลือกจากคลังแม่แบบ', d:'', icon:'star', c:6, key:'@library'},
+];
+const svg = (id, cls='') => `<svg class="${cls}"><use href="#i-${id}"/></svg>`;
+const tint = c => `--t:var(--t${c});--c:var(--c${c})`;
+function allTemplates(){
+  return TEMPLATES.map(t => ({key:t.key, type:t.tag==='ซื้อ'?'buy':'hire', title:t.title, desc:t.desc, user:false, make:t.make, meta:TPL_META[t.key]||{icon:'doc',c:2}}))
+    .concat(userTpl.map((t, i) => ({key:'u'+i, type:t.doc.type, title:t.title, desc:'แม่แบบที่บันทึกไว้', user:true, idx:i, make:() => cloneDoc(t.doc), meta:{icon:'bookmark', c:4}})));
+}
+function useTemplate(key){
+  const t = allTemplates().find(x => x.key === key); if (!t) return;
+  const d = t.make(); if (!t.user){ /* make() คืนเอกสารใหม่อยู่แล้ว */ }
+  d.status = 'draft';
+  openNew(d); toast('สร้างร่างจากแม่แบบ “' + t.title + '” แล้ว');
+}
+
+/* =========================================================
+   หน้าหลัก
+   ========================================================= */
+let listFilter = 'all', libFilter = 'all';
+const STATUS = {draft:'ร่าง', review:'รอตรวจ', revise:'ส่งกลับแก้ไข', done:'ผ่านการตรวจ'};
+const money = v => { const n = Number(String(v||'').replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
+const fmtMoney = n => n.toLocaleString('th-TH', {maximumFractionDigits:2});
+function ago(t){
+  const s = (Date.now() - t) / 1000, rtf = new Intl.RelativeTimeFormat('th', {numeric:'auto'});
+  if (s < 60) return 'เมื่อสักครู่';
+  if (s < 3600) return rtf.format(-Math.round(s/60), 'minute');
+  if (s < 86400) return rtf.format(-Math.round(s/3600), 'hour');
+  if (s < 86400*7) return rtf.format(-Math.round(s/86400), 'day');
+  return new Date(t).toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'2-digit'});
+}
+function homeDocs(){
+  // รวมเอกสารในเครื่องกับรายการบน Drive (ใช้ข้อมูลที่ใหม่กว่า)
+  const m = {};
+  Object.values(drafts).forEach(d => m[d.id] = d);
+  if (cloudOn()) Object.values(cloudIndex).forEach(s => {
+    const l = m[s.id];
+    if (!l) m[s.id] = Object.assign({_remote:true}, s);
+    else if (s.rev !== syncRev[s.id] && !pending[s.id]) m[s.id] = Object.assign({}, l, s, {_newer:true});
+  });
+  return Object.values(m);
+}
+function renderHome(){
+  const list = homeDocs();
+  $('#stTotal').textContent = list.length;
+  $('#stBuy').textContent = list.filter(d => d.type === 'buy').length;
+  $('#stHire').textContent = list.filter(d => d.type === 'hire').length;
+  const sum = list.reduce((a, d) => a + money(d.budget), 0);
+  $('#stBudget').innerHTML = sum >= 1e6 ? `${(sum/1e6).toLocaleString('th-TH',{maximumFractionDigits:2})}<small>ล้าน</small>` : fmtMoney(sum);
+
+  $('#createGrid').innerHTML = CREATE.map(c => `<button class="ccard" style="${tint(c.c)}" data-create="${c.key}">
+    <span class="ti">${svg(c.icon)}</span><b>${c.t}</b><span>${c.key==='@library' ? `แม่แบบ ${allTemplates().length} แบบ จาก TOR ที่ใช้จริง` : c.d}</span>
+    <span class="go">เริ่มเลย ${svg('arrow')}</span></button>`).join('');
+
+  const q = $('#listSearch').value.trim().toLowerCase();
+  const rows = list.filter(d => (listFilter === 'all' || d.type === listFilter) && (!q || (d.name||'').toLowerCase().includes(q) || (d.place||'').toLowerCase().includes(q)))
+    .sort((a, b) => b.updated - a.updated);
+  $('#listCount').textContent = list.length + ' ฉบับ';
+  if (!list.length){
+    $('#listBox').innerHTML = `<div class="emptyBox"><div class="big">${svg('doc')}</div><b>ยังไม่มีร่าง TOR</b>เลือกประเภทงานด้านบนเพื่อเริ่มร่างฉบับแรก</div>`; return;
+  }
+  if (!rows.length){ $('#listBox').innerHTML = `<div class="emptyBox"><div class="big">${svg('search')}</div><b>ไม่พบร่างที่ค้นหา</b>ลองเปลี่ยนคำค้นหรือตัวกรอง</div>`; return; }
+  $('#listBox').innerHTML = `<table class="list"><thead><tr><th>ชื่อโครงการ</th><th class="hideSm">ประเภท</th><th class="num-r colHide">วงเงิน (บาท)</th><th class="hideSm">สถานะ</th><th class="colHide">แก้ไขล่าสุด</th><th></th></tr></thead><tbody>${
+    rows.map(d => { const c = d.type === 'buy' ? 1 : 3; const n = countItems(d.items); return `<tr data-open="${d.id}">
+      <td><div class="docName"><span class="fi" style="background:var(--t${c});color:var(--c${c})">${svg(d.type==='buy'?'cart':'brief')}</span><span style="min-width:0"><b>${esc(d.name || 'ร่างไม่มีชื่อ')}</b><small>${d._remote || d._newer ? `<span style="color:var(--blue)">● ${d._remote ? 'ใน Google Drive' : 'มีฉบับใหม่ใน Drive'}${d.updatedBy ? ' · ' + esc(d.updatedBy) : ''}</span> ` : pending[d.id] ? '<span style="color:#d79a00">● รอขึ้น Drive</span> ' : ''}${esc(d.place || (n ? n + ' รายการย่อย' : d._remote ? '' : 'ยังไม่มีรายละเอียด'))}</small></span></div></td>
+      <td class="hideSm"><span class="badge ${d.type}">${d.type==='buy'?'ซื้อ':'จ้าง'}</span></td>
+      <td class="num-r colHide">${money(d.budget) ? fmtMoney(money(d.budget)) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="hideSm"><span class="st ${d.status||'draft'}">${STATUS[d.status||'draft']}</span></td>
+      <td class="colHide" style="color:var(--muted);white-space:nowrap">${ago(d.updated)}</td>
+      <td><div class="rowAct"><button class="icon" data-dup="${d.id}" title="ทำสำเนา">${svg('copy')}</button><button class="icon del" data-del="${d.id}" title="ลบ">${svg('trash')}</button></div></td></tr>`; }).join('')
+  }</tbody></table>`;
+}
+function countItems(items){ let n = 0; (items||[]).forEach(function w(x){ if (x.kind === 'item') n++; (x.children||[]).forEach(w); }); return n; }
+
+$('#createGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-create]'); if (!b) return;
+  if (b.dataset.create === '@library') go('#/library'); else useTemplate(b.dataset.create);
+});
+$('#listFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; listFilter = b.dataset.f; $('#listFilter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderHome(); });
+$('#listSearch').addEventListener('input', renderHome);
+$('#listBox').addEventListener('click', e => {
+  const dup = e.target.closest('[data-dup]'), del = e.target.closest('[data-del]');
+  if (dup && !drafts[dup.dataset.dup]){ e.stopPropagation(); toast('เปิดเอกสารนี้ก่อน แล้วค่อยทำสำเนา'); return; }
+  if (dup){ e.stopPropagation(); const c = cloneDoc(drafts[dup.dataset.dup] || {}); c.name = (c.name||'') + ' (สำเนา)'; drafts[c.id] = c; saveAll(); queueSave(c.id, 0); renderHome(); toast('ทำสำเนาแล้ว'); return; }
+  if (del){
+    e.stopPropagation(); const id = del.dataset.del, t = drafts[id] || cloudIndex[id];
+    if (!confirm(cloudOn() ? `ลบร่าง “${t.name || 'ไม่มีชื่อ'}”?\nไฟล์ใน Google Drive จะถูกย้ายไปถังขยะ (กู้คืนได้ภายใน 30 วัน) และทุกคนในทีมจะไม่เห็นเอกสารนี้` : `ลบร่าง “${t.name || 'ไม่มีชื่อ'}”?\nลบแล้วกู้คืนไม่ได้ ถ้าไม่ได้สำรองไว้`)) return;
+    delete drafts[id]; delete pending[id]; saveAll(); cloudDelete(id);
+    if (doc && doc.id === id){ doc = null; $('#navEdit').hidden = true; store.set(K_CUR, ''); }
+    renderHome(); toast('ลบร่างแล้ว'); return;
+  }
+  const r = e.target.closest('[data-open]'); if (r) go('#/edit/' + r.dataset.open);
+});
+
+/* =========================================================
+   คลังแม่แบบ
+   ========================================================= */
+function previewLines(d){
+  const out = [];
+  (d.items||[]).forEach((n, i) => {
+    if (n.kind === 'group'){ out.push({t:n.text, s:false}); return; }
+    out.push({t:`${i+1}. ${n.text || '...'}`, s:false});
+    (n.children||[]).slice(0, 3).forEach((c, j) => out.push({t:`${i+1}.${j+1} ${c.text}`, s:true}));
+  });
+  return out.slice(0, 9);
+}
+function renderLibrary(){
+  const q = $('#libSearch').value.trim().toLowerCase();
+  const list = allTemplates().filter(t => (libFilter === 'all' || (libFilter === 'mine' ? t.user : t.type === libFilter)) && (!q || (t.title + t.desc).toLowerCase().includes(q)));
+  if (!list.length){ $('#tplGrid').innerHTML = `<div class="emptyBox" style="grid-column:1/-1"><div class="big">${svg('bookmark')}</div><b>${libFilter==='mine' ? 'ยังไม่มีแม่แบบของคุณ' : 'ไม่พบแม่แบบ'}</b>${libFilter==='mine' ? 'เปิดร่างที่ทำเสร็จแล้ว กดปุ่ม ' + svg('bookmark') + ' เพื่อบันทึกเป็นแม่แบบ' : 'ลองเปลี่ยนคำค้น'}</div>`; return; }
+  $('#tplGrid').innerHTML = list.map(t => {
+    const d = t.make(); const lines = previewLines(d);
+    const head = d.type === 'buy' ? 'รายละเอียดคุณลักษณะเฉพาะของพัสดุ' : 'รายละเอียดงานจ้าง' + (d.name || '');
+    return `<div class="tpl"><div class="thumb"><div class="mini"><div class="mt">${esc(head)}</div>${d.type==='buy' && d.name ? `<div class="mt">${esc(d.name)}</div>` : ''}<div class="mr"></div>${lines.map(l => `<p class="${l.s?'s':''}">${esc(l.t)}</p>`).join('') || '<p style="color:#aaa">— เอกสารเปล่า —</p>'}</div></div>
+      <div class="body"><div><span class="badge ${t.user ? 'mine' : t.type}">${t.type==='buy'?'ซื้อ':'จ้าง'}${t.user?' · ของฉัน':''}</span></div><b>${esc(t.title)}</b><span>${esc(t.desc)}</span>
+      <div class="meta"><span style="font-size:12.5px;color:var(--muted)">${countItems(d.items)} รายการ</span>${t.user ? `<button class="icon del" data-utdel="${t.idx}" title="ลบแม่แบบ">${svg('trash')}</button>` : ''}<button class="btn sm primary" data-use="${t.key}">ใช้แม่แบบนี้</button></div></div></div>`;
+  }).join('');
+}
+$('#libFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; libFilter = b.dataset.f; $('#libFilter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderLibrary(); });
+$('#libSearch').addEventListener('input', renderLibrary);
+$('#tplGrid').addEventListener('click', e => {
+  const del = e.target.closest('[data-utdel]');
+  if (del){ if (confirm('ลบแม่แบบนี้?')){ userTpl.splice(+del.dataset.utdel, 1); store.set(K_TPL, userTpl); renderLibrary(); } return; }
+  const u = e.target.closest('[data-use]'); if (u) useTemplate(u.dataset.use);
+});
+
+/* =========================================================
+   ปุ่มในหน้าแก้ไข
+   ========================================================= */
+$('#btnDup').onclick = () => { const c = cloneDoc(doc, (doc.name || '') + ' (สำเนา)'); openNew(c); toast('ทำสำเนาแล้ว — กำลังแก้ไขฉบับสำเนา'); };
+$('#btnSaveTpl').onclick = () => {
+  const title = prompt('ตั้งชื่อแม่แบบ', doc.name || ''); if (!title) return;
+  const c = JSON.parse(JSON.stringify(doc)); c.images = []; c.budget = ''; c.status = 'draft';
+  userTpl.push({title, doc:c}); store.set(K_TPL, userTpl); updateNavCounts(); toast('บันทึกเป็นแม่แบบแล้ว — ดูได้ที่ “คลังแม่แบบ”');
+};
+$('#btnWord').onclick = () => exportDocx().catch(err => { console.error(err); toast('สร้างไฟล์ Word ไม่สำเร็จ: ' + err.message); });
+$('#btnPrint').onclick = () => { persist(); window.print(); };
+$('#editor').addEventListener('click', e => {
+  const a = e.target.closest('[data-jump]'); if (!a) return;
+  e.preventDefault(); const sec = $(a.getAttribute('href')); sec.open = true; sec.scrollIntoView({behavior:'smooth', block:'start'});
+});
+document.querySelectorAll('.mobileTabs .btn').forEach(b => b.onclick = () => {
+  document.body.dataset.pane = b.dataset.pane;
+  document.querySelectorAll('.mobileTabs .btn').forEach(x => x.classList.toggle('on', x === b));
+  setTimeout(fitSheet, 0);
+});
+
+/* =========================================================
+   สำรอง / นำเข้า
+   ========================================================= */
+$('#navExport').onclick = () => {
+  persist();
+  const data = {app:'TOR Builder', version:2, exported:new Date().toISOString(), settings:Object.assign({}, settings, {cloudKey:''}), drafts:Object.values(drafts), templates:userTpl};
+  download(new Blob([JSON.stringify(data, null, 1)], {type:'application/json'}), `TOR-Builder-สำรอง-${new Date().toISOString().slice(0,10)}.json`);
+  toast('ดาวน์โหลดไฟล์สำรองแล้ว');
+};
+$('#navImport').onclick = () => $('#importInput').click();
+$('#importInput').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    const list = data.drafts || (data.items ? [data] : []);
+    let n = 0;
+    list.forEach(d => { if (d && d.items){ if (drafts[d.id] && drafts[d.id].updated > d.updated) return; drafts[d.id] = d; n++; queueSave(d.id, 0); } });
+    if (Array.isArray(data.templates)) data.templates.forEach(t => { if (!userTpl.some(u => u.title === t.title)) userTpl.push(t); });
+    saveAll(); store.set(K_TPL, userTpl); updateNavCounts();
+    if (list.length === 1 && list[0] && list[0].id && drafts[list[0].id]){ doc = null; toast(`เปิด “${list[0].name || 'ร่าง'}” (${STATUS[list[0].status || 'draft']})`); go('#/edit/' + list[0].id); }
+    else { toast(`นำเข้า ${n} ร่างเรียบร้อย`); go('#/home'); }
+  } catch(err){ toast('ไฟล์ไม่ถูกต้อง'); }
+  e.target.value = '';
+};
+
+/* =========================================================
+   ตั้งค่า / ธีม
+   ========================================================= */
+function effectiveDark(){ return settings.theme === 'dark' || (settings.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches); }
+function applyTheme(){
+  const t = settings.theme;
+  if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('[data-theme-toggle] use').forEach(u => u.setAttribute('href', effectiveDark() ? '#i-sun' : '#i-moon'));
+}
+function applyAgency(){
+  $('#footAgency').textContent = settings.agency || '—';
+  $('#footUni').textContent = settings.uni || '';
+  document.querySelectorAll('[data-agency]').forEach(el => el.textContent = [settings.agency, settings.uni].filter(Boolean).join(' · '));
+}
+const pageStyle = document.createElement('style'); document.head.appendChild(pageStyle);
+function updatePageStyle(){
+  pageStyle.textContent = settings.pageNo === 'frac'
+    ? `@page{@top-right{content:counter(page) "/" counter(pages);font-family:'TH SarabunPSK','TH Sarabun New','SarabunDoc',serif;font-size:${settings.fontSize||16}pt;vertical-align:bottom;padding-bottom:6mm}}` : '';
+}
+$('#navSettings').onclick = () => {
+  document.querySelectorAll('[data-set]').forEach(el => el.value = settings[el.dataset.set] ?? '');
+  renderCloudSettings(); closeNav(); $('#dlgSettings').showModal();
+};
+document.querySelectorAll('[data-set]').forEach(el => el.addEventListener('input', () => {
+  const k = el.dataset.set; settings[k] = el.type === 'number' ? (+el.value || 16) : el.value;
+  store.set(K_SET, settings); applyTheme(); applyAgency(); updatePageStyle(); applyRole();
+  if (doc && !$('#viewEditor').hidden) changed(false);
+}));
+document.querySelectorAll('[data-theme-toggle]').forEach(b => b.onclick = () => {
+  settings.theme = effectiveDark() ? 'light' : 'dark'; store.set(K_SET, settings); applyTheme();
+});
+
+/* =========================================================
+   เส้นทางหน้า (#/home, #/library, #/edit/<id>)
+   ========================================================= */
+function updateNavCounts(){ $('#navTplCount').textContent = `${allTemplates().length} แม่แบบพร้อมใช้`; }
+function closeNav(){ document.body.classList.remove('navOpen'); }
+function show(view){
+  ['Home','Library','Editor'].forEach(v => $('#view' + v).hidden = v.toLowerCase() !== view);
+  document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === (view === 'editor' ? 'edit' : view)));
+  closeNav(); window.scrollTo(0, 0);
+}
+let curPath = '';
+function go(p){ try { if (location.hash !== p) history.pushState(null, '', p); } catch(e){} route(p); }
+function route(p){
+  p = typeof p === 'string' ? p : (location.hash || '#/home');
+  curPath = p;
+  const [, page, id] = p.split('/');
+  if (page === 'join' && id) return handleJoin(id);
+  if (page === 'edit' && id && needsFetch(id)){
+    toast('กำลังเปิดฉบับล่าสุดจาก Google Drive…');
+    fetchDoc(id).then(() => route(p)).catch(e => { toast('โหลดจาก Drive ไม่ได้: ' + e.message); if (drafts[id]){ cloudIndex[id] && (cloudIndex[id].rev = syncRev[id]); route(p); } else go('#/home'); });
+    return;
+  }
+  if (page === 'edit'){
+    const target = drafts[id] || (doc && !id ? doc : null);
+    if (!target) return go('#/home');
+    if (!id) return go('#/edit/' + target.id);
+    if (!doc || doc.id !== target.id) loadDoc(target);
+    show('editor'); requestAnimationFrame(fitSheet);
+  } else if (page === 'library'){ persist(); show('library'); renderLibrary(); }
+  else { persist(); show('home'); renderHome(); }
+}
+window.addEventListener('hashchange', () => { if (location.hash !== curPath) route(location.hash); });
+window.addEventListener('popstate', () => route(location.hash || '#/home'));
+document.addEventListener('click', e => { const a = e.target.closest('a[href^="#/"]'); if (!a) return; e.preventDefault(); go(a.getAttribute('href')); });
+
+/* =========================================================
+   Google Drive (ผ่าน Google Apps Script Web App)
+   - เก็บสำเนาในเครื่องเสมอ (ใช้ต่อได้แม้ออฟไลน์) แล้วซิงก์ขึ้น Drive
+   - กันบันทึกทับกันด้วยเลขรุ่น (rev) ที่เซิร์ฟเวอร์ให้มา
+   ========================================================= */
+const K_SYNC = 'torb.sync.v1';
+let syncRev = store.get(K_SYNC, {});   // id -> rev ล่าสุดที่เครื่องนี้รู้
+let cloudIndex = {};                    // id -> สรุปเอกสารบน Drive
+let cloudInfo = {};
+const pending = {};                     // id -> true = มีการแก้ที่ยังไม่ขึ้น Drive
+const saveTimers = {};
+let cloudLoaded = false;
+const cloudOn = () => !!(settings.cloudUrl && settings.cloudKey);
+
+async function api(action, payload = {}, url = settings.cloudUrl, key = settings.cloudKey){
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(Object.assign({action, key}, payload))});
+  if (!r.ok) throw new Error('เซิร์ฟเวอร์ตอบกลับ ' + r.status);
+  let j; try { j = await r.json(); } catch(e){ throw new Error('URL ไม่ใช่ตัวเชื่อม TOR Builder (ตรวจว่าลงท้ายด้วย /exec และตั้ง Who has access = Anyone)'); }
+  if (!j.ok && !j.conflict) throw new Error(j.error || 'เกิดข้อผิดพลาด');
+  return j;
+}
+function saveSync(){ store.set(K_SYNC, syncRev); }
+
+function setCloud(state, msg){
+  const el = $('#cloudState'), txt = {
+    off:'บันทึกในเครื่องนี้ (ยังไม่เชื่อม Google Drive)', ok:'เชื่อม Google Drive · ซิงก์แล้ว', busy:'กำลังซิงก์กับ Google Drive…',
+    pend:'มีการแก้ไขรอขึ้น Google Drive', err:'เชื่อม Drive ไม่ได้ — บันทึกในเครื่องไว้ก่อน'
+  }[state];
+  el.className = 'cloud ' + state; el.querySelector('span').textContent = msg || txt;
+  $('#cloudLink').hidden = !(cloudOn() && cloudInfo.folderUrl);
+  if (cloudInfo.folderUrl) $('#cloudLink').href = cloudInfo.folderUrl;
+  const ss = $('#saveState');
+  if (doc && cloudOn() && ss){
+    if (state === 'busy' || state === 'pend') { ss.textContent = 'กำลังบันทึกลง Drive…'; ss.className = 'saveState busy'; }
+    else if (state === 'ok' && !pending[doc.id]) { ss.textContent = 'บันทึกลง Google Drive แล้ว'; ss.className = 'saveState'; }
+    else if (state === 'err') { ss.textContent = 'บันทึกในเครื่องแล้ว · ยังไม่ขึ้น Drive'; ss.className = 'saveState err'; }
+  }
+  $('#btnSync').hidden = !cloudOn();
+}
+
+/* ---- ดึงรายการจาก Drive ---- */
+async function cloudRefresh(silent){
+  if (!cloudOn()) { setCloud('off'); return; }
+  setCloud('busy');
+  try {
+    if (!cloudInfo.folderUrl) cloudInfo = await api('ping');
+    const j = await api('list');
+    cloudIndex = {}; j.items.forEach(s => cloudIndex[s.id] = s);
+    cloudLoaded = true;
+    // เอกสารที่เคยซิงก์แต่หายจาก Drive = ถูกลบโดยคนอื่น
+    for (const id in drafts){
+      if (syncRev[id] != null && !cloudIndex[id] && !pending[id] && !(doc && doc.id === id)){ delete drafts[id]; delete syncRev[id]; }
+    }
+    saveAll(); saveSync();
+    // เอกสารในเครื่องที่ยังไม่เคยขึ้น Drive → อัปโหลด
+    for (const id in drafts) if (syncRev[id] == null && !cloudIndex[id]) queueSave(id, 0);
+    setCloud(Object.keys(pending).length ? 'pend' : 'ok');
+    if (!$('#viewHome').hidden) renderHome();
+  } catch(e){
+    setCloud('err');
+    if (!silent) toast('เชื่อมต่อ Google Drive ไม่ได้: ' + e.message);
+  }
+}
+const needsFetch = id => cloudOn() && cloudIndex[id] && !pending[id] && (!drafts[id] || cloudIndex[id].rev !== syncRev[id]);
+async function fetchDoc(id){
+  const j = await api('get', {id});
+  drafts[id] = j.doc; syncRev[id] = j.rev; cloudIndex[id] = j.summary;
+  saveAll(); saveSync();
+  if (doc && doc.id === id) doc = null;   // บังคับโหลดใหม่
+  return j.doc;
+}
+
+/* ---- บันทึกขึ้น Drive (หน่วงเวลา รวมหลายการแก้เป็นครั้งเดียว) ---- */
+function queueSave(id, delay = 1800){
+  if (!cloudOn() || !drafts[id]) return;
+  pending[id] = true; setCloud('pend');
+  clearTimeout(saveTimers[id]);
+  saveTimers[id] = setTimeout(() => pushSave(id), delay);
+}
+async function pushSave(id, force){
+  const d = drafts[id]; if (!d) { delete pending[id]; return; }
+  d._savedBy = me().by;
+  setCloud('busy');
+  try {
+    const j = await api('save', {doc:d, baseRev: syncRev[id] ?? null, force: !!force});
+    if (j.conflict) return openConflict(id, j.remote);
+    syncRev[id] = j.summary.rev; cloudIndex[id] = j.summary; delete pending[id]; saveSync();
+    setCloud(Object.keys(pending).length ? 'pend' : 'ok');
+  } catch(e){
+    setCloud('err');
+    clearTimeout(saveTimers[id]); saveTimers[id] = setTimeout(() => pushSave(id), 20000);   // ลองใหม่อัตโนมัติ
+  }
+}
+async function cloudDelete(id){
+  if (!cloudOn() || (syncRev[id] == null && !cloudIndex[id])) return;
+  try { await api('delete', {id}); delete cloudIndex[id]; delete syncRev[id]; saveSync(); } catch(e){ toast('ลบใน Drive ไม่สำเร็จ: ' + e.message); }
+}
+async function uploadToDrive(blob, name){
+  if (!cloudOn()) return null;
+  const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+  const j = await api('saveFile', {name, base64:b64, mime:blob.type, docId: doc && doc.id});
+  return j.url;
+}
+
+/* ---- เมื่อมีคนอื่นบันทึกแทรก ---- */
+let conflictId = null;
+function openConflict(id, remote){
+  conflictId = id;
+  const d = drafts[id];
+  $('#cfMsg').innerHTML = `เอกสาร <b>${esc(d.name || 'ร่างไม่มีชื่อ')}</b> ถูกบันทึกใน Google Drive โดย <b>${esc(remote.updatedBy || 'ผู้ใช้อื่น')}</b> เมื่อ ${new Date(remote.savedAt || remote.updated).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})} ระหว่างที่คุณกำลังแก้ไข`;
+  setCloud('pend', 'มีฉบับใหม่กว่าใน Drive — รอคุณเลือก');
+  if (!$('#dlgConflict').open) $('#dlgConflict').showModal();
+}
+$('#dlgConflict').addEventListener('click', async e => {
+  const b = e.target.closest('[data-cf]'); if (!b) return;
+  const id = conflictId, act = b.dataset.cf; $('#dlgConflict').close();
+  try {
+    if (act === 'remote'){ delete pending[id]; await fetchDoc(id); toast('โหลดฉบับล่าสุดจาก Drive แล้ว'); }
+    if (act === 'mine'){ await pushSave(id, true); toast('บันทึกทับด้วยฉบับของคุณแล้ว'); }
+    if (act === 'copy'){
+      const c = cloneDoc(drafts[id], (drafts[id].name || '') + ' (ฉบับของ ' + me().by + ')');
+      drafts[c.id] = c; delete pending[id]; await fetchDoc(id); queueSave(c.id, 0);
+      toast('เก็บฉบับของคุณเป็นสำเนาแล้ว'); go('#/edit/' + c.id); return;
+    }
+  } catch(err){ toast('ไม่สำเร็จ: ' + err.message); }
+  setCloud(Object.keys(pending).length ? 'pend' : 'ok');
+  if (doc === null && curPath.startsWith('#/edit/' + id)) route(curPath); else if (!$('#viewHome').hidden) renderHome();
+});
+
+/* ---- ตั้งค่าการเชื่อมต่อ ---- */
+function renderCloudSettings(msg, ok){
+  $('#cUrl').value = settings.cloudUrl || ''; $('#cKey').value = settings.cloudKey || '';
+  $('#cStatus').innerHTML = msg ? `<span style="color:${ok ? 'var(--ok)' : 'var(--danger)'}">${esc(msg)}</span>`
+    : cloudOn() ? `<span style="color:var(--ok)">เชื่อมต่ออยู่${cloudInfo.owner ? ' · เก็บใน Drive ของ ' + esc(cloudInfo.owner) : ''}</span>` : 'ยังไม่ได้เชื่อมต่อ — ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น';
+  $('#cDisconnect').hidden = !cloudOn(); $('#cInvite').hidden = !cloudOn();
+}
+async function connectCloud(url, key){
+  url = url.trim(); key = key.trim();
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) throw new Error('URL ต้องขึ้นต้นด้วย https://script.google.com/macros/s/ และลงท้ายด้วย /exec');
+  if (!key) throw new Error('กรุณากรอกรหัสทีม');
+  const info = await api('ping', {}, url, key);
+  settings.cloudUrl = url; settings.cloudKey = key; store.set(K_SET, settings);
+  cloudInfo = info; syncRev = {}; saveSync();
+  await cloudRefresh(true);
+  return info;
+}
+$('#cConnect').onclick = async () => {
+  const b = $('#cConnect'); b.disabled = true; b.textContent = 'กำลังเชื่อมต่อ…';
+  try { const info = await connectCloud($('#cUrl').value, $('#cKey').value); renderCloudSettings('เชื่อมต่อสำเร็จ · เก็บใน Drive ของ ' + (info.owner || 'ผู้ดูแล'), true); toast('เชื่อม Google Drive แล้ว'); }
+  catch(e){ renderCloudSettings(e.message, false); }
+  b.disabled = false; b.textContent = 'เชื่อมต่อ';
+};
+$('#cDisconnect').onclick = () => {
+  if (!confirm('ยกเลิกการเชื่อม Google Drive บนเครื่องนี้?\nข้อมูลใน Drive ยังอยู่ครบ และสำเนาในเครื่องยังใช้ต่อได้')) return;
+  settings.cloudUrl = ''; settings.cloudKey = ''; store.set(K_SET, settings); cloudIndex = {}; cloudInfo = {};
+  renderCloudSettings(); setCloud('off'); renderHome();
+};
+$('#cInvite').onclick = async () => {
+  const data = btoa(unescape(encodeURIComponent(JSON.stringify({u:settings.cloudUrl, k:settings.cloudKey, a:settings.agency, n:settings.uni}))));
+  const link = location.href.split('#')[0] + '#/join/' + data;
+  try { await navigator.clipboard.writeText(link); toast('คัดลอกลิงก์เชิญแล้ว — ส่งให้ทีมทางช่องทางส่วนตัว'); }
+  catch(e){ prompt('คัดลอกลิงก์นี้ส่งให้ทีม (มีรหัสทีมอยู่ในลิงก์ ส่งเฉพาะคนในทีม)', link); }
+};
+$('#btnSync').onclick = () => cloudRefresh(false);
+$('#cloudState').onclick = () => { $('#navSettings').click(); setTimeout(() => $('#cUrl').scrollIntoView({block:'center'}), 50); };
+
+/* ---- ลิงก์เชิญทีม #/join/<ข้อมูล> ---- */
+async function handleJoin(data){
+  try {
+    const j = JSON.parse(decodeURIComponent(escape(atob(data))));
+    if (j.a && !settings.agency) settings.agency = j.a;
+    if (j.n && !settings.uni) settings.uni = j.n;
+    await connectCloud(j.u, j.k);
+    applyAgency(); toast('เข้าร่วมทีมแล้ว — ข้อมูลจาก Google Drive พร้อมใช้งาน');
+    try { history.replaceState(null, '', location.pathname + '#/home'); } catch(e){}
+    if (!settings.userName) setTimeout(() => { $('#navSettings').click(); setTimeout(() => $('#sUser').focus(), 50); }, 600);
+  } catch(e){ toast('ลิงก์เชิญใช้ไม่ได้: ' + e.message); }
+  go('#/home');
+}
+
+// ซิงก์อัตโนมัติเมื่อกลับมาที่หน้าต่าง / ทุก 1 นาทีขณะอยู่หน้าหลัก
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && cloudOn()) cloudRefresh(true); });
+setInterval(() => { if (cloudOn() && !$('#viewHome').hidden && document.visibilityState === 'visible') cloudRefresh(true); }, 60000);
+window.addEventListener('beforeunload', e => { if (cloudOn() && Object.keys(pending).length){ e.preventDefault(); e.returnValue = ''; } });
+
+/* =========================================================
+   อื่น ๆ
+   ========================================================= */
+document.querySelectorAll('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
+document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+document.querySelectorAll('[data-menu]').forEach(b => b.onclick = () => document.body.classList.toggle('navOpen'));
+$('#scrim').onclick = closeNav;
+window.addEventListener('resize', fitSheet);
+window.addEventListener('beforeprint', () => { const s = $('#sheet'); s.style.transform = ''; s.style.marginBottom = ''; });
+window.addEventListener('afterprint', fitSheet);
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
+document.addEventListener('keydown', e => {
+  if ($('#viewEditor').hidden) return;
+  if ((e.metaKey || e.ctrlKey) && e.key === 's'){ e.preventDefault(); persist(); toast('บันทึกแล้ว'); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'p'){ e.preventDefault(); persist(); window.print(); }
+});
+let toastT; function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+applyTheme(); applyAgency(); updatePageStyle(); updateNavCounts(); applyRole();
+if (doc){ $('#navEdit').hidden = false; $('#navEdit').href = '#/edit/' + doc.id; $('#navEditName').textContent = doc.name || 'ร่างไม่มีชื่อ'; }
+route();
+setCloud(cloudOn() ? 'busy' : 'off'); cloudRefresh(true);
+document.fonts && document.fonts.ready.then(fitSheet);
+</script>
+</body>
+</html>
