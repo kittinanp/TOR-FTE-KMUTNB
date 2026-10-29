@@ -449,6 +449,12 @@ textarea{resize:vertical;min-height:40px;line-height:1.5}
 .rolePills button[disabled]{opacity:.45;cursor:not-allowed}
 .ssoTag{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--gold);letter-spacing:.3px}
 
+.gGoogle{display:flex;flex-direction:column;align-items:center;min-height:44px}
+.gGoogle #gBtn{display:flex;justify-content:center;width:100%}
+.gWait{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13.5px;padding:10px}
+.gOr{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:14px 0}
+.gOr::before,.gOr::after{content:'';flex:1;height:1px;background:var(--line)}
+
 /* ================= dialogs / toast ================= */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;transition:.25s;pointer-events:none;z-index:80;box-shadow:var(--shadow-lg);display:flex;gap:8px;align-items:center}
 .toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
@@ -580,8 +586,10 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
     <h1>TOR Builder</h1>
     <p class="gsub">ระบบร่างขอบเขตของงาน (TOR)<br><span data-agency>คณะครุศาสตร์อุตสาหกรรม</span></p>
     <div class="gateMsg" id="gateMsg" hidden></div>
+    <div class="gGoogle" id="gGoogle" hidden><div id="gBtn"></div><div class="gWait" id="gWait"><span class="spin"></span>กำลังโหลดปุ่ม Google…</div></div>
+    <div class="gOr" id="gOr" hidden><span>หรือ</span></div>
     <button class="btn gold gbtn" id="ssoLogin"><svg><use href="#i-key"/></svg>เข้าสู่ระบบด้วย ICIT Account</button>
-    <p class="gnote">ใช้บัญชีเดียวกับระบบของมหาวิทยาลัย (KMUTNB SSO)<br>รหัสผ่านกรอกที่หน้าของมหาวิทยาลัยเท่านั้น ระบบนี้ไม่เห็นรหัสผ่านของคุณ</p>
+    <p class="gnote" id="gNote">รหัสผ่านกรอกที่หน้าของ Google / มหาวิทยาลัยเท่านั้น<br>ระบบนี้ไม่เห็นรหัสผ่านของคุณ</p>
     <button class="glink" id="gateLocal">ใช้งานแบบไม่เชื่อมต่อ (เก็บข้อมูลในเครื่องนี้)</button>
     <a class="glink" href="guide.html" target="_blank" rel="noopener">คู่มือการใช้งาน</a>
   </div>
@@ -1938,7 +1946,7 @@ function applyRole(){
   document.querySelectorAll('#rolePills button').forEach(b => b.classList.toggle('on', b.dataset.role === role));
   const name = settings.userName || '';
   $('#whoName').textContent = name || 'ตั้งชื่อผู้ใช้งาน';
-  $('#whoRole').innerHTML = su ? `<span class="ssoTag">ICIT</span> ${esc(ROLE[role])}${su.role === 'admin' ? ' · ผู้ดูแล' : ''}` : ROLE[role] + (role === 'reviewer' ? ' · นักวิชาการพัสดุ' : ' · ผู้กำหนดรายละเอียด');
+  $('#whoRole').innerHTML = su ? `<span class="ssoTag">${su.provider === 'google' ? 'GOOGLE' : 'ICIT'}</span> ${esc(ROLE[role])}${su.role === 'admin' ? ' · ผู้ดูแล' : ''}` : ROLE[role] + (role === 'reviewer' ? ' · นักวิชาการพัสดุ' : ' · ผู้กำหนดรายละเอียด');
   $('#whoAv').textContent = name ? name.replace(/^(นาย|นางสาว|นาง|ดร\.|ผศ\.|รศ\.|อ\.)\s*/, '').trim().charAt(0) : '?';
   if (doc && !$('#viewEditor').hidden) renderFlow();
 }
@@ -2397,22 +2405,22 @@ function renderCloudSettings(msg, ok){
   if (authValid()){
     const u = auth.user;
     $('#acctName').textContent = u.name; $('#acctAv').textContent = (u.name || '?').replace(/^(นาย|นางสาว|นาง|ดร\.|ผศ\.|รศ\.|อ\.)\s*/, '').charAt(0);
-    $('#acctMeta').textContent = [u.username, {admin:'ผู้ดูแลระบบ', reviewer:'ผู้ตรวจสอบ', maker:'ผู้จัดทำ'}[u.role], u.org].filter(Boolean).join(' · ');
+    $('#acctMeta').textContent = [u.provider === 'google' ? 'Google · ' + u.email : 'ICIT · ' + u.username, {admin:'ผู้ดูแลระบบ', reviewer:'ผู้ตรวจสอบ', maker:'ผู้จัดทำ'}[u.role], u.org].filter(Boolean).join(' · ');
   }
   $('#cStatus').innerHTML = msg ? `<span style="color:${ok ? 'var(--ok)' : 'var(--danger)'}">${esc(msg)}</span>`
     : cloudOn() ? `<span style="color:var(--ok)">เชื่อมต่ออยู่${cloudInfo.owner ? ' · เก็บใน Drive ของ ' + esc(cloudInfo.owner) : ''}</span>` : 'ยังไม่ได้เชื่อมต่อ — ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น';
   $('#cDisconnect').hidden = !cloudOn() || sso; $('#cInvite').hidden = !cloudOn() || sso;
   $('#cConnect').hidden = sso && authValid();
-  if (sso && !msg) $('#cStatus').innerHTML = authValid() ? '<span style="color:var(--ok)">เชื่อม Google Drive ผ่านบัญชี ICIT แล้ว</span>' : 'ระบบนี้ใช้การเข้าสู่ระบบด้วย ICIT Account';
+  if (sso && !msg) $('#cStatus').innerHTML = authValid() ? '<span style="color:var(--ok)">เข้าสู่ระบบแล้ว · ข้อมูลเก็บใน Google Drive ของหน่วยงาน</span>' : 'ระบบนี้ต้องเข้าสู่ระบบก่อนใช้งาน';
 }
 async function connectCloud(url, key){
   url = url.trim(); key = key.trim();
   if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) throw new Error('URL ต้องขึ้นต้นด้วย https://script.google.com/macros/s/ และลงท้ายด้วย /exec');
   const conf = await api('config', {}, url, key);
-  if (conf.sso){   // เซิร์ฟเวอร์ใช้ ICIT Account → ไปหน้าเข้าสู่ระบบ
+  if (conf.sso || conf.google || conf.auth){   // เซิร์ฟเวอร์บังคับเข้าสู่ระบบ → ไปหน้าเข้าสู่ระบบ
     settings.cloudUrl = url; store.set(K_SET, settings); ssoConf = conf; store.set(K_SSOC, conf);
     ss.del('torb.local');
-    $('#dlgSettings').close(); showGate('ระบบนี้ใช้ ICIT Account — กดปุ่มด้านล่างเพื่อเข้าสู่ระบบ'); return {owner:''};
+    $('#dlgSettings').close(); showGate('กรุณาเข้าสู่ระบบเพื่อเชื่อมต่อข้อมูลของหน่วยงาน'); return {owner:''};
   }
   if (!key) throw new Error('กรุณากรอกรหัสทีม');
   const info = await api('ping', {}, url, key);
@@ -2734,7 +2742,7 @@ const ss = { get(k){ try { return sessionStorage.getItem(k); } catch(e){ return 
 let auth = store.get(K_AUTH, null);
 let ssoConf = store.get(K_SSOC, null);
 const authValid = () => !!(auth && auth.session && auth.exp > Date.now());
-const ssoMode = () => !!(ssoConf && ssoConf.sso);
+const ssoMode = () => !!(ssoConf && (ssoConf.sso || ssoConf.google || ssoConf.auth));
 const localMode = () => ss.get('torb.local') === '1';
 const redirectUri = () => location.origin + location.pathname.replace(/index\.html$/, '');
 const rand = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, x => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[x % 66]).join(''); };
@@ -2742,6 +2750,9 @@ const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(
 
 function showGate(msg, isErr){
   $('#gate').hidden = false;
+  const g = !!(ssoConf && ssoConf.google), i = !!(ssoConf && ssoConf.sso);
+  $('#gGoogle').hidden = !g; $('#ssoLogin').hidden = !i && g; $('#gOr').hidden = !(g && i);
+  if (g) initGoogle();
   $('#gateMsg').hidden = !msg; $('#gateMsg').textContent = msg || ''; $('#gateMsg').className = 'gateMsg' + (isErr ? ' err' : '');
   $('#ssoLogin').disabled = false; $('#ssoLogin').innerHTML = `${svg('key')}เข้าสู่ระบบด้วย ICIT Account`;
 }
@@ -2756,6 +2767,39 @@ async function startLogin(){
     location.href = ssoConf.authorize + '?' + new URLSearchParams({response_type:'code', client_id:ssoConf.clientId, redirect_uri:redirectUri(), scope:ssoConf.scope, state, code_challenge:challenge, code_challenge_method:'S256'});
   } catch(e){ showGate('เชื่อมต่อระบบไม่ได้: ' + e.message, true); }
 }
+/* ---- เข้าสู่ระบบด้วย Google (Google Identity Services) ---- */
+let gisLoaded = null;
+function loadGIS(){
+  if (window.google && google.accounts && google.accounts.id) return Promise.resolve();
+  if (!gisLoaded) gisLoaded = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = res; sc.onerror = () => { gisLoaded = null; rej(new Error('โหลดปุ่ม Google ไม่ได้ — ตรวจการเชื่อมต่ออินเทอร์เน็ต')); }; document.head.appendChild(sc); });
+  return gisLoaded;
+}
+async function initGoogle(){
+  try {
+    await loadGIS();
+    google.accounts.id.initialize({client_id:ssoConf.googleClientId, callback:onGoogleCredential, ux_mode:'popup', auto_select:false, cancel_on_tap_outside:true, use_fedcm_for_prompt:true});
+    $('#gBtn').innerHTML = '';
+    google.accounts.id.renderButton($('#gBtn'), {theme:'filled_blue', size:'large', shape:'pill', text:'signin_with', locale:'th', width:Math.min(340, $('#gBtn').clientWidth || 340), logo_alignment:'left'});
+    $('#gWait').hidden = true;
+  } catch(e){ $('#gWait').hidden = false; $('#gWait').textContent = e.message; }
+}
+async function onGoogleCredential(resp){
+  $('#gWait').hidden = false; $('#gWait').innerHTML = '<span class="spin"></span>กำลังยืนยันตัวตน…';
+  try {
+    const j = await api('googleLogin', {credential:resp.credential});
+    completeLogin(j);
+    applyRole(); route(curPath || '#/home'); setCloud('busy'); cloudRefresh(true).then(applyAIVisibility); applyAIVisibility();
+  } catch(e){ $('#gWait').hidden = true; showGate(e.message, true); }
+}
+function completeLogin(j){
+  auth = {session:j.session, user:j.user, exp:Date.now() + 11.5 * 3600e3}; store.set(K_AUTH, auth);
+  settings.userName = j.user.name;
+  if (j.user.role === 'maker') settings.role = 'maker';
+  else if (!settings.role || j.user.role === 'reviewer') settings.role = 'reviewer';
+  store.set(K_SET, settings);
+  hideGate(); toast('ยินดีต้อนรับ ' + j.user.name);
+}
+
 async function finishLogin(q){
   let saved = {}; try { saved = JSON.parse(ss.get('torb.pkce') || '{}'); } catch(e){}
   try { history.replaceState(null, '', location.pathname + (saved.hash || '#/home')); } catch(e){}
@@ -2765,13 +2809,8 @@ async function finishLogin(q){
   $('#ssoLogin').disabled = true; $('#ssoLogin').innerHTML = '<span class="spin"></span>กำลังเข้าสู่ระบบ…';
   try {
     const j = await api('login', {code:q.get('code'), verifier:saved.verifier, redirect_uri:redirectUri()});
-    auth = {session:j.session, user:j.user, exp:Date.now() + 11.5 * 3600e3}; store.set(K_AUTH, auth);
     ss.del('torb.pkce');
-    settings.userName = j.user.name;
-    if (j.user.role === 'maker') settings.role = 'maker';
-    else if (!settings.role || j.user.role === 'reviewer') settings.role = 'reviewer';
-    store.set(K_SET, settings);
-    hideGate(); toast('ยินดีต้อนรับ ' + j.user.name);
+    completeLogin(j);
     return true;
   } catch(e){ showGate(e.message, true); return false; }
 }
@@ -2780,6 +2819,7 @@ function logout(){
   if (pend && !confirm(`ยังมีการแก้ไข ${pend} ฉบับที่ยังไม่ขึ้น Google Drive — ออกจากระบบตอนนี้การแก้ไขนั้นจะค้างอยู่ในเครื่องนี้ ต้องการออกหรือไม่?`)) return;
   const wipe = confirm('ลบสำเนาเอกสารที่เก็บไว้ในเครื่องนี้ด้วยไหม?\n(แนะนำถ้าเป็นเครื่องที่ใช้ร่วมกับผู้อื่น — ข้อมูลใน Google Drive ยังอยู่ครบ)');
   if (wipe){ for (const id in drafts) if (!pending[id]) delete drafts[id]; syncRev = {}; saveAll(); saveSync(); doc = null; store.set(K_CUR, ''); }
+  try { if (window.google && google.accounts) google.accounts.id.disableAutoSelect(); } catch(e){}
   auth = null; store.set(K_AUTH, null); cloudIndex = {};
   $('#dlgSettings').open && $('#dlgSettings').close();
   setCloud('off'); showGate('ออกจากระบบแล้ว');

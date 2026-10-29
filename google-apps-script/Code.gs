@@ -20,6 +20,13 @@
  *   REVIEWERS           = รายชื่อ username/อีเมล นักวิชาการพัสดุ (ได้สิทธิ์ผู้ตรวจสอบ)
  *   ADMINS              = รายชื่อผู้ดูแลระบบ (ได้ทุกสิทธิ์)
  * เมื่อใส่ SSO_CLIENT_ID แล้ว ระบบจะบังคับเข้าสู่ระบบด้วย ICIT Account แทนรหัสทีม
+ *
+ * เข้าสู่ระบบด้วย Google (Gmail / บัญชี Google Workspace เช่น @fte.kmutnb.ac.th)
+ *   GOOGLE_CLIENT_ID    = OAuth Client ID (Web) จาก Google Cloud Console — ไม่ต้องใช้ secret
+ *   ALLOWED_DOMAINS     = fte.kmutnb.ac.th,email.kmutnb.ac.th   (อนุญาตทุกบัญชีในโดเมนเหล่านี้)
+ *   ALLOWED_USERS       = someone@gmail.com,...                 (อนุญาตรายบุคคล — ใช้ร่วมกับ ICIT ได้)
+ *   ถ้าไม่ใส่ทั้งสองค่า จะเข้าได้เฉพาะเจ้าของสคริปต์ และรายชื่อใน ADMINS / REVIEWERS เท่านั้น (ปลอดภัยไว้ก่อน)
+ * เปิดได้พร้อมกันทั้ง ICIT และ Google — หน้าเข้าสู่ระบบจะแสดงทั้งสองปุ่ม
  */
 
 // ★ เปลี่ยนเป็นรหัสทีมของคุณ (ห้ามใช้ค่าเริ่มต้นนี้) — ผู้ใช้ต้องกรอกรหัสนี้ในระบบจึงจะอ่าน/เขียนได้
@@ -38,7 +45,7 @@ const WORD_FOLDER = 'เอกสาร Word';
 
 /** รันครั้งแรกเพื่อสร้างโฟลเดอร์และอนุญาตสิทธิ์ */
 function setup() {
-  if (!ssoOn_() && teamKey_() === 'CHANGE-ME') throw new Error('กรุณาเปลี่ยน TEAM_KEY ในบรรทัดบนสุด หรือใส่ SSO_CLIENT_ID ใน Script Properties ก่อน');
+  if (!authOn_() && teamKey_() === 'CHANGE-ME') throw new Error('กรุณาเปลี่ยน TEAM_KEY ในบรรทัดบนสุด หรือใส่ GOOGLE_CLIENT_ID / SSO_CLIENT_ID ใน Script Properties ก่อน');
   secret_();
   const root = root_();
   sub_(DATA_FOLDER);
@@ -56,9 +63,10 @@ function doPost(e) {
   // คำสั่งที่ไม่ต้องยืนยันตัวตน
   if (req.action === 'config') return out_(config_());
   if (req.action === 'login') { try { return out_(login_(req)); } catch (err) { return out_({ ok: false, error: String(err.message || err) }); } }
+  if (req.action === 'googleLogin') { try { return out_(googleLogin_(req)); } catch (err) { return out_({ ok: false, error: String(err.message || err) }); } }
 
   let user = null;
-  if (ssoOn_()) {
+  if (authOn_()) {
     user = verify_(req.session);
     if (!user) return out_({ ok: false, auth: true, relogin: true, error: 'กรุณาเข้าสู่ระบบด้วย ICIT Account อีกครั้ง' });
   } else {
@@ -195,11 +203,14 @@ function aiModels_() {
 /* ---------------- เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO / OpenID Connect) ---------------- */
 
 function ssoOn_() { return !!prop_('SSO_CLIENT_ID'); }
+function googleOn_() { return !!prop_('GOOGLE_CLIENT_ID'); }
+function authOn_() { return ssoOn_() || googleOn_(); }
 function prop_(k) { return PropertiesService.getScriptProperties().getProperty(k); }
 function list_prop_(k) { return String(prop_(k) || '').split(/[,\s]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(String); }
 
 function config_() {
-  return { ok: true, sso: ssoOn_(), clientId: prop_('SSO_CLIENT_ID') || '', authorize: SSO.authorize, scope: SSO.scope, teamKey: !ssoOn_() };
+  return { ok: true, sso: ssoOn_(), clientId: prop_('SSO_CLIENT_ID') || '', authorize: SSO.authorize, scope: SSO.scope,
+    google: googleOn_(), googleClientId: prop_('GOOGLE_CLIENT_ID') || '', auth: authOn_(), teamKey: !authOn_() };
 }
 
 function login_(req) {
@@ -233,6 +244,31 @@ function login_(req) {
   const inList = function (k) { const l = list_prop_(k); return ids.some(function (x) { return l.indexOf(x) >= 0; }); };
   const role = inList('ADMINS') ? 'admin' : inList('REVIEWERS') ? 'reviewer' : 'maker';
   const user = { username: username, name: name, email: email, type: type, org: org, role: role };
+  logLogin_(user);
+  return { ok: true, user: user, session: sign_(user) };
+}
+
+/** เข้าสู่ระบบด้วย Google: ตรวจ ID token กับ Google แล้วออกเซสชันของระบบ */
+function googleLogin_(req) {
+  if (!googleOn_()) return { ok: false, error: 'ยังไม่ได้เปิดใช้การเข้าสู่ระบบด้วย Google' };
+  if (!req.credential) return { ok: false, error: 'ไม่ได้รับข้อมูลจาก Google' };
+  const res = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(req.credential), { muteHttpExceptions: true });
+  let t; try { t = JSON.parse(res.getContentText()); } catch (e) { t = {}; }
+  if (res.getResponseCode() !== 200 || !t.email) return { ok: false, error: 'Google ยืนยันตัวตนไม่สำเร็จ กรุณาลองใหม่' };
+  if (t.aud !== prop_('GOOGLE_CLIENT_ID')) return { ok: false, error: 'ข้อมูลเข้าสู่ระบบไม่ได้ออกให้ระบบนี้' };
+  if (['accounts.google.com', 'https://accounts.google.com'].indexOf(t.iss) < 0) return { ok: false, error: 'ผู้ออกข้อมูลไม่ถูกต้อง' };
+  if (String(t.email_verified) !== 'true') return { ok: false, error: 'อีเมลนี้ยังไม่ได้ยืนยันกับ Google' };
+  if (Number(t.exp) * 1000 < Date.now()) return { ok: false, error: 'ข้อมูลเข้าสู่ระบบหมดอายุ กรุณาลองใหม่' };
+
+  const email = String(t.email).toLowerCase(), domain = String(t.hd || email.split('@')[1] || '').toLowerCase();
+  const users = list_prop_('ALLOWED_USERS'), domains = list_prop_('ALLOWED_DOMAINS');
+  const inList = function (k) { return list_prop_(k).indexOf(email) >= 0; };
+  const owner = String(Session.getEffectiveUser().getEmail() || '').toLowerCase();
+  const allowed = users.indexOf(email) >= 0 || domains.indexOf(domain) >= 0 || email === owner || inList('ADMINS') || inList('REVIEWERS');
+  if (!allowed) return { ok: false, error: 'บัญชี ' + email + ' ยังไม่ได้รับสิทธิ์ใช้งาน — แจ้งผู้ดูแลระบบให้เพิ่มอีเมลนี้' };
+
+  const role = (inList('ADMINS') || email === owner) ? 'admin' : inList('REVIEWERS') ? 'reviewer' : 'maker';
+  const user = { username: email, name: t.name || email, email: email, type: 'google', org: t.hd || '', role: role, provider: 'google', picture: t.picture || '' };
   logLogin_(user);
   return { ok: true, user: user, session: sign_(user) };
 }

@@ -31,7 +31,35 @@
 
 > แก้โค้ด Apps Script ภายหลัง: **Deploy → Manage deployments → ✏️ → Version: New version → Deploy** (URL เดิมใช้ต่อได้)
 
-## 1.1) เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO) — แนะนำ
+## 1.1) เข้าสู่ระบบด้วย Google (Gmail / บัญชี @fte.kmutnb.ac.th) — เริ่มใช้ได้ทันที
+
+ไม่ต้องรอหน่วยงานอื่นอนุมัติ ใช้ได้ทั้งบัญชี Google Workspace ของคณะและ Gmail ส่วนตัว (ตามที่ผู้ดูแลอนุญาต)
+
+1. เข้า <https://console.cloud.google.com> → สร้างโปรเจกต์ใหม่ (เช่น `TOR Builder`)
+2. **APIs & Services → OAuth consent screen**
+   - User type: **External** (ถ้าจะให้ Gmail ส่วนตัวเข้าได้) หรือ **Internal** (เฉพาะบัญชีในองค์กรเดียวกับโปรเจกต์)
+   - ใส่ชื่อแอป อีเมลติดต่อ → บันทึก → กด **Publish app** (ขอแค่ชื่อ อีเมล รูปโปรไฟล์ จึงไม่ต้องให้ Google ตรวจแอป)
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID**
+   - Application type: **Web application**
+   - Authorized JavaScript origins: `https://kittinanp.github.io`
+   - กด Create แล้วคัดลอก **Client ID** (ลงท้าย `.apps.googleusercontent.com`) — ไม่ต้องใช้ Client secret
+4. Apps Script → ⚙️ Project Settings → **Script Properties**
+
+| Property | ค่า | |
+|---|---|---|
+| `GOOGLE_CLIENT_ID` | Client ID จากข้อ 3 | ✔ จำเป็น |
+| `ALLOWED_DOMAINS` | เช่น `fte.kmutnb.ac.th,email.kmutnb.ac.th` — ทุกบัญชีในโดเมนนี้เข้าได้ | |
+| `ALLOWED_USERS` | อีเมลรายบุคคล เช่น `someone@gmail.com` คั่นด้วย `,` | |
+| `REVIEWERS` | อีเมลนักวิชาการพัสดุ (ได้สิทธิ์ผู้ตรวจสอบ) | แนะนำ |
+| `ADMINS` | อีเมลผู้ดูแลระบบ | |
+
+> ถ้าไม่ใส่ `ALLOWED_DOMAINS` และ `ALLOWED_USERS` จะเข้าได้เฉพาะเจ้าของสคริปต์และรายชื่อใน `ADMINS` / `REVIEWERS` (ปลอดภัยไว้ก่อน)
+
+5. Deploy เวอร์ชันใหม่ → นำ Web app URL ใส่ `driveUrl` ใน [`config.js`](config.js) — หน้าเว็บจะแสดงปุ่ม **เข้าสู่ระบบด้วย Google**
+
+เปิดได้พร้อมกันกับ ICIT Account ด้านล่าง หน้าเข้าสู่ระบบจะแสดงทั้งสองปุ่ม
+
+## 1.2) เข้าสู่ระบบด้วย ICIT Account (KMUTNB SSO)
 
 เมื่อเปิด SSO ผู้ใช้ต้องเข้าสู่ระบบด้วยบัญชี ICIT ของมหาวิทยาลัย ไม่ต้องใช้รหัสทีม และประวัติการแก้ไขจะเป็นชื่อจริงจากบัญชี
 
