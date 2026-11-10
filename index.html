@@ -455,6 +455,12 @@ textarea{resize:vertical;min-height:40px;line-height:1.5}
 .gOr{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:14px 0}
 .gOr::before,.gOr::after{content:'';flex:1;height:1px;background:var(--line)}
 
+.aiRefBox{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin:2px 0 10px;background:var(--panel-2)}
+.aiRefBox summary{cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink-2)}
+.aiRefBox[open] summary{margin-bottom:8px}
+.aiCond{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.aiCond span{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--ink-2)}
+
 /* ================= dialogs / toast ================= */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;transition:.25s;pointer-events:none;z-index:80;box-shadow:var(--shadow-lg);display:flex;gap:8px;align-items:center}
 .toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
@@ -645,7 +651,7 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
           <div class="hero">
             <div class="plus"><svg><use href="#i-plus"/></svg></div>
             <div class="grow"><h2>สร้าง TOR ใหม่</h2><p>เลือกประเภทงาน ระบบจะเตรียมหัวข้อและเงื่อนไขมาตรฐานให้ทันที</p></div>
-            <button class="btn ai aiOnly" id="heroAI" hidden><svg><use href="#i-spark"/></svg>ร่างด้วย AI</button>
+            <button class="btn ai" id="heroAI"><svg><use href="#i-spark"/></svg>ร่าง TOR ด้วย AI</button>
             <a class="btn gold" href="#/library"><svg><use href="#i-grid"/></svg>ดูคลังแม่แบบทั้งหมด</a>
           </div>
           <div class="create" id="createGrid"></div>
@@ -756,7 +762,7 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
               <div class="row" style="margin-top:12px">
                 <button class="btn sm" id="addItem"><svg><use href="#i-plus"/></svg>รายการหลัก</button>
                 <button class="btn sm" id="addGroup" title="หัวข้อจัดกลุ่ม ไม่มีเลขลำดับ เช่น 'สำหรับห้องเครือข่าย อาคาร 52'"><svg><use href="#i-plus"/></svg>หัวข้อกลุ่ม</button>
-                <button class="btn sm ai aiOnly" id="btnAIDraft" hidden><svg><use href="#i-spark"/></svg>AI ช่วยร่าง</button>
+                <button class="btn sm ai" id="btnAIDraft"><svg><use href="#i-spark"/></svg>ร่างด้วย AI</button>
                 <button class="btn sm" id="btnPaste" title="วางข้อความที่มีเลขข้อ 1. 1.1 1) ระบบจะแยกลำดับให้"><svg><use href="#i-clip"/></svg>วางจากข้อความ</button>
               </div>
               <div class="row" style="margin-top:14px">
@@ -885,20 +891,26 @@ dialog::backdrop{background:rgba(8,15,35,.5);backdrop-filter:blur(3px)}
 </dialog>
 
 <dialog id="dlgAI" style="width:min(760px,calc(100vw - 32px))">
-  <div class="dlgHead"><div class="di" style="background:linear-gradient(135deg,#7353f5,#2f7cf6);color:#fff"><svg><use href="#i-spark"/></svg></div><h2>AI ช่วยร่างรายละเอียด</h2><button class="btn sm ghost" data-close>ปิด</button></div>
+  <div class="dlgHead"><div class="di" style="background:linear-gradient(135deg,#7353f5,#2f7cf6);color:#fff"><svg><use href="#i-spark"/></svg></div><h2>ร่าง TOR ด้วย AI</h2><button class="btn sm ghost" data-close>ปิด</button></div>
   <div class="dlgBody">
     <div class="row">
       <div class="field"><label for="aiType">ประเภท</label><select id="aiType"><option value="buy">ซื้อ — คุณลักษณะเฉพาะของพัสดุ</option><option value="hire">จ้าง — รายละเอียดงานจ้าง</option></select></div>
       <div class="field"><label for="aiLevel">ความละเอียด</label><select id="aiLevel"><option value="short">กระชับ</option><option value="normal" selected>ปกติ</option><option value="detail">ละเอียด</option></select></div>
     </div>
     <div class="field"><label for="aiDesc">อธิบายสิ่งที่ต้องการ</label><textarea id="aiDesc" rows="3" placeholder="เช่น เครื่องปรับอากาศ 2 เครื่อง ขนาด 30,000 และ 60,000 BTU พร้อมติดตั้ง ห้องสมาคมศิษย์เก่า / จ้างซ่อมกระเบื้องพื้นทางเดินอาคาร 44 ประมาณ 30 ตร.ม."></textarea></div>
+    <div class="field"><label for="aiPlace">สถานที่ / ใช้สำหรับ <span class="hint">(ไม่บังคับ)</span></label><input type="text" id="aiPlace" placeholder="เช่น ห้อง 52-205 อาคารคณะครุศาสตร์อุตสาหกรรม"></div>
+    <details class="aiRefBox"><summary>แนบข้อมูลอ้างอิง <span class="hint">— ใบเสนอราคา สเปกจากผู้ขาย หรือ TOR เดิม (ไม่บังคับ)</span></summary>
+      <textarea id="aiRef" rows="6" placeholder="วางข้อความจากใบเสนอราคา / แคตตาล็อก / TOR ปีก่อน — AI จะดึงสเปกที่จำเป็น ตัดยี่ห้อ รุ่น ออก และเขียนใหม่เป็น “ไม่น้อยกว่า / หรือดีกว่า”"></textarea>
+      <label class="upload" style="margin-top:8px;padding:10px"><svg><use href="#i-upload"/></svg>หรือเลือกไฟล์ข้อความ (.txt, .csv)<input type="file" id="aiRefFile" accept=".txt,.csv,.md,text/plain" hidden></label>
+    </details>
+    <label class="check"><input type="checkbox" id="aiWithCond" checked>ให้ AI เสนอเงื่อนไข (ส่งมอบ ยืนราคา รับประกัน) ให้เหมาะกับงาน</label>
     <button class="btn ai" id="aiGo"><svg><use href="#i-spark"/></svg>ร่างด้วย AI</button>
     <div id="aiResult" style="margin-top:14px"></div>
   </div>
   <div class="dlgFoot">
     <label class="check" style="margin:0 auto 0 0"><input type="checkbox" id="aiReplace">แทนที่รายการเดิม</label>
     <button class="btn" data-close>ยกเลิก</button>
-    <button class="btn primary" id="aiApply" disabled>ใช้รายการนี้</button>
+    <button class="btn primary" id="aiApply" disabled>ใช้ร่างนี้</button>
   </div>
 </dialog>
 
@@ -2525,26 +2537,42 @@ const AI_SYSTEM = `คุณคือผู้เชี่ยวชาญกา�
 
 /* ---------- 1) AI ช่วยร่างรายละเอียด ---------- */
 let aiDraft = null;
+let aiSetupThenDraft = false;
 function openAIDraft(){
-  if (!aiOn()){ toast('ยังไม่ได้ตั้งค่า AI — ไปที่ ตั้งค่า → AI ผู้ช่วย'); $('#navSettings').click(); return; }
+  if (!aiOn()){
+    aiSetupThenDraft = true;
+    if ((settings.aiMode || 'off') === 'off'){ settings.aiMode = cloudOn() ? 'drive' : 'direct'; settings.aiProvider = settings.aiProvider || 'openrouter'; store.set(K_SET, settings); }
+    $('#navSettings').click();
+    setTimeout(() => {
+      $('#aiMode').closest('.driveBox').scrollIntoView({block:'center'});
+      renderAISettings('ตั้งค่า AI ครั้งแรก: ' + (settings.aiMode === 'drive' ? 'กด “โหลดรายชื่อ” เลือกโมเดล แล้วกด “ทดสอบ AI”' : 'ใส่ API key (เช่น จาก openrouter.ai/keys) เลือกโมเดล แล้วกด “ทดสอบ AI”') + ' — ผ่านแล้วจะพาไปหน้าร่างทันที', true);
+      (settings.aiMode === 'direct' && !settings.aiKey ? $('#aiKey') : $('#aiModel')).focus();
+    }, 80);
+    return;
+  }
   $('#aiType').value = doc.type;
-  $('#aiDesc').value = $('#aiDesc').value || [doc.name, doc.qty && doc.unit ? `จำนวน ${doc.qty} ${doc.unit}` : '', doc.place].filter(Boolean).join(' ');
+  $('#aiPlace').value = doc.place || '';
+  $('#aiDesc').value = $('#aiDesc').value || [doc.name, doc.qty && doc.unit ? `จำนวน ${doc.qty} ${doc.unit}` : ''].filter(Boolean).join(' ');
   $('#aiResult').innerHTML = ''; $('#aiApply').disabled = true; aiDraft = null;
   $('#dlgAI').showModal(); $('#aiDesc').focus();
 }
 $('#aiGo').onclick = async () => {
   const desc = $('#aiDesc').value.trim(); if (!desc){ $('#aiDesc').focus(); return; }
-  const type = $('#aiType').value, level = $('#aiLevel').value;
+  const type = $('#aiType').value, level = $('#aiLevel').value, place = $('#aiPlace').value.trim();
+  const ref = $('#aiRef').value.trim().slice(0, 12000), withCond = $('#aiWithCond').checked;
+  const refBlock = ref ? '\nข้อมูลอ้างอิง (จากใบเสนอราคา/สเปกผู้ขาย/TOR เดิม — ใช้เป็นแนวทางเท่านั้น ห้ามคัดลอกยี่ห้อ รุ่น หรือรหัสสินค้า ให้แปลงเป็นคุณลักษณะกลางที่ผู้ขายหลายรายเสนอได้):\n-----\n' + ref + '\n-----' : '';
+  const condJson = withCond ? '"conditions":{"delivery_days":15,"validity_days":30,"warranty_n":1,"warranty_unit":"ปี หรือ เดือน","detailed_warranty":false},' : '';
+  const condHint = withCond ? '\nเงื่อนไขให้เลือกตัวเลขที่เหมาะกับลักษณะงานจริง (เช่น งานซ่อมเล็ก ส่งมอบ 15 วัน รับประกัน 3 เดือน; ครุภัณฑ์พร้อมติดตั้ง 30–60 วัน รับประกัน 1 ปี)' : '';
   const btn = $('#aiGo'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>AI กำลังร่าง…';
   $('#aiResult').innerHTML = '<div class="aiWait"><span class="spin"></span>กำลังร่างรายละเอียด อาจใช้เวลา 10–40 วินาที</div>';
   try {
     const content = await aiChat([
       {role:'system', content:AI_SYSTEM},
       {role:'user', content:`ประเภท: ${type === 'buy' ? 'งานซื้อ (รายละเอียดคุณลักษณะเฉพาะของพัสดุ)' : 'งานจ้าง (รายละเอียดงานจ้าง)'}
-ความต้องการ: ${desc}
-ระดับรายละเอียด: ${{short:'กระชับ 3–5 ข้อย่อยต่อรายการ', normal:'ปกติ 5–8 ข้อย่อยต่อรายการ', detail:'ละเอียด มีข้อย่อยระดับ 3 ได้'}[level]}
+ความต้องการ: ${desc}${place ? '\nสถานที่: ' + place : ''}
+ระดับรายละเอียด: ${{short:'กระชับ 3–5 ข้อย่อยต่อรายการ', normal:'ปกติ 5–8 ข้อย่อยต่อรายการ', detail:'ละเอียด มีข้อย่อยระดับ 3 ได้'}[level]}${refBlock}
 ตอบ JSON รูปแบบ:
-{"name":"ชื่อรายการ/ชื่องานที่เหมาะสม","qty":"จำนวนรวม","unit":"หน่วย","items":[{"text":"รายการหลัก","qty":"จำนวน (งานซื้อ)","unit":"หน่วย","tech":true,"children":[{"text":"ข้อย่อย","children":[{"text":"ข้อย่อยระดับ 3 (ถ้ามี)"}]}]}],"extras":["เงื่อนไขเพิ่มเติมที่ควรมี เช่น การติดตั้ง การรับประกัน"],"notes":"สิ่งที่ผู้จัดทำควรตรวจสอบ"}`}
+{"name":"ชื่อรายการ/ชื่องานที่เหมาะสม (ไม่ต้องขึ้นต้นด้วย รายละเอียด/จ้าง/ซื้อ)","qty":"จำนวนรวม","unit":"หน่วย","items":[{"text":"รายการหลัก","qty":"จำนวน (งานซื้อ)","unit":"หน่วย","tech":true,"children":[{"text":"ข้อย่อย","children":[{"text":"ข้อย่อยระดับ 3 (ถ้ามี)"}]}]}],${condJson}"extras":["เงื่อนไขเพิ่มเติมที่ควรมี เช่น การติดตั้ง การทดสอบ"],"notes":"สิ่งที่ผู้จัดทำควรตรวจสอบ"}${condHint}`}
     ], {temperature:0.3});
     aiDraft = parseAIJson(content);
     if (!Array.isArray(aiDraft.items) || !aiDraft.items.length) throw new Error('AI ไม่ได้ส่งรายการกลับมา');
@@ -2558,6 +2586,7 @@ function renderAIDraft(){
     ${(it.children || []).length ? `<ul>${it.children.map((c, j) => `<li>${i+1}.${j+1} ${esc(stripNum(c.text))}${(c.children || []).length ? `<ul>${c.children.map((g, k) => `<li>${lv3(`${i+1}.${j+1}`, k+1)} ${esc(stripNum(g.text))}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ul>` : ''}</li>`).join('');
   const ex = (d.extras || []).filter(Boolean);
   $('#aiResult').innerHTML = `<div class="aiOut"><div class="aiHead">${svg('spark')}<b>${esc(d.name || 'ผลการร่าง')}</b>${d.qty ? `<span class="q">จำนวน ${esc(d.qty)} ${esc(d.unit || '')}</span>` : ''}</div><ol class="aiTree">${list}</ol>
+    ${d.conditions && $('#aiWithCond').checked ? `<div class="aiCond"><span>ส่งมอบ ${esc(d.conditions.delivery_days ?? '-')} วัน</span><span>ยืนราคา ${esc(d.conditions.validity_days ?? '-')} วัน</span><span>รับประกัน ${esc(d.conditions.warranty_n ?? '-')} ${esc(d.conditions.warranty_unit || '')}</span></div>` : ''}
     ${ex.length ? `<div class="lbl" style="margin-top:10px">เงื่อนไขเพิ่มเติมที่ AI แนะนำ</div>${ex.map((x, i) => `<label class="check"><input type="checkbox" data-aix="${i}" checked>${esc(x)}</label>`).join('')}` : ''}
     ${d.notes ? `<div class="aiNote">${svg('alert')}<span><b>ควรตรวจสอบ:</b> ${esc(d.notes)}</span></div>` : ''}</div>`;
   $('#aiApply').disabled = false;
@@ -2577,9 +2606,19 @@ $('#aiApply').onclick = () => {
   if ((!doc.name.trim() || isEmpty) && aiDraft.name) doc.name = aiDraft.name;
   if (isEmpty && aiDraft.qty){ doc.qty = String(aiDraft.qty); doc.unit = aiDraft.unit || doc.unit; }
   document.querySelectorAll('[data-aix]').forEach(c => { if (c.checked){ const t = aiDraft.extras[+c.dataset.aix]; if (t && !doc.cond.extras.includes(t)) doc.cond.extras.push(t); } });
-  logEvent('add', 'AI ช่วยร่างรายละเอียด ' + items.length + ' รายการ', {ai:true});
+  if ($('#aiPlace').value.trim()) doc.place = $('#aiPlace').value.trim();
+  const k = aiDraft.conditions;
+  if (k && $('#aiWithCond').checked){
+    const int = (v, lo, hi) => { const n = parseInt(v, 10); return n >= lo && n <= hi ? n : null; };
+    const dd = int(k.delivery_days, 1, 720), vd = int(k.validity_days, 1, 365), wn = int(k.warranty_n, 1, 120);
+    if (dd){ doc.cond.delivery.on = true; doc.cond.delivery.days = dd; }
+    if (vd){ doc.cond.validity.on = true; doc.cond.validity.days = vd; }
+    if (wn){ doc.cond.warranty.on = true; doc.cond.warranty.n = wn; doc.cond.warranty.unit = /เดือน/.test(k.warranty_unit) ? 'เดือน' : /วัน/.test(k.warranty_unit) ? 'วัน' : 'ปี'; }
+    if (k.detailed_warranty === true) doc.cond.warranty.detailed = true;
+  }
+  logEvent('add', 'ร่าง TOR ด้วย AI ' + items.length + ' รายการ' + ($('#aiRef').value.trim() ? ' (มีข้อมูลอ้างอิง)' : ''), {ai:true});
   $('#dlgAI').close(); afterModelChange();
-  toast('ใส่รายละเอียดจาก AI แล้ว — โปรดตรวจทานทุกข้อ');
+  toast('ใส่ร่างจาก AI แล้ว — โปรดตรวจทานทุกข้อ และเปิดแผง “ตรวจทาน → ระเบียบ” เพื่อตรวจซ้ำ');
 };
 
 /* ---------- 2) AI ปรับภาษารายข้อ ---------- */
@@ -2721,8 +2760,15 @@ $('#aiTest').onclick = async () => {
   try {
     const t = await aiChat([{role:'user', content:'ตอบคำว่า "พร้อมใช้งาน" เป็นภาษาไทยคำเดียว'}], {max_tokens:20});
     renderAISettings('AI ตอบกลับ: ' + String(t).trim().slice(0, 60), true);
+    if (aiSetupThenDraft && aiOn() && doc && !$('#viewEditor').hidden){ aiSetupThenDraft = false; setTimeout(() => { $('#dlgSettings').close(); toast('ตั้งค่า AI สำเร็จ'); openAIDraft(); }, 700); }
   } catch(e){ renderAISettings(e.message, false); }
   b.disabled = false; b.textContent = 'ทดสอบ AI';
+};
+$('#aiRefFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const t = await f.text(); $('#aiRef').value = ($('#aiRef').value ? $('#aiRef').value + '\n' : '') + t.slice(0, 12000); toast('แนบข้อความจาก ' + f.name + ' แล้ว'); }
+  catch(err){ toast('อ่านไฟล์ไม่ได้'); }
+  e.target.value = '';
 };
 function applyAIVisibility(){
   const on = aiOn();
